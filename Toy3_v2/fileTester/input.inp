@@ -1,0 +1,5 @@
+program
+
+begin
+somma = false : bool;
+end

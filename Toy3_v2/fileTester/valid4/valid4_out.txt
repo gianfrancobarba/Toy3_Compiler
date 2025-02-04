@@ -1,0 +1,15 @@
+Questo programma permette di svolgere una serie di moltiplicazioni
+sommand i risultati < 100 in sommagrande e quelli < 100 in sommapiccola
+Quante moltiplicazioni vuoi svolgere? (inserire intero > 0)
+ciao
+Moltiplicazione 2: inserisci due numeri positivi
+byebye
+40
+il risultato è piccolo
+Moltiplicazione 1: inserisci due numeri positivi
+byebye
+4000
+il risultato è grande
+
+sommagrande è 4000
+sommapiccola è 40
