@@ -1,16 +1,13 @@
 package main.nodes.expr;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-import main.visitor.ASTVisitor;
-
-public class UnaryExprOp extends ExprOp {
+public class UnaryExprOp extends Node implements ExprOp {
 
     private ExprOp expr;
     private String op;
 
     public UnaryExprOp(String op, ExprOp expr) {
-        super("UnaryOp: " + op);
-        super.add(expr);
-
         this.expr=expr;
         this.op=op;
     }
@@ -34,7 +31,7 @@ public class UnaryExprOp extends ExprOp {
     public String toString() {return super.toString();}
 
     @Override
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

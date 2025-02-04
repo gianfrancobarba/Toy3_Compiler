@@ -1,14 +1,14 @@
 package main.nodes.common;
 
 import main.nodes.expr.ExprOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-public class Identifier extends ExprOp {
+public class Identifier extends Node implements ExprOp {
 
     private String lessema;
 
     public Identifier(String lessema){
-        super("ID: " + lessema);
         this.lessema = lessema;
     }
 
@@ -18,7 +18,7 @@ public class Identifier extends ExprOp {
 
     public String toString() {return super.toString();}
 
-     public void accept(ASTVisitor visitor) {
+     public void accept(Visitor visitor) {
             visitor.visit(this);
      }
 }

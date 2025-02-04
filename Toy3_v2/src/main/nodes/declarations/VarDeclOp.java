@@ -1,31 +1,17 @@
 package main.nodes.declarations;
-import main.visitor.ASTVisitor;
-import main.nodes.expr.ExprOp;
-import main.nodes.types.TypeOp;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import main.visitor.Visitor;
+import main.visitor.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VarDeclOp extends DefaultMutableTreeNode {
+public class VarDeclOp extends Node {
     private List<VarOptInitOp> listVarOptInit;
     private Object typeOrConstant;
 
     public VarDeclOp(List<VarOptInitOp> listVarOptInit, Object typeOrConstant) {
-
-        super("VarDeclOp");
-
         this.listVarOptInit = new ArrayList<>(listVarOptInit);
         this.typeOrConstant = typeOrConstant;
-
-        for (VarOptInitOp varOptInit : this.listVarOptInit) {
-            super.add(varOptInit);
-        }
-        if (typeOrConstant instanceof TypeOp) {
-            super.add((TypeOp) typeOrConstant);
-        } else if (typeOrConstant instanceof ExprOp) {
-            super.add((ExprOp) typeOrConstant);
-        }
     }
 
     public List<VarOptInitOp> getListVarOptInit() {
@@ -39,7 +25,6 @@ public class VarDeclOp extends DefaultMutableTreeNode {
     public void addVarOptInit(VarOptInitOp varOptInit) {
         if (varOptInit != null) {
             listVarOptInit.add(varOptInit);
-            super.add(varOptInit);
         }
     }
 
@@ -48,7 +33,7 @@ public class VarDeclOp extends DefaultMutableTreeNode {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

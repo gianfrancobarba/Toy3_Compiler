@@ -22,7 +22,7 @@ Whitespace = {LineTerminator} | [ \t\f] // spazi, tabulazioni, a capo
 
 // Numeri
 INT_CONST    = \d+ // interi positivi o negativi
-DOUBLE_CONST = (\d.\d+|\d+.\d)([eE][+-]?\d+)? // numeri in virgola mobile con o senza esponente (es. 1.0, 1.0e-1)
+DOUBLE_CONST = (\d*\.\d+|\d+\.\d*)([eE][+-]?\d+)? // numeri in virgola mobile con o senza esponente (es. 1.0, 1.0e-1)
 
 // Escape
 ESCAPE_SEQUENCE = \\[bfnrt'\\] // Escape validi

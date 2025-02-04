@@ -1,5 +1,5 @@
 program
 
 begin
-somma = false : bool;
+i = 3+1 : int;
 end

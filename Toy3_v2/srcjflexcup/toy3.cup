@@ -16,7 +16,7 @@ import main.nodes.expr.ExprOp;
 import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.UnaryExprOp;
 import main.nodes.expr.FunCallOp;
-import main.nodes.expr.ExprListOp;
+import main.nodes.expr.ExprOpListOp;
 
 import main.nodes.common.Identifier;
 
@@ -30,7 +30,6 @@ import main.nodes.statements.WhileOp;
 import main.nodes.statements.ReturnOp;
 import main.nodes.statements.AssignOp;
 import main.nodes.statements.BodyOp;
-import main.nodes.statements.FunCallOpStat;
 
 import main.nodes.types.TypeOp;
 import main.nodes.types.ConstOp;
@@ -195,7 +194,7 @@ Stat ::= Vars:v IN SEMI                                {: RESULT = new ReadOp((L
          :}
        | FunCall:call SEMI
          {:
-                RESULT = new FunCallOpStat((FunCallOp) call);
+                RESULT = call;
                 exprList.clear();
          :}
        | IF LPAR Expr:e RPAR THEN Body:b1 ELSE Body:b2 {: RESULT = new IfThenElseOp((ExprOp) e,(BodyOp) b1,(BodyOp) b2); :}

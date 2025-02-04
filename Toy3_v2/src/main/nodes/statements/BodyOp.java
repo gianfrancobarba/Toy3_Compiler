@@ -1,30 +1,19 @@
 package main.nodes.statements;
 
 import main.nodes.declarations.VarDeclOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BodyOp extends DefaultMutableTreeNode {
+public class BodyOp extends Node {
     private List<VarDeclOp> varDecls;
     private List<StatementOp> listStatement;
 
     public BodyOp(List<VarDeclOp> varDecls, List<StatementOp> listStatement) {
-
-        super("BodyOp");
-
         this.varDecls = new ArrayList<>(varDecls);
         this.listStatement = new ArrayList<>(listStatement);
-
-        for (VarDeclOp var : this.varDecls) {
-            super.add(var);
-        }
-
-        for (StatementOp stmt : this.listStatement) {
-            super.add(stmt);
-        }
     }
 
     public BodyOp() {
@@ -42,7 +31,6 @@ public class BodyOp extends DefaultMutableTreeNode {
     public void addVarDecl(VarDeclOp var) {
         if (var != null) {
             varDecls.add(var);
-            super.add(var);
         }
     }
 
@@ -57,7 +45,6 @@ public class BodyOp extends DefaultMutableTreeNode {
     public void addStatement(StatementOp statement) {
         if (statement != null) {
             listStatement.add(statement);
-            super.add(statement);
         }
     }
 
@@ -73,7 +60,7 @@ public class BodyOp extends DefaultMutableTreeNode {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

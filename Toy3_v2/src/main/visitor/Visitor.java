@@ -9,19 +9,17 @@ import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.nodes.types.TypeOp;
 
-public interface ASTVisitor {
+public interface Visitor {
 
-    void visit(TypeOp node);
+    void visit(TypeOp typeOp);
 
-    void visit(UnaryExprOp node);
+    void visit(UnaryExprOp unaryExprOp);
 
-    void visit(Identifier node);
+    void visit(Identifier identifier);
 
-    void visit(BinaryExprOp node);
+    void visit(BinaryExprOp binaryExprOp);
 
     void visit(ConstOp constantOp);
-
-    void visit(ExprListOp exprListOp);
 
     void visit(VarDeclOp varDeclOp);
 
@@ -36,8 +34,6 @@ public interface ASTVisitor {
     void visit(FunCallOp funCallOp);
 
     void visit(ProgramOp programOp);
-
-    void visit(FunCallOpStat funCallOpStat);
 
     void visit(ReturnOp returnOp);
 

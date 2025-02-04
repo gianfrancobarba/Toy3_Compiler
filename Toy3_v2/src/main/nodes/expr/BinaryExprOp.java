@@ -1,17 +1,14 @@
 package main.nodes.expr;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-public class BinaryExprOp extends ExprOp {
+public class BinaryExprOp extends Node implements ExprOp {
 
     private ExprOp left;
     private ExprOp right;
     private String op;
 
     public BinaryExprOp(ExprOp left, String op, ExprOp right) {
-        super("BinaryOp: " + op); // Inizializza il nodo con il nome dell'operatore
-        super.add(left); // Aggiunge left come figlio di op
-        super.add(right); // Aggiunge right come figlio di op
-
         this.left=left;
         this.right=right;
         this.op=op;
@@ -44,7 +41,7 @@ public class BinaryExprOp extends ExprOp {
     public String toString() {return super.toString();}
 
     @Override
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

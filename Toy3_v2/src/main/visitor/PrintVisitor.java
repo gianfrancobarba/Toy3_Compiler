@@ -9,7 +9,7 @@ import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.nodes.types.TypeOp;
 
-public class PrintVisitor implements ASTVisitor {
+public class PrintVisitor implements Visitor {
 
     private int indentLevel = 0;  // Per gestire l'indentazione
 
@@ -21,53 +21,41 @@ public class PrintVisitor implements ASTVisitor {
     }
 
     @Override
-    public void visit(TypeOp node) {
+    public void visit(TypeOp typeOp) {
         printIndent();
-        System.out.println("TypeOp: " + node.getTypeName());
+        System.out.println("TypeOp: " + typeOp.getTypeName());
     }
 
     @Override
-    public void visit(UnaryExprOp node) {
+    public void visit(UnaryExprOp unaryExprOp) {
         printIndent();
-        System.out.println("UnaryOp (" + node.getOp() + "):");
+        System.out.println("UnaryOp (" + unaryExprOp.getOp() + "):");
         indentLevel++;
-        node.getExpr().accept(this);
+        unaryExprOp.getExpr().accept(this);
         indentLevel--;
     }
 
     @Override
     public void visit(Identifier node) {
         printIndent();
-        System.out.println("ID: " + node.getLessema());
+        System.out.println("id: " + node.getLessema());
     }
 
     @Override
-    public void visit(BinaryExprOp node) {
+    public void visit(BinaryExprOp binaryExprOp) {
         printIndent();
-        System.out.println("BinaryOp (" + node.getOp() + "):");
+        System.out.println("BinaryOp (" + binaryExprOp.getOp() + "):");
         indentLevel++;
-        node.getLeft().accept(this);
-        node.getRight().accept(this);
+        binaryExprOp.getLeft().accept(this);
+        binaryExprOp.getRight().accept(this);
         indentLevel--;
+
     }
 
     @Override
     public void visit(ConstOp constOp) {
         printIndent();
-        System.out.println("Const: " + constOp.getConstantType());
-    }
-
-    @Override
-    public void visit(ExprListOp exprListOp) {
-        printIndent();
-        System.out.println("ExprListOp:");
-        indentLevel++;
-
-        for (ExprOp expr : exprListOp.getExprList()) {
-            expr.accept(this);
-        }
-
-        indentLevel--;
+        System.out.println("const: " + constOp.getValue());
     }
 
     @Override
@@ -112,7 +100,7 @@ public class PrintVisitor implements ASTVisitor {
     public void visit(FunDeclOp funDeclOp) {
 
         printIndent();
-        System.out.println("FunDeclOp: ");
+        System.out.println("DefDeclOp: ");
 
         indentLevel++;
 
@@ -180,22 +168,6 @@ public class PrintVisitor implements ASTVisitor {
     }
 
     @Override
-    public void visit(FunCallOpStat funCallOpStat) {
-        printIndent();
-        System.out.println("FunCallOp: ");
-
-        indentLevel++;
-
-        funCallOpStat.getId().accept(this);
-
-        for(ExprOp expr : funCallOpStat.getExprList()) {
-            expr.accept(this);
-        }
-
-        indentLevel--;
-    }
-
-    @Override
     public void visit(ReturnOp returnOp) {
         printIndent();
         System.out.println("ReturnOp: ");
@@ -227,7 +199,7 @@ public class PrintVisitor implements ASTVisitor {
 
     @Override
     public void visit(ParDeclOp parDeclOp) {
-
+        String ref_temp = "";
         printIndent();
         System.out.println("ParDeclOp: ");
 
@@ -235,6 +207,8 @@ public class PrintVisitor implements ASTVisitor {
 
         if(parDeclOp.getPVars() != null)
             for (PVarOp pVarOp : parDeclOp.getPVars()) {
+                if(pVarOp.isRef())
+                    ref_temp = "ref";
                 pVarOp.accept(this);
             }
 
@@ -242,6 +216,7 @@ public class PrintVisitor implements ASTVisitor {
             parDeclOp.getType().accept(this);
         }
 
+        System.out.println("Type: " + ref_temp + parDeclOp.getType());
         indentLevel--;
 
     }
@@ -301,7 +276,6 @@ public class PrintVisitor implements ASTVisitor {
 
     @Override
     public void visit(PVarOp pVarOp) {
-
         printIndent();
         System.out.println("PVarOp: ");
 

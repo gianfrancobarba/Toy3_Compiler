@@ -2,27 +2,17 @@ package main.nodes.declarations;
 
 import main.nodes.common.Identifier;
 import main.nodes.expr.ExprOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
-public class VarOptInitOp extends DefaultMutableTreeNode {
+public class VarOptInitOp extends Node {
 
     private Identifier id;
     private ExprOp exprOp;
 
     public VarOptInitOp(Identifier id, ExprOp exprOp) {
-
-        super("VarOptInitOp");
-
         this.id = id;
         this.exprOp = exprOp;
-
-        super.add(id);
-
-        if(exprOp != null) {
-            super.add(exprOp);
-        }
     }
 
     public Identifier getId() {
@@ -46,7 +36,7 @@ public class VarOptInitOp extends DefaultMutableTreeNode {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

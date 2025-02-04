@@ -1,17 +1,15 @@
 package main.nodes.types;
 
 import main.nodes.expr.ExprOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
-public class ConstOp extends ExprOp {
+public class ConstOp extends Node implements ExprOp {
 
     private Object value;
     private String[] typeConst = {"int", "double", "char", "string", "bool"};
 
     public ConstOp(Object value){
-        super("Const: "+ value.toString());
         this.value = value;
     }
 
@@ -40,7 +38,7 @@ public class ConstOp extends ExprOp {
     public String toString() {return super.toString();}
 
     @Override
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

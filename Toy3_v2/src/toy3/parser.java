@@ -5,7 +5,6 @@
 
 package toy3;
 
-import java_cup.runtime.*;
 import java.util.*;
 import main.nodes.program.ProgramOp;
 import main.nodes.program.BeginEndOp;
@@ -18,7 +17,6 @@ import main.nodes.expr.ExprOp;
 import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.UnaryExprOp;
 import main.nodes.expr.FunCallOp;
-import main.nodes.expr.ExprListOp;
 import main.nodes.common.Identifier;
 import main.nodes.statements.StatementOp;
 import main.nodes.statements.ReadOp;
@@ -28,12 +26,9 @@ import main.nodes.statements.IfThenElseOp;
 import main.nodes.statements.IfThenOp;
 import main.nodes.statements.WhileOp;
 import main.nodes.statements.ReturnOp;
-import main.nodes.statements.AssignOp;
 import main.nodes.statements.BodyOp;
-import main.nodes.statements.FunCallOpStat;
 import main.nodes.types.TypeOp;
 import main.nodes.types.ConstOp;
-import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
   */
@@ -895,7 +890,7 @@ class CUP$parser$actions {
 		int callright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object call = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
 		
-                RESULT = new FunCallOpStat((FunCallOp) call);
+                RESULT = call;
                 exprList.clear();
          
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Stat",16, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);

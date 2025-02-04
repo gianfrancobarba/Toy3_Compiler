@@ -1,14 +1,13 @@
 package main.nodes.types;
 
-import main.visitor.ASTVisitor;
-import javax.swing.tree.DefaultMutableTreeNode;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-public class TypeOp extends DefaultMutableTreeNode {
+public class TypeOp extends Node {
     private String typeName;  // Nome del tipo (int, bool, double, etc.)
 
     public TypeOp(String typeName)
     {
-        super("Type: "+ typeName); // Inizializza il nodo AST con il nome del tipo
         this.typeName = typeName;
     }
 
@@ -24,7 +23,7 @@ public class TypeOp extends DefaultMutableTreeNode {
         return this.typeName.equals(other.typeName);
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 

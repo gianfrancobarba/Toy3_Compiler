@@ -1,29 +1,23 @@
-package main.test;
+package main.java;
 
 import main.nodes.program.ProgramOp;
-import main.visitor.PrintVisitor;
+import main.visitor.*;
 import toy3.Lexer;
+import toy3.parser;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;
-import toy3.parser;
 
-
-public class TestVisitor {
-
+public class Main {
     public static void main(String[] args) {
-        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid4/valid4.txt"))) {
+        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid1/valid1.txt"))) {
             Lexer lexer = new Lexer(fileReader);
             parser p = new parser(lexer);
             try {
                 // Esegui il parsing per costruire l'AST
                 ProgramOp ast = (ProgramOp) p.parse().value;
-
-                if(ast == null) {
-                    System.out.println("AST is null");
-                    return;
-                }
 
                 // Applica il Visitor all'AST
                 System.out.println("** Stampa dell'AST **");
@@ -50,3 +44,4 @@ public class TestVisitor {
         }
     }
 }
+

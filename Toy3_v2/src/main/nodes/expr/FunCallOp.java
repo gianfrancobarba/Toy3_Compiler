@@ -1,20 +1,19 @@
 package main.nodes.expr;
 
 import main.nodes.common.Identifier;
-import main.visitor.ASTVisitor;
+import main.nodes.statements.StatementOp;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunCallOp extends ExprOp{
+public class FunCallOp extends Node implements ExprOp, StatementOp {
 
     private Identifier id;
     private List<ExprOp> exprList; // argomenti della funzione
 
     public FunCallOp(Identifier id, List<ExprOp> exprList){
-
-        super("FunCallOp");
-
         this.id = id;
 
         // Controllo null su exprList
@@ -22,12 +21,6 @@ public class FunCallOp extends ExprOp{
             this.exprList = new ArrayList<>(); // Lista vuota per evitare il NullPointerException
         } else {
             this.exprList = new ArrayList<>(exprList);
-        }
-
-        super.add(id);
-
-        for (ExprOp par : this.exprList) { // Ora siamo sicuri che exprList non sia null
-            super.add(par);
         }
     }
 
@@ -44,7 +37,7 @@ public class FunCallOp extends ExprOp{
         return exprList;
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 

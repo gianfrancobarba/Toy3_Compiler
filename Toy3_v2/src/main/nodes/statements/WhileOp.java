@@ -1,25 +1,16 @@
 package main.nodes.statements;
 
 import main.nodes.expr.ExprOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-public class WhileOp extends StatementOp {
+public class WhileOp extends Node implements StatementOp {
     private ExprOp condition;
     private BodyOp body;
 
     public WhileOp(ExprOp condition, BodyOp body) {
-
-        super("WhileOp");
-
         this.condition = condition;
         this.body = body;
-
-        // Aggiungiamo i nodi figli per la visualizzazione grafica
-        super.add(condition);
-
-        if(body != null) {
-            super.add(body);
-        }
     }
 
     public ExprOp getCondition() {
@@ -30,7 +21,7 @@ public class WhileOp extends StatementOp {
         return body;
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 

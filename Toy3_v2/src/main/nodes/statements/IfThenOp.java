@@ -1,21 +1,15 @@
 package main.nodes.statements;
 import main.nodes.expr.ExprOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-public class IfThenOp extends StatementOp {
+public class IfThenOp extends Node implements StatementOp {
     private ExprOp condition;
     private BodyOp thenBranch;
 
     public IfThenOp(ExprOp condition, BodyOp thenBranch) {
-        super("IfOp");
         this.condition = condition;
         this.thenBranch = thenBranch;
-
-        super.add(condition);
-
-        if(thenBranch != null) {
-            super.add(thenBranch);
-        }
     }
 
     public ExprOp getCondition() {
@@ -30,7 +24,7 @@ public class IfThenOp extends StatementOp {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

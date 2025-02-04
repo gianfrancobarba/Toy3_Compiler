@@ -1,21 +1,14 @@
 package main.nodes.statements;
 
 import main.nodes.expr.ExprOp;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.Objects;
-
-public class ReturnOp extends StatementOp {
+public class ReturnOp extends Node implements StatementOp {
     private ExprOp expr; // Opzionale
 
     public ReturnOp(ExprOp expr) {
-
-        super("Return");
-
         this.expr = expr;
-
-        super.add(Objects.requireNonNullElseGet(expr, () -> new DefaultMutableTreeNode("Null")));
     }
 
     public ExprOp getExpr() {
@@ -26,7 +19,7 @@ public class ReturnOp extends StatementOp {
         this.expr = expr;
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 

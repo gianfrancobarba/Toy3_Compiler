@@ -1,22 +1,17 @@
 package main.nodes.statements;
 
 import main.nodes.common.Identifier;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReadOp extends StatementOp {
+public class ReadOp extends Node implements StatementOp {
     private List<Identifier> listId; // Variabili di input
 
     public ReadOp(List<Identifier> listId) {
-        super("ReadOp");
         this.listId = new ArrayList<>(listId);
-
-        // Aggiungiamo i nodi figli per la visualizzazione grafica
-        for (Identifier id : this.listId) {
-            super.add(id);
-        }
     }
 
     public List<Identifier> getIdenfiers() {
@@ -26,10 +21,10 @@ public class ReadOp extends StatementOp {
     public void setIdenfiers(List<Identifier> listId) {
         this.listId = listId;
     }
+
     public void addId(Identifier id) {
         if (id != null) {
             listId.add(id);
-            super.add(id);
         }
     }
 
@@ -45,7 +40,7 @@ public class ReadOp extends StatementOp {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

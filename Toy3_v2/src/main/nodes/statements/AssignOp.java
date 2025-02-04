@@ -1,29 +1,21 @@
 package main.nodes.statements;
 
-import main.visitor.ASTVisitor;
 import main.nodes.expr.ExprOp;
+import main.visitor.Visitor;
 import main.nodes.common.Identifier;
+import main.visitor.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssignOp extends StatementOp {
+public class AssignOp extends Node implements StatementOp {
     private List<Identifier> listId;
     private List<ExprOp> listExpr;
 
 
     public AssignOp(List<Identifier> listId, List<ExprOp> listExpr) {
-        super("AssignOp");
         this.listId = new ArrayList<>(listId);
         this.listExpr = new ArrayList<>(listExpr);
-
-        for (Identifier id : listId) {
-            super.add(id);
-        }
-        
-        for (ExprOp expr : listExpr) {
-            super.add(expr);
-        }
     }
 
     public List<Identifier> getIdentfiers() {
@@ -45,7 +37,7 @@ public class AssignOp extends StatementOp {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }

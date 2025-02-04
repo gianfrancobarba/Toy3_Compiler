@@ -1,26 +1,16 @@
 package main.nodes.declarations;
 import main.nodes.common.Identifier;
-import main.visitor.ASTVisitor;
+import main.visitor.Visitor;
+import main.visitor.Node;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
-public class PVarOp extends DefaultMutableTreeNode {
+public class PVarOp extends Node {
 
     private Identifier id;
     private boolean isRef;
 
     public PVarOp(Identifier id, boolean isRef) {
-
-        super("PVarOp");
-
         this.id = id;
         this.isRef = isRef;
-
-        super.add(id);
-
-        if(isRef) {
-            super.add(new DefaultMutableTreeNode("Ref"));
-        }
     }
 
     public Identifier getId() {
@@ -36,7 +26,7 @@ public class PVarOp extends DefaultMutableTreeNode {
         return super.toString();
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 }
