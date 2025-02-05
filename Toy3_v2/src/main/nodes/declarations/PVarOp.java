@@ -21,11 +21,6 @@ public class PVarOp extends Node {
         return isRef;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }

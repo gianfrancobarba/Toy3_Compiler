@@ -23,10 +23,6 @@ public class ParDeclOp extends Node {
         return type;
     }
 
-    public String toString() {
-        return super.toString();
-    }
-
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }

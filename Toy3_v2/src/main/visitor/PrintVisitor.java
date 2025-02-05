@@ -194,12 +194,10 @@ public class PrintVisitor implements Visitor {
         whileOp.getBody().accept(this);
 
         indentLevel--;
-
     }
 
     @Override
     public void visit(ParDeclOp parDeclOp) {
-        String ref_temp = "";
         printIndent();
         System.out.println("ParDeclOp: ");
 
@@ -207,8 +205,6 @@ public class PrintVisitor implements Visitor {
 
         if(parDeclOp.getPVars() != null)
             for (PVarOp pVarOp : parDeclOp.getPVars()) {
-                if(pVarOp.isRef())
-                    ref_temp = "ref";
                 pVarOp.accept(this);
             }
 
@@ -216,14 +212,13 @@ public class PrintVisitor implements Visitor {
             parDeclOp.getType().accept(this);
         }
 
-        System.out.println("Type: " + ref_temp + parDeclOp.getType());
+        System.out.println("Type: " + parDeclOp.getType().getTypeName());
         indentLevel--;
 
     }
 
     @Override
     public void visit(ReadOp readOp) {
-
         printIndent();
         System.out.println("ReadOp: ");
 

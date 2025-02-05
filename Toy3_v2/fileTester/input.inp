@@ -1,5 +1,14 @@
 program
-
+def stampa(ref x,ref y: string; i : int): string
+{
+    i: 0;
+    while (i < 4) do {
+        "" !>>; // Ritorno a capo
+        i := i + 1;
+    }
+    messaggio !>>;
+    return "ok";
+}
 begin
-i = 3+1 : int;
+
 end

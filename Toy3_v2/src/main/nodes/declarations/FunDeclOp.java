@@ -44,10 +44,6 @@ public class FunDeclOp extends Node {
     public BodyOp getBody() {
         return body;
     }
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 
     public void accept(Visitor visitor) {
         visitor.visit(this);

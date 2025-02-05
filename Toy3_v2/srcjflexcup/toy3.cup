@@ -16,7 +16,6 @@ import main.nodes.expr.ExprOp;
 import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.UnaryExprOp;
 import main.nodes.expr.FunCallOp;
-import main.nodes.expr.ExprOpListOp;
 
 import main.nodes.common.Identifier;
 
@@ -145,6 +144,7 @@ VarsOptInit ::=  ID:id PIPE VarsOptInit
 DefDecl ::= DEF ID:id LPAR ParDecls:paramList RPAR OptType:t Body:body
             {:
                 RESULT = new FunDeclOp(new Identifier((String) id), (List<ParDeclOp>) paramList, (TypeOp) t, (BodyOp) body);
+                System.out.println(((TypeOp) t).getTypeName());
                 parDeclList.clear();
             :}
           | DEF ID:id LPAR RPAR OptType:t Body:body
