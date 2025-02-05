@@ -20,7 +20,6 @@ public class PrintVisitor implements Visitor {
         }
     }
 
-    @Override
     public void visit(TypeOp typeOp) {
         printIndent();
         System.out.println("TypeOp: " + typeOp.getTypeName());
@@ -52,7 +51,6 @@ public class PrintVisitor implements Visitor {
 
     }
 
-    @Override
     public void visit(ConstOp constOp) {
         printIndent();
         System.out.println("const: " + constOp.getValue());

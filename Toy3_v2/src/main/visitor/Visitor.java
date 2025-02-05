@@ -6,20 +6,15 @@ import main.nodes.common.Identifier;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
-import main.nodes.types.ConstOp;
-import main.nodes.types.TypeOp;
+
 
 public interface Visitor {
-
-    void visit(TypeOp typeOp);
 
     void visit(UnaryExprOp unaryExprOp);
 
     void visit(Identifier identifier);
 
     void visit(BinaryExprOp binaryExprOp);
-
-    void visit(ConstOp constantOp);
 
     void visit(VarDeclOp varDeclOp);
 
