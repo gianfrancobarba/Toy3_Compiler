@@ -24,5 +24,13 @@ public class ReturnOp extends Node implements StatementOp {
     }
 
     @Override
-    public String toString() {return super.toString();}
+    public String toString() {
+        if (expr == null) {
+            return "ReturnOp{}";
+        } else {
+            return "ReturnOp{ " +
+                    ", expr= " + expr +
+                    " }";
+        }
+    }
 }

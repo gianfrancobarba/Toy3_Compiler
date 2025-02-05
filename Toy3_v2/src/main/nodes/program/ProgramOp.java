@@ -30,7 +30,10 @@ public class ProgramOp extends Node {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "ProgramOp{ "+
+            "listDecls= " + listDecls +
+            ", beginBeginEndOp= " + beginEndOp +
+            " }";
     }
 
     public void accept(Visitor visitor) {

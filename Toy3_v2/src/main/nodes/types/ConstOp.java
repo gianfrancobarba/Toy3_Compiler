@@ -35,7 +35,11 @@ public class ConstOp extends Node implements ExprOp {
         return null;
     }
 
-    public String toString() {return super.toString();}
+    public String toString() {
+        return "Const{ " +
+                ", value= " + value +
+                " }";
+    }
 
     @Override
     public void accept(Visitor visitor) {

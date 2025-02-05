@@ -34,7 +34,10 @@ public class AssignOp extends Node implements StatementOp {
         this.listExpr = listExpr;
     }
     public String toString() {
-        return super.toString();
+        return "AssignOp{ " +
+                "listId= " + listId +
+                ", listExpr= " + listExpr +
+                " }";
     }
 
     public void accept(Visitor visitor) {

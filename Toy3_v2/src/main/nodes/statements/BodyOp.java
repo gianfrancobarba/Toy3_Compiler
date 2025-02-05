@@ -57,7 +57,10 @@ public class BodyOp extends Node {
     }
 
     public String toString() {
-        return super.toString();
+        return "BodyOp{ " +
+                "varDecls= " + varDecls +
+                ", listStatement= " + listStatement +
+                '}';
     }
 
     public void accept(Visitor visitor) {

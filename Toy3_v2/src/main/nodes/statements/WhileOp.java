@@ -26,5 +26,10 @@ public class WhileOp extends Node implements StatementOp {
     }
 
     @Override
-    public String toString() {return super.toString();}
+    public String toString() {
+        return "WhileOp{ " +
+                "condition= " + condition +
+                ", body= " + body +
+                " }";
+    }
 }

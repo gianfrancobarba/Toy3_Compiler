@@ -31,7 +31,11 @@ public class IfThenElseOp extends Node implements StatementOp {
     }
 
     public String toString() {
-        return super.toString();
+        return "IfThenElseOp{" +
+                "condition=" + condition +
+                ", thenBranch=" + thenBranch +
+                ", elseBranch=" + elseBranch +
+                '}';
     }
 
     public void accept(Visitor visitor) {

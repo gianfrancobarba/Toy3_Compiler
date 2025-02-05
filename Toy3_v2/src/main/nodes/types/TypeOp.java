@@ -28,5 +28,9 @@ public class TypeOp extends Node {
     }
 
     @Override
-    public String toString() {return super.toString();}
+    public String toString() {
+        return "TypeOp{ " +
+                ", typeName= '" + typeName + '\'' +
+                " }";
+    }
 }

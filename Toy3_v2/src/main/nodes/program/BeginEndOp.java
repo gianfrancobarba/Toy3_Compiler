@@ -35,7 +35,10 @@ public class BeginEndOp extends Node {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "BeginEndOp{ " +
+                "varDeclList= " + varDeclList +
+                ", stmtList= " + stmtList +
+                '}';
     }
 
     public void accept(Visitor visitor) {

@@ -21,7 +21,10 @@ public class IfThenOp extends Node implements StatementOp {
     }
 
     public String toString() {
-        return super.toString();
+        return "IfThenOp{ " +
+                "condition= " + condition +
+                ", thenBranch= " + thenBranch +
+                " }";
     }
 
     public void accept(Visitor visitor) {

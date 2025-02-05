@@ -37,7 +37,9 @@ public class ReadOp extends Node implements StatementOp {
     }
 
     public String toString() {
-        return super.toString();
+        return "ReadOp{ " +
+                ", listId=" + listId +
+                " }";
     }
 
     public void accept(Visitor visitor) {

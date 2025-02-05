@@ -33,7 +33,10 @@ public class WriteOp extends Node implements StatementOp {
     }
 
     public String toString() {
-        return super.toString();
+        return "WriteOp{ " +
+                " listExpr=" + listExpr +
+                ", newLine=" + newLine +
+                '}';
     }
 
     public void accept(Visitor visitor) {
