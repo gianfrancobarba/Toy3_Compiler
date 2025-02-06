@@ -2,6 +2,7 @@ package main.java;
 
 import main.nodes.program.ProgramOp;
 import main.visitor.*;
+import main.visitor.scoping.Scoping;
 import toy3.Lexer;
 import toy3.parser;
 
@@ -12,7 +13,7 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) {
-        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid1/valid1.txt"))) {
+        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/input.inp"))) {
             Lexer lexer = new Lexer(fileReader);
             parser p = new parser(lexer);
             try {
@@ -24,10 +25,10 @@ public class Main {
                 PrintVisitor printVisitor = new PrintVisitor();
                 ast.accept(printVisitor);
 
-//                // Test the Scoping visitor
-//                System.out.println("** Testing Scoping Visitor **");
-//                Scoping scopingVisitor = new Scoping();
-//                ast.accept(scopingVisitor);
+                // Test the Scoping visitor
+                System.out.println("** Testing Scoping Visitor **");
+                Scoping scopingVisitor = new Scoping();
+                ast.accept(scopingVisitor);
 //
 //                System.out.println("** Testing TypeChecking Visitor **");
 //                TypeChecking typeChecking = new TypeChecking();

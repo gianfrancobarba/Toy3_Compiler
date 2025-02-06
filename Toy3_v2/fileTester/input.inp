@@ -1,5 +1,5 @@
 program
-def stampa(ref x,ref y: string; i : int): string
+def stampa(messaggio: string): string
 {
     i: 0;
     while (i < 4) do {

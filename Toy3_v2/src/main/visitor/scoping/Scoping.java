@@ -33,13 +33,13 @@ public class Scoping implements Visitor {
                     ((FunDeclOp) varDeclOp).accept(this);
 
         System.out.println("Scope in ProgramOp: ");
-        printIndent();
+        
         symbolTable.printTable();
-        indentLevel++;
+        
 
         programOp.getBeginEndOp().accept(this);
 
-        indentLevel--;
+        
         symbolTable.exitScope();
     }
 
@@ -62,13 +62,13 @@ public class Scoping implements Visitor {
         }
 
         if (varDeclOp.getListVarOptInit() != null)
-            varDeclOp.getListVarOptInit().forEach(varOptInitOp -> {
+            for(VarOptInitOp varOptInitOp : varDeclOp.getListVarOptInit()) {
                 if (varDeclOp.getTypeOrConstant() instanceof String type)
                     tempType = type;
                 else if (varDeclOp.getTypeOrConstant() instanceof ConstOp constant)
                     tempType = constant.getConstantType();
                 varOptInitOp.accept(this);
-            });
+            }
     }
 
     @Override
@@ -117,14 +117,34 @@ public class Scoping implements Visitor {
                 stmt.accept(this);
             }
         }
-        indentLevel++;
-        printIndent();
+        
+        
 
         System.out.println("Scope in DefDeclOp: ");
         symbolTable.printTable();
 
-        indentLevel--;
+        
         symbolTable.exitScope();
+    }
+
+    @Override
+    public void visit(ParDeclOp parDeclOp) {
+        tempType = parDeclOp.getType().getTypeName();
+        if(parDeclOp.getPVars() != null) {
+            for(PVarOp pVarOp : parDeclOp.getPVars()){
+                pVarOp.accept(this);
+            }
+        }
+
+    }
+
+    @Override
+    public void visit(PVarOp pVarOp) {
+        if(symbolTable.probe(Kind.VAR, pVarOp.getId().getLessema())){
+            System.err.print(pVarOp.getId().getLessema() + " is already declared");
+            System.exit(1);
+        }
+        symbolTable.addId(Kind.VAR, pVarOp.getId().getLessema(), tempType);
     }
 
     @Override
@@ -136,13 +156,17 @@ public class Scoping implements Visitor {
                 varDeclOp.accept(this);
             }
         }
+        
+        
+        System.out.println("Scope in BeginEndOp: ");
+        symbolTable.printTable();
+
         if(beginEndOp.getStmtList() != null){
             for(StatementOp statOp : beginEndOp.getStmtList()){
                 statOp.accept(this);
             }
         }
-        System.out.println("Scope in BeginEndOp: ");
-        symbolTable.printTable();
+        
         symbolTable.exitScope();
     }
 
@@ -155,89 +179,30 @@ public class Scoping implements Visitor {
                 varDeclOp.accept(this);
             }
         }
+
+        System.out.println("Scope in BodyOp: ");
+        
+        
+        symbolTable.printTable();
+
         if(bodyOp.getStatements() != null){
             for(StatementOp statOp : bodyOp.getStatements()){
                 statOp.accept(this);
             }
         }
-        System.out.println("Scope in BodyOp: ");
-        symbolTable.printTable();
+        
         symbolTable.exitScope();
     }
 
-    @Override
-    public void visit(FunCallOp funCallOp) {
-
-    }
-
-    @Override
-    public void visit(ReturnOp returnOp) {
-
-    }
-
-    @Override
-    public void visit(WhileOp whileOp) {
-
-    }
-
-    @Override
-    public void visit(ParDeclOp parDeclOp) {
-
-    }
-
-    @Override
-    public void visit(ReadOp readOp) {
-
-    }
-
-    @Override
-    public void visit(WriteOp writeOp) {
-
-    }
-
-    @Override
-    public void visit(IfThenElseOp ifThenElseOp) {
-
-    }
-
-    @Override
-    public void visit(ConstOp constOp) {
-
-    }
-
-    @Override
-    public void visit(TypeOp typeOp) {
-
-    }
-
-    @Override
-    public void visit(PVarOp pVarOp) {
-
-    }
-
-    @Override
-    public void visit(UnaryExprOp unaryExprOp) {
-
-    }
-
-    @Override
-    public void visit(Identifier identifier) {
-
-    }
-
-    @Override
-    public void visit(BinaryExprOp binaryExprOp) {
-
-    }
-
-    @Override
-    public void visit(AssignOp assignOp) {
-
-    }
-
-    @Override
-    public void visit(IfThenOp ifThenOp) {
-
+    public void visit(StatementOp statementOp) {
+       if (statementOp instanceof IfThenOp ifThenOp) {
+            ifThenOp.getThenBranch().accept(this);
+        } else if (statementOp instanceof IfThenElseOp ifThenElseOp) {
+            ifThenElseOp.getThenBranch().accept(this);
+            ifThenElseOp.getElseBranch().accept(this);
+        } else if (statementOp instanceof WhileOp whileOp) {
+            whileOp.getBody().accept(this);
+        }
     }
 
     private String functionSignature(FunDeclOp funDeclOp) {
@@ -271,4 +236,31 @@ public class Scoping implements Visitor {
             System.out.print("\t");
         }
     }
+
+    @Override
+    public void visit(FunCallOp funCallOp) {}
+    @Override
+    public void visit(WhileOp whileOp) {}
+    @Override
+    public void visit(ReturnOp returnOp) {}
+    @Override
+    public void visit(UnaryExprOp unaryExprOp) {}
+    @Override
+    public void visit(Identifier identifier) {}
+    @Override
+    public void visit(BinaryExprOp binaryExprOp) {}
+    @Override
+    public void visit(AssignOp assignOp) {}
+    @Override
+    public void visit(IfThenOp ifThenOp) {}
+    @Override
+    public void visit(ReadOp readOp) {}
+    @Override
+    public void visit(WriteOp writeOp) {}
+    @Override
+    public void visit(IfThenElseOp ifThenElseOp) {}
+    @Override
+    public void visit(ConstOp constOp) {}
+    @Override
+    public void visit(TypeOp typeOp) {}
 }
