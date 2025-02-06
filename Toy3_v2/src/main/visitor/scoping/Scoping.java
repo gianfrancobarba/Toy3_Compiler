@@ -41,13 +41,15 @@ public class Scoping implements Visitor {
                 System.err.print("Error: cannot declare multiple variables with a constant type");
                 System.exit(1);
             }
-            for(VarOptInitOp varOptInit : varDeclOp.getListVarOptInit())
-                if(varOptInit.getExprOp() != null){
-                    System.err.print("Error: ");
-                    System.err.print(varOptInit.getId().getLessema() + " ");
-                    System.err.print("is a constant and cannot be initialized");
-                    System.exit(1);
-                }
+
+            // se non restituisce il primo errore allora sicuramente la lista avrà al più un elemento.
+            VarOptInitOp varOpt = varDeclOp.getListVarOptInit().get(0);
+            if(varOpt.getExprOp() != null){
+                System.err.print("Error: ");
+                System.err.print(varOpt.getId().getLessema() + " ");
+                System.err.print("is a constant and cannot be initialized");
+                System.exit(1);
+            }
         }
 
         if (varDeclOp.getListVarOptInit() != null)
@@ -90,12 +92,16 @@ public class Scoping implements Visitor {
     }
 
     @Override
-    public void visit(FunDeclOp funDeclOp) {
+    public void visit(FunDeclOp funDeclOp) { // può essere solo program (Global)
+        String funName = funDeclOp.getId().getLessema();
+        if(symbolTable.probe(Kind.FUN, funName)){
+            System.err.print("Function " + funName + "already declared: "+ symbolTable.lookup(Kind.FUN, funName));
+            System.exit(1);
+        }
 
-        indentLevel--;
-        symbolTable.exitScope();
 
     }
+
 
     private void printIndent() {
         for (int i = 0; i < indentLevel; i++) {
@@ -175,7 +181,6 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
-
     }
 
     @Override
