@@ -6,10 +6,11 @@ public abstract class Node{
     private String type = "notype";
     private Scope scope;
 
-    public void accept(Visitor visitor) {
-    }
+    public void accept(Visitor visitor) {}
 
-    public void setScope(Scope currentScope){
-        this.scope = currentScope;
-    }
+    public Scope getScope() { return scope; }
+
+    public void setScope(Scope scope) { this.scope = scope; }
+
+    public void setType(String type) { this.type = type; }
 }

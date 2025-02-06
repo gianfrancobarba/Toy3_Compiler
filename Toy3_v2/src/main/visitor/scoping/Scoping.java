@@ -8,11 +8,16 @@ import main.nodes.expr.UnaryExprOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
+import main.nodes.types.ConstOp;
+import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
+
+import java.util.Objects;
 
 public class Scoping implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
-
+    private int indentLevel = 0;
+    private String tempType;
 
     @Override
     public void visit(UnaryExprOp unaryExprOp) {
@@ -31,7 +36,28 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(VarDeclOp varDeclOp) {
+        if (varDeclOp.getTypeOrConstant() instanceof ConstOp) {
+            if (varDeclOp.getListVarOptInit().size() > 1) {
+                System.err.print("Error: cannot declare multiple variables with a constant type");
+                System.exit(1);
+            }
+            for(VarOptInitOp varOptInit : varDeclOp.getListVarOptInit())
+                if(varOptInit.getExprOp() != null){
+                    System.err.print("Error: ");
+                    System.err.print(varOptInit.getId().getLessema() + " ");
+                    System.err.print("is a constant and cannot be initialized");
+                    System.exit(1);
+                }
+        }
 
+        if (varDeclOp.getListVarOptInit() != null)
+            varDeclOp.getListVarOptInit().forEach(varOptInitOp -> {
+                if (varDeclOp.getTypeOrConstant() instanceof String type)
+                    tempType = type;
+                else if (varDeclOp.getTypeOrConstant() instanceof ConstOp constant)
+                    tempType = constant.getConstantType();
+                varOptInitOp.accept(this);
+            });
     }
 
     @Override
@@ -66,6 +92,15 @@ public class Scoping implements Visitor {
     @Override
     public void visit(FunDeclOp funDeclOp) {
 
+        indentLevel--;
+        symbolTable.exitScope();
+
+    }
+
+    private void printIndent() {
+        for (int i = 0; i < indentLevel; i++) {
+            System.out.print("\t");
+        }
     }
 
     @Override
@@ -75,7 +110,21 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(ProgramOp programOp) {
+        indentLevel++;
 
+        symbolTable.enterScope();
+        programOp.setScope(symbolTable.getCurrentScope());
+        if (programOp.getListDecls() != null)
+            for (Object varDeclOp : programOp.getListDecls())
+                if (varDeclOp instanceof VarDeclOp)
+                    ((VarDeclOp) varDeclOp).accept(this);
+                else if (varDeclOp instanceof FunDeclOp)
+                    ((FunDeclOp) varDeclOp).accept(this);
+
+        System.out.println("Scope in ProgramOp: ");
+        printIndent();
+        symbolTable.printTable();
+        programOp.getBeginEndOp().accept(this);
 
     }
 
@@ -106,6 +155,16 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(IfThenElseOp ifThenElseOp) {
+
+    }
+
+    @Override
+    public void visit(ConstOp constOp) {
+
+    }
+
+    @Override
+    public void visit(TypeOp typeOp) {
 
     }
 
