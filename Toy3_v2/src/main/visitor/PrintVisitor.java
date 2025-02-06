@@ -311,7 +311,7 @@ public class PrintVisitor implements Visitor {
 
         indentLevel++;
 
-        for(VarDeclOp varDeclOp : beginEndOp.getvarDeclList()) {
+        for(VarDeclOp varDeclOp : beginEndOp.getVarDeclList()) {
             varDeclOp.accept(this);
         }
 

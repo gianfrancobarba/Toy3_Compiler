@@ -11,6 +11,8 @@ import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
+
+import java.util.Objects;
 import java.util.StringJoiner;
 
 public class Scoping implements Visitor {
@@ -19,18 +21,26 @@ public class Scoping implements Visitor {
     private String tempType;
 
     @Override
-    public void visit(UnaryExprOp unaryExprOp) {
+    public void visit(ProgramOp programOp) {
 
-    }
+        symbolTable.enterScope();
+        programOp.setScope(symbolTable.getCurrentScope());
+        if (programOp.getListDecls() != null)
+            for (Object varDeclOp : programOp.getListDecls())
+                if (varDeclOp instanceof VarDeclOp)
+                    ((VarDeclOp) varDeclOp).accept(this);
+                else if (varDeclOp instanceof FunDeclOp)
+                    ((FunDeclOp) varDeclOp).accept(this);
 
-    @Override
-    public void visit(Identifier identifier) {
+        System.out.println("Scope in ProgramOp: ");
+        printIndent();
+        symbolTable.printTable();
+        indentLevel++;
 
-    }
+        programOp.getBeginEndOp().accept(this);
 
-    @Override
-    public void visit(BinaryExprOp binaryExprOp) {
-
+        indentLevel--;
+        symbolTable.exitScope();
     }
 
     @Override
@@ -62,33 +72,19 @@ public class Scoping implements Visitor {
     }
 
     @Override
-    public void visit(AssignOp assignOp) {
-
-    }
-
-    @Override
-    public void visit(IfThenOp ifThenOp) {
-
-    }
-
-    @Override
-    public void visit(BodyOp bodyOp) {
-        symbolTable.enterScope();
-        bodyOp.setScope(symbolTable.getCurrentScope());
-        if(bodyOp.getVarDecls() != null){
-            for(VarDeclOp varDeclOp : bodyOp.getVarDecls()){
-                varDeclOp.accept(this);
+    public void visit(VarOptInitOp varOptInitOp) {
+        if (symbolTable.probe(Kind.VAR, varOptInitOp.getId().getLessema())) {
+            if (Objects.equals(symbolTable.lookup(Kind.VAR, varOptInitOp.getId().getLessema()), tempType)) {
+                System.err.print("Redeclaration of " + varOptInitOp.getId().getLessema());
+                System.exit(1);
             }
+            System.err.print("Conflicting types for " + varOptInitOp.getId().getLessema());
+            System.err.print("; Previous declaration have type " + symbolTable.lookup(Kind.VAR, varOptInitOp.getId().getLessema()));
+            System.exit(1);
         }
-        if(bodyOp.getStatements() != null){
-            for(StatementOp statOp : bodyOp.getStatements()){
-                statOp.accept(this);
-            }
-        }
-        System.out.println("Scope in BodyOp: ");
-        symbolTable.printTable();
-        symbolTable.exitScope();
+        symbolTable.addId(Kind.VAR, varOptInitOp.getId().getLessema(), tempType);
     }
+
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
@@ -121,66 +117,56 @@ public class Scoping implements Visitor {
                 stmt.accept(this);
             }
         }
+        indentLevel++;
+        printIndent();
 
         System.out.println("Scope in DefDeclOp: ");
+        symbolTable.printTable();
+
+        indentLevel--;
+        symbolTable.exitScope();
+    }
+
+    @Override
+    public void visit(BeginEndOp beginEndOp) {
+        symbolTable.enterScope();
+        beginEndOp.setScope(symbolTable.getCurrentScope());
+        if(beginEndOp.getVarDeclList() != null){
+            for(VarDeclOp varDeclOp : beginEndOp.getVarDeclList()){
+                varDeclOp.accept(this);
+            }
+        }
+        if(beginEndOp.getStmtList() != null){
+            for(StatementOp statOp : beginEndOp.getStmtList()){
+                statOp.accept(this);
+            }
+        }
+        System.out.println("Scope in BeginEndOp: ");
         symbolTable.printTable();
         symbolTable.exitScope();
     }
 
-    private String functionSignature(FunDeclOp funDeclOp) {
-        StringBuilder sb = new StringBuilder();
-        String type;
-        if (funDeclOp.getOptType() != null) {
-            type = funDeclOp.getOptType().getTypeName();
-            sb.append(type);
-        } else {
-            sb.append("void");
-        }
-        sb.append("(");
-
-        if (funDeclOp.getParams() != null) {
-            StringJoiner joiner = new StringJoiner(", ");
-            for (ParDeclOp parDecl : funDeclOp.getParams()) {
-                for (PVarOp pVarOp : parDecl.getPVars()) {
-                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getType().getTypeName();
-                    joiner.add(param);
-                }
+    @Override
+    public void visit(BodyOp bodyOp) {
+        symbolTable.enterScope();
+        bodyOp.setScope(symbolTable.getCurrentScope());
+        if(bodyOp.getVarDecls() != null){
+            for(VarDeclOp varDeclOp : bodyOp.getVarDecls()){
+                varDeclOp.accept(this);
             }
-            sb.append(joiner);
         }
-
-        sb.append(")");
-        return sb.toString();
-    }
-
-    private void printIndent() {
-        for (int i = 0; i < indentLevel; i++) {
-            System.out.print("\t");
+        if(bodyOp.getStatements() != null){
+            for(StatementOp statOp : bodyOp.getStatements()){
+                statOp.accept(this);
+            }
         }
+        System.out.println("Scope in BodyOp: ");
+        symbolTable.printTable();
+        symbolTable.exitScope();
     }
 
     @Override
     public void visit(FunCallOp funCallOp) {
-
-    }
-
-    @Override
-    public void visit(ProgramOp programOp) {
-        indentLevel++;
-
-        symbolTable.enterScope();
-        programOp.setScope(symbolTable.getCurrentScope());
-        if (programOp.getListDecls() != null)
-            for (Object varDeclOp : programOp.getListDecls())
-                if (varDeclOp instanceof VarDeclOp)
-                    ((VarDeclOp) varDeclOp).accept(this);
-                else if (varDeclOp instanceof FunDeclOp)
-                    ((FunDeclOp) varDeclOp).accept(this);
-
-        System.out.println("Scope in ProgramOp: ");
-        printIndent();
-        symbolTable.printTable();
-        programOp.getBeginEndOp().accept(this);
 
     }
 
@@ -230,26 +216,59 @@ public class Scoping implements Visitor {
     }
 
     @Override
-    public void visit(VarOptInitOp varOptInitOp) {
+    public void visit(UnaryExprOp unaryExprOp) {
 
     }
 
     @Override
-    public void visit(BeginEndOp beginEndOp) {
-        symbolTable.enterScope();
-        beginEndOp.setScope(symbolTable.getCurrentScope());
-        if(beginEndOp.getVarDeclList() != null){
-            for(VarDeclOp varDeclOp : beginEndOp.getVarDeclList()){
-                varDeclOp.accept(this);
-            }
+    public void visit(Identifier identifier) {
+
+    }
+
+    @Override
+    public void visit(BinaryExprOp binaryExprOp) {
+
+    }
+
+    @Override
+    public void visit(AssignOp assignOp) {
+
+    }
+
+    @Override
+    public void visit(IfThenOp ifThenOp) {
+
+    }
+
+    private String functionSignature(FunDeclOp funDeclOp) {
+        StringBuilder sb = new StringBuilder();
+        String type;
+        if (funDeclOp.getOptType() != null) {
+            type = funDeclOp.getOptType().getTypeName();
+            sb.append(type);
+        } else {
+            sb.append("void");
         }
-        if(beginEndOp.getStmtList() != null){
-            for(StatementOp statOp : beginEndOp.getStmtList()){
-                statOp.accept(this);
+        sb.append("(");
+
+        if (funDeclOp.getParams() != null) {
+            StringJoiner joiner = new StringJoiner(", ");
+            for (ParDeclOp parDecl : funDeclOp.getParams()) {
+                for (PVarOp pVarOp : parDecl.getPVars()) {
+                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getType().getTypeName();
+                    joiner.add(param);
+                }
             }
+            sb.append(joiner);
         }
-        System.out.println("Scope in BeginEndOp: ");
-        symbolTable.printTable();
-        symbolTable.exitScope();
+
+        sb.append(")");
+        return sb.toString();
+    }
+
+    private void printIndent() {
+        for (int i = 0; i < indentLevel; i++) {
+            System.out.print("\t");
+        }
     }
 }
