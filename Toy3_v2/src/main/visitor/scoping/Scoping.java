@@ -11,8 +11,7 @@ import main.nodes.statements.*;
 import main.visitor.Visitor;
 
 public class Scoping implements Visitor {
-
-    private SymbolTable symbolTable = new SymbolTable();
+    private final SymbolTable symbolTable = new SymbolTable();
 
 
     @Override
@@ -47,7 +46,21 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(BodyOp bodyOp) {
-
+        symbolTable.enterScope();
+        bodyOp.setScope(symbolTable.getCurrentScope());
+        if(bodyOp.getVarDecls() != null){
+            for(VarDeclOp varDeclOp : bodyOp.getVarDecls()){
+                varDeclOp.accept(this);
+            }
+        }
+        if(bodyOp.getStatements() != null){
+            for(StatementOp statOp : bodyOp.getStatements()){
+                statOp.accept(this);
+            }
+        }
+        System.out.println("Scope in BodyOp: ");
+        symbolTable.printTable();
+        symbolTable.exitScope();
     }
 
     @Override
@@ -108,6 +121,20 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(BeginEndOp beginEndOp) {
-
+        symbolTable.enterScope();
+        beginEndOp.setScope(symbolTable.getCurrentScope());
+        if(beginEndOp.getVarDeclList() != null){
+            for(VarDeclOp varDeclOp : beginEndOp.getVarDeclList()){
+                varDeclOp.accept(this);
+            }
+        }
+        if(beginEndOp.getStmtList() != null){
+            for(StatementOp statOp : beginEndOp.getStmtList()){
+                statOp.accept(this);
+            }
+        }
+        System.out.println("Scope in BeginEndOp: ");
+        symbolTable.printTable();
+        symbolTable.exitScope();
     }
 }

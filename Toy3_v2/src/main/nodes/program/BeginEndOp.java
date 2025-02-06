@@ -17,11 +17,11 @@ public class BeginEndOp extends Node {
         this.stmtList = new ArrayList<>(stmtList);
     }
 
-    public List<VarDeclOp> getvarDeclList() {
+    public List<VarDeclOp> getVarDeclList() {
         return varDeclList;
     }
 
-    public void setvarDeclList(List<VarDeclOp> varDeclList) {
+    public void setVarDeclList(List<VarDeclOp> varDeclList) {
         this.varDeclList = varDeclList;
     }
 
