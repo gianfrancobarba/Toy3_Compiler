@@ -11,8 +11,7 @@ import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
-
-import java.util.Objects;
+import java.util.StringJoiner;
 
 public class Scoping implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
@@ -92,16 +91,67 @@ public class Scoping implements Visitor {
     }
 
     @Override
-    public void visit(FunDeclOp funDeclOp) { // può essere solo program (Global)
-        String funName = funDeclOp.getId().getLessema();
-        if(symbolTable.probe(Kind.FUN, funName)){
-            System.err.print("Function " + funName + "already declared: "+ symbolTable.lookup(Kind.FUN, funName));
+    public void visit(FunDeclOp funDeclOp) {
+        String funId = funDeclOp.getId().getLessema();
+        if(symbolTable.probe(Kind.FUN, funId)){
+            System.err.print("Function "+ funId + " already declared with type: "+symbolTable.lookup(Kind.FUN, funId));
             System.exit(1);
         }
 
+        String signature = functionSignature(funDeclOp);
+        // aggiungiamo la firma del metodo in Globals
+        symbolTable.addId(Kind.FUN, funId, signature);
 
+        // nuovo scope per il body della funzione
+        symbolTable.enterScope();
+        funDeclOp.setScope(symbolTable.getCurrentScope());
+        // ridefinizione delle variabili prese in input (se presenti)
+        if(funDeclOp.getParams() != null){
+            for(ParDeclOp parDecl : funDeclOp.getParams()){
+                parDecl.accept(this);
+            }
+        }
+        if(funDeclOp.getBody().getVarDecls() != null){
+            for(VarDeclOp varDecl : funDeclOp.getBody().getVarDecls()){
+                varDecl.accept(this);
+            }
+        }
+        if(funDeclOp.getBody().getStatements() != null){
+            for(StatementOp stmt : funDeclOp.getBody().getStatements()){
+                stmt.accept(this);
+            }
+        }
+
+        System.out.println("Scope in DefDeclOp: ");
+        symbolTable.printTable();
+        symbolTable.exitScope();
     }
 
+    private String functionSignature(FunDeclOp funDeclOp) {
+        StringBuilder sb = new StringBuilder();
+        String type;
+        if (funDeclOp.getOptType() != null) {
+            type = funDeclOp.getOptType().getTypeName();
+            sb.append(type);
+        } else {
+            sb.append("void");
+        }
+        sb.append("(");
+
+        if (funDeclOp.getParams() != null) {
+            StringJoiner joiner = new StringJoiner(", ");
+            for (ParDeclOp parDecl : funDeclOp.getParams()) {
+                for (PVarOp pVarOp : parDecl.getPVars()) {
+                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getType().getTypeName();
+                    joiner.add(param);
+                }
+            }
+            sb.append(joiner);
+        }
+
+        sb.append(")");
+        return sb.toString();
+    }
 
     private void printIndent() {
         for (int i = 0; i < indentLevel; i++) {
@@ -181,6 +231,7 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
+
     }
 
     @Override
