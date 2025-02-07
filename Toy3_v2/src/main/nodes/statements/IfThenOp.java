@@ -6,6 +6,7 @@ import main.visitor.Node;
 public class IfThenOp extends Node implements StatementOp {
     private ExprOp condition;
     private BodyOp thenBranch;
+    private String funLabel;
 
     public IfThenOp(ExprOp condition, BodyOp thenBranch) {
         this.condition = condition;
@@ -25,6 +26,14 @@ public class IfThenOp extends Node implements StatementOp {
                 "condition= " + condition +
                 ", thenBranch= " + thenBranch +
                 " }";
+    }
+
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    public String getFunLabel() {
+        return funLabel;
     }
 
     public void accept(Visitor visitor) {

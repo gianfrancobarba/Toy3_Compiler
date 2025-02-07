@@ -10,6 +10,7 @@ import java.util.List;
 public class BodyOp extends Node {
     private List<VarDeclOp> varDecls;
     private List<StatementOp> listStatement;
+    private String funLabel;
 
     public BodyOp(List<VarDeclOp> varDecls, List<StatementOp> listStatement) {
         this.varDecls = new ArrayList<>(varDecls);
@@ -54,6 +55,14 @@ public class BodyOp extends Node {
                 addStatement(stmt);
             }
         }
+    }
+
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    public String getFunLabel() {
+        return funLabel;
     }
 
     public String toString() {

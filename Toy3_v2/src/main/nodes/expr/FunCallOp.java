@@ -12,6 +12,7 @@ public class FunCallOp extends Node implements ExprOp, StatementOp {
 
     private Identifier id;
     private List<ExprOp> exprList; // argomenti della funzione
+    private String funLabel;
 
     public FunCallOp(Identifier id, List<ExprOp> exprList){
         this.id = id;
@@ -39,6 +40,16 @@ public class FunCallOp extends Node implements ExprOp, StatementOp {
 
     public void accept(Visitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    @Override
+    public String getFunLabel() {
+        return funLabel;
     }
 
     @Override

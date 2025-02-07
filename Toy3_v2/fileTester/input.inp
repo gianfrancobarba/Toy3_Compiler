@@ -1,9 +1,7 @@
 program
-def sommac(a: double; d: double; b: double; ref size: string; ref result: double)
-{
-    result := a + b + c + d;
-}
+    a : int;
 begin
     x : 10;
-    a | b | c : int;
+    b | c : int;
+    a : double;
 end

@@ -7,6 +7,7 @@ public class IfThenElseOp extends Node implements StatementOp {
     private ExprOp condition;
     private BodyOp thenBranch;
     private BodyOp elseBranch;
+    private String funLabel;
 
     public IfThenElseOp(ExprOp condition, BodyOp thenBranch, BodyOp elseBranch) {
         this.condition = condition;
@@ -40,5 +41,15 @@ public class IfThenElseOp extends Node implements StatementOp {
 
     public void accept(Visitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    @Override
+    public String getFunLabel() {
+        return funLabel;
     }
 }

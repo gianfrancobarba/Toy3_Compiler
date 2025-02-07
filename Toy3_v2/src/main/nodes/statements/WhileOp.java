@@ -7,6 +7,7 @@ import main.visitor.Node;
 public class WhileOp extends Node implements StatementOp {
     private ExprOp condition;
     private BodyOp body;
+    private String funLabel;
 
     public WhileOp(ExprOp condition, BodyOp body) {
         this.condition = condition;
@@ -23,6 +24,14 @@ public class WhileOp extends Node implements StatementOp {
 
     public void accept(Visitor visitor) {
         visitor.visit(this);
+    }
+
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    public String getFunLabel() {
+        return funLabel;
     }
 
     @Override

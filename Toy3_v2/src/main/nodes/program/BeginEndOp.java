@@ -11,6 +11,7 @@ import java.util.List;
 public class BeginEndOp extends Node {
     private List<VarDeclOp> varDeclList;
     private List<StatementOp> stmtList;
+    private String funLabel;
 
     public BeginEndOp(List<VarDeclOp> varDeclList, List<StatementOp> stmtList) {
         this.varDeclList = new ArrayList<>(varDeclList);
@@ -31,6 +32,14 @@ public class BeginEndOp extends Node {
 
     public void setStmtList(List<StatementOp> statOps) {
         this.stmtList = statOps;
+    }
+
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    public String getFunLabel() {
+        return funLabel;
     }
 
     @Override

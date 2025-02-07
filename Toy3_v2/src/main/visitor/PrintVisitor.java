@@ -222,7 +222,7 @@ public class PrintVisitor implements Visitor {
 
         indentLevel++;
 
-        for(Identifier id : readOp.getIdenfiers()) {
+        for(Identifier id : readOp.getIdentifiers()) {
             id.accept(this);
         }
 

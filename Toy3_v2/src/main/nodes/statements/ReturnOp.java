@@ -6,6 +6,7 @@ import main.visitor.Node;
 
 public class ReturnOp extends Node implements StatementOp {
     private ExprOp expr; // Opzionale
+    private String funLabel;
 
     public ReturnOp(ExprOp expr) {
         this.expr = expr;
@@ -21,6 +22,14 @@ public class ReturnOp extends Node implements StatementOp {
 
     public void accept(Visitor visitor) {
         visitor.visit(this);
+    }
+
+    public void setFunLabel(String funLabel) {
+        this.funLabel = funLabel;
+    }
+
+    public String getFunLabel() {
+        return funLabel;
     }
 
     @Override
