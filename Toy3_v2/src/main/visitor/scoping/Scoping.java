@@ -135,16 +135,33 @@ public class Scoping implements Visitor {
                 pVarOp.accept(this);
             }
         }
-
+        tempType = parDeclOp.getType().getTypeName();
+        if(parDeclOp.getPVars() != null){
+            for(PVarOp pVar : parDeclOp.getPVars()){
+                pVar.accept(this);
+            }
+        }
     }
 
     @Override
     public void visit(PVarOp pVarOp) {
-        if(symbolTable.probe(Kind.VAR, pVarOp.getId().getLessema())){
-            System.err.print(pVarOp.getId().getLessema() + " is already declared");
+        String varId  = pVarOp.getId().getLessema();
+        if(symbolTable.probe(Kind.VAR, varId)){
+            System.out.println("IIIIIIFFFFF");
+            symbolTable.printTable();
+            if(Objects.equals(symbolTable.lookup(Kind.VAR, varId), tempType)){
+                System.err.print("Redefinition of parameter " + varId);
+                System.exit(1);
+            }
+            System.err.print("Conflicting types for parameter " + varId);
+            System.err.print("; Previous definition have type " + symbolTable.lookup(Kind.VAR, varId));
             System.exit(1);
         }
-        symbolTable.addId(Kind.VAR, pVarOp.getId().getLessema(), tempType);
+
+        if(pVarOp.isRef())
+            tempType = "ref " + tempType;
+
+        symbolTable.addId(Kind.VAR, varId, tempType);
     }
 
     @Override
@@ -196,13 +213,28 @@ public class Scoping implements Visitor {
 
     public void visit(StatementOp statementOp) {
        if (statementOp instanceof IfThenOp ifThenOp) {
-            ifThenOp.getThenBranch().accept(this);
+           visit(ifThenOp);
         } else if (statementOp instanceof IfThenElseOp ifThenElseOp) {
-            ifThenElseOp.getThenBranch().accept(this);
-            ifThenElseOp.getElseBranch().accept(this);
+           visit(ifThenElseOp);
         } else if (statementOp instanceof WhileOp whileOp) {
-            whileOp.getBody().accept(this);
+           visit(whileOp);
         }
+    }
+
+    @Override
+    public void visit(IfThenOp ifThenOp) {
+        ifThenOp.getThenBranch().accept(this);
+    }
+
+    @Override
+    public void visit(IfThenElseOp ifThenElseOp) {
+        ifThenElseOp.getThenBranch().accept(this);
+        ifThenElseOp.getElseBranch().accept(this);
+    }
+
+    @Override
+    public void visit(WhileOp whileOp) {
+        whileOp.getBody().accept(this);
     }
 
     private String functionSignature(FunDeclOp funDeclOp) {
@@ -240,8 +272,6 @@ public class Scoping implements Visitor {
     @Override
     public void visit(FunCallOp funCallOp) {}
     @Override
-    public void visit(WhileOp whileOp) {}
-    @Override
     public void visit(ReturnOp returnOp) {}
     @Override
     public void visit(UnaryExprOp unaryExprOp) {}
@@ -252,13 +282,9 @@ public class Scoping implements Visitor {
     @Override
     public void visit(AssignOp assignOp) {}
     @Override
-    public void visit(IfThenOp ifThenOp) {}
-    @Override
     public void visit(ReadOp readOp) {}
     @Override
     public void visit(WriteOp writeOp) {}
-    @Override
-    public void visit(IfThenElseOp ifThenElseOp) {}
     @Override
     public void visit(ConstOp constOp) {}
     @Override

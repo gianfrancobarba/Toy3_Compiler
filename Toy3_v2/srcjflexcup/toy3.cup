@@ -144,7 +144,6 @@ VarsOptInit ::=  ID:id PIPE VarsOptInit
 DefDecl ::= DEF ID:id LPAR ParDecls:paramList RPAR OptType:t Body:body
             {:
                 RESULT = new FunDeclOp(new Identifier((String) id), (List<ParDeclOp>) paramList, (TypeOp) t, (BodyOp) body);
-                System.out.println(((TypeOp) t).getTypeName());
                 parDeclList.clear();
             :}
           | DEF ID:id LPAR RPAR OptType:t Body:body

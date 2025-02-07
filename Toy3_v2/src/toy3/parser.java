@@ -5,6 +5,7 @@
 
 package toy3;
 
+import java_cup.runtime.*;
 import java.util.*;
 import main.nodes.program.ProgramOp;
 import main.nodes.program.BeginEndOp;
@@ -30,6 +31,7 @@ import main.nodes.statements.AssignOp;
 import main.nodes.statements.BodyOp;
 import main.nodes.types.TypeOp;
 import main.nodes.types.ConstOp;
+import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
   */

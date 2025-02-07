@@ -1,14 +1,9 @@
 program
-def stampa(messaggio: string): string
+def sommac(a: double; d: double; b: double; ref size: string; ref result: double)
 {
-    i: 0;
-    while (i < 4) do {
-        "" !>>; // Ritorno a capo
-        i := i + 1;
-    }
-    messaggio !>>;
-    return "ok";
+    result := a + b + c + d;
 }
 begin
-
+    x : 10;
+    a | b | c : int;
 end
