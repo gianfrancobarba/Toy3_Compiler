@@ -23,10 +23,6 @@ public class TypeOp extends Node {
         return this.typeName.equals(other.typeName);
     }
 
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
-
     @Override
     public String toString() {
         return "TypeOp{ " +

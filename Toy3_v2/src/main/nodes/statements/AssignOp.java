@@ -48,9 +48,4 @@ public class AssignOp extends Node implements StatementOp {
                 ", listExpr= " + listExpr +
                 " }";
     }
-
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
-
 }

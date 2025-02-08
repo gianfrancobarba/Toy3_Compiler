@@ -25,7 +25,6 @@ public class PrintVisitor implements Visitor {
         System.out.println("TypeOp: " + typeOp.getTypeName());
     }
 
-    @Override
     public void visit(UnaryExprOp unaryExprOp) {
         printIndent();
         System.out.println("UnaryOp (" + unaryExprOp.getOp() + "):");
@@ -34,13 +33,12 @@ public class PrintVisitor implements Visitor {
         indentLevel--;
     }
 
-    @Override
     public void visit(Identifier node) {
         printIndent();
         System.out.println("id: " + node.getLessema());
     }
 
-    @Override
+
     public void visit(BinaryExprOp binaryExprOp) {
         printIndent();
         System.out.println("BinaryOp (" + binaryExprOp.getOp() + "):");
@@ -76,7 +74,6 @@ public class PrintVisitor implements Visitor {
         indentLevel--;
     }
 
-    @Override
     public void visit(AssignOp assignOp) {
         printIndent();
         System.out.println("AssignOp: ");
@@ -165,7 +162,6 @@ public class PrintVisitor implements Visitor {
         indentLevel--;
     }
 
-    @Override
     public void visit(ReturnOp returnOp) {
         printIndent();
         System.out.println("ReturnOp: ");
@@ -206,16 +202,15 @@ public class PrintVisitor implements Visitor {
                 pVarOp.accept(this);
             }
 
-        if(parDeclOp.getType() != null) {
-            parDeclOp.getType().accept(this);
+        if(parDeclOp.getTypeOp() != null) {
+            parDeclOp.getTypeOp().accept(this);
         }
 
-        System.out.println("Type: " + parDeclOp.getType().getTypeName());
+        System.out.println("Type: " + parDeclOp.getTypeOp().getTypeName());
         indentLevel--;
 
     }
 
-    @Override
     public void visit(ReadOp readOp) {
         printIndent();
         System.out.println("ReadOp: ");
@@ -230,7 +225,6 @@ public class PrintVisitor implements Visitor {
 
     }
 
-    @Override
     public void visit(WriteOp writeOp) {
 
         printIndent();

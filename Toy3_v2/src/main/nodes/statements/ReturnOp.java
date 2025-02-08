@@ -20,10 +20,6 @@ public class ReturnOp extends Node implements StatementOp {
         this.expr = expr;
     }
 
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
-
     public void setFunLabel(String funLabel) {
         this.funLabel = funLabel;
     }

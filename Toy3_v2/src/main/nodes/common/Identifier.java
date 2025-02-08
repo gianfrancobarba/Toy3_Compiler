@@ -17,8 +17,4 @@ public class Identifier extends Node implements ExprOp {
     }
 
     public String toString() {return super.toString();}
-
-     public void accept(Visitor visitor) {
-            visitor.visit(this);
-     }
 }
