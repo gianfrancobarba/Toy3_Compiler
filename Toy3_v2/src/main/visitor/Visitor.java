@@ -36,4 +36,6 @@ public interface Visitor {
 
     void visit(BeginEndOp beginEndOp);
 
+    void visit(AssignOp assignOp);
+
 }
