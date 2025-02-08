@@ -13,5 +13,9 @@ public abstract class Node implements NodeInterface{
 
     public void setScope(Scope scope) { this.scope = scope; }
 
+    public String getType() {
+        return type;
+    }
+
     public void setType(String type) { this.type = type; }
 }

@@ -44,7 +44,14 @@ public class TypeChecking implements Visitor {
         whileOp.getCondition().accept(this);
         whileOp.getBody().accept(this);
         // controllo che il type della condizione sia bool
-
+        if(whileOp.getCondition().getType().equals("bool")
+            && whileOp.getBody().getType().equals("notype")){
+            whileOp.setType("notype");
+        }
+        else {
+            System.err.print("Invalid type in While statement");
+            System.exit(1);
+        }
     }
 
     @Override
