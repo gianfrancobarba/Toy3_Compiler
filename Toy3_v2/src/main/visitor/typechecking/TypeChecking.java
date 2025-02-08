@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.typechecking;
 
 import main.nodes.declarations.*;
 import main.nodes.expr.FunCallOp;
@@ -8,14 +8,11 @@ import main.nodes.statements.BodyOp;
 import main.nodes.statements.IfThenElseOp;
 import main.nodes.statements.IfThenOp;
 import main.nodes.statements.WhileOp;
+import main.visitor.Visitor;
+import main.visitor.scoping.SymbolTable;
 
 public class TypeChecking implements Visitor {
-
-
-    @Override
-    public void visit(VarDeclOp varDeclOp) {
-
-    }
+    private final SymbolTable symbolTable = new SymbolTable();
 
     @Override
     public void visit(IfThenOp ifThenOp) {
@@ -44,6 +41,9 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(WhileOp whileOp) {
+        whileOp.getCondition().accept(this);
+        whileOp.getBody().accept(this);
+        // controllo che il type della condizione sia bool
 
     }
 
@@ -58,11 +58,6 @@ public class TypeChecking implements Visitor {
     }
 
     @Override
-    public void visit(PVarOp pVarOp) {
-
-    }
-
-    @Override
     public void visit(VarOptInitOp varOptInitOp) {
 
     }
@@ -71,4 +66,10 @@ public class TypeChecking implements Visitor {
     public void visit(BeginEndOp beginEndOp) {
 
     }
+
+    @Override
+    public void visit(PVarOp pVarOp) {}
+
+    @Override
+    public void visit(VarDeclOp varDeclOp) {}
 }
