@@ -1,15 +1,16 @@
-package main.visitor.typechecking;
+package main.visitor.type_checking;
 
+import main.nodes.common.Identifier;
 import main.nodes.declarations.*;
+import main.nodes.expr.ExprOp;
 import main.nodes.expr.FunCallOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
-import main.nodes.statements.BodyOp;
-import main.nodes.statements.IfThenElseOp;
-import main.nodes.statements.IfThenOp;
-import main.nodes.statements.WhileOp;
+import main.nodes.statements.*;
 import main.visitor.Visitor;
 import main.visitor.scoping.SymbolTable;
+
+import java.util.ArrayList;
 
 public class TypeChecking implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
@@ -72,6 +73,28 @@ public class TypeChecking implements Visitor {
     @Override
     public void visit(BeginEndOp beginEndOp) {
 
+    }
+
+    @Override
+    public void visit(AssignOp assignOp) {
+        ArrayList<ExprOp> exprList = (ArrayList<ExprOp>) assignOp.getExpressions();
+        ArrayList<Identifier> idList = (ArrayList<Identifier>) assignOp.getIdentfiers();
+
+        // Non si puo fare un assegnamento di una chiamata a funzione in un multiple assign
+        if(exprList.size() > 1){
+            for(ExprOp exprOp : exprList){
+                if(exprOp instanceof FunCallOp){
+                    System.err.println("Cannot assign a function call to a variable in a multiple assign statement");
+                    System.exit(1);
+                }
+            }
+        }
+
+        // #Identifiers == #expressions negli assegnamenti, altrimenti errore
+        if(idList.size() != exprList.size()){
+            System.err.println("Number of identifiers and expressions do not match in assignment");
+            System.exit(1);
+        }
     }
 
     @Override

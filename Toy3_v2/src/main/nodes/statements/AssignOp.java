@@ -1,9 +1,8 @@
 package main.nodes.statements;
-
 import main.nodes.expr.ExprOp;
-import main.visitor.Visitor;
 import main.nodes.common.Identifier;
 import main.visitor.Node;
+import main.visitor.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +41,15 @@ public class AssignOp extends Node implements StatementOp {
         return funLabel;
     }
 
+
     public String toString() {
         return "AssignOp{ " +
                 "listId= " + listId +
                 ", listExpr= " + listExpr +
                 " }";
+    }
+
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
     }
 }

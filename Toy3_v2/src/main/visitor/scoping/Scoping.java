@@ -284,4 +284,7 @@ public class Scoping implements Visitor {
     @Override
     public void visit(FunCallOp funCallOp) {}
 
+    @Override
+    public void visit(AssignOp assignOp) {}
+
 }
