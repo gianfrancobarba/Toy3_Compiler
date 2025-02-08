@@ -133,7 +133,7 @@ public class Scoping implements Visitor {
     @Override
     public void visit(ParDeclOp parDeclOp) {
         // System.out.println("Visit par decl");
-        tempType = parDeclOp.getType().getTypeName();
+        tempType = parDeclOp.getTypeOp().getTypeName();
 
         if(parDeclOp.getPVars() != null) {
             for(PVarOp pVarOp : parDeclOp.getPVars()) {
@@ -270,7 +270,7 @@ public class Scoping implements Visitor {
             StringJoiner joiner = new StringJoiner(", ");
             for (ParDeclOp parDecl : funDeclOp.getParams()) {
                 for (PVarOp pVarOp : parDecl.getPVars()) {
-                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getType().getTypeName();
+                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getTypeOp().getTypeName();
                     joiner.add(param);
                 }
             }

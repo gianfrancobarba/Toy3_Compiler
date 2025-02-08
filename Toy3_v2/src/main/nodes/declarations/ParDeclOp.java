@@ -20,7 +20,7 @@ public class ParDeclOp extends Node {
     }
 
 
-    public TypeOp getType(){
+    public TypeOp getTypeOp(){
         return type;
     }
 
