@@ -11,6 +11,7 @@ import main.visitor.Visitor;
 import main.visitor.scoping.SymbolTable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TypeChecking implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
@@ -95,6 +96,23 @@ public class TypeChecking implements Visitor {
             System.err.println("Number of identifiers and expressions do not match in assignment");
             System.exit(1);
         }
+
+        // Visita che crea la SymbolTable
+        for(Identifier id : idList)
+            id.accept(this);
+        for(ExprOp expr : exprList)
+            expr.accept(this);
+
+        for(Identifier id : idList){
+            String idType = id.getType();
+            String exprType = exprList.get(idList.indexOf(id)).getType();
+            if(!Objects.equals(idType,exprType)){
+                System.err.print("ERROR: Conflicting types in assignment: id "+ id.getLessema());
+                System.err.print(" has type " + idType + " but expression has type "+ exprType);
+                System.exit(1);
+            }
+        }
+
     }
 
     @Override
