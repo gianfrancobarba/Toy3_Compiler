@@ -29,9 +29,4 @@ public class UnaryExprOp extends Node implements ExprOp {
     }
 
     public String toString() {return super.toString();}
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
 }

@@ -40,8 +40,4 @@ public class ConstOp extends Node implements ExprOp {
                 ", value= " + value +
                 " }";
     }
-
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
 }

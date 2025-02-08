@@ -54,8 +54,4 @@ public class ReadOp extends Node implements StatementOp {
                 ", listId=" + listId +
                 " }";
     }
-
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
-    }
 }
