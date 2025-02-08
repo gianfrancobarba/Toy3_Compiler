@@ -283,22 +283,5 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(FunCallOp funCallOp) {}
-    @Override
-    public void visit(ReturnOp returnOp) {}
-    @Override
-    public void visit(UnaryExprOp unaryExprOp) {}
-    @Override
-    public void visit(Identifier identifier) {}
-    @Override
-    public void visit(BinaryExprOp binaryExprOp) {}
-    @Override
-    public void visit(AssignOp assignOp) {}
-    @Override
-    public void visit(ReadOp readOp) {}
-    @Override
-    public void visit(WriteOp writeOp) {}
-    @Override
-    public void visit(ConstOp constOp) {}
-    @Override
-    public void visit(TypeOp typeOp) {}
+
 }

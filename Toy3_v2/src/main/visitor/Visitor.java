@@ -12,15 +12,7 @@ import main.nodes.types.TypeOp;
 
 public interface Visitor {
 
-    void visit(UnaryExprOp unaryExprOp);
-
-    void visit(Identifier identifier);
-
-    void visit(BinaryExprOp binaryExprOp);
-
     void visit(VarDeclOp varDeclOp);
-
-    void visit(AssignOp assignOp);
 
     void visit(IfThenOp ifThenOp);
 
@@ -32,15 +24,9 @@ public interface Visitor {
 
     void visit(ProgramOp programOp);
 
-    void visit(ReturnOp returnOp);
-
     void visit(WhileOp whileOp);
 
     void visit(ParDeclOp parDeclOp);
-
-    void visit(ReadOp readOp);
-
-    void visit(WriteOp writeOp);
 
     void visit(IfThenElseOp ifThenElseOp);
 
@@ -50,7 +36,4 @@ public interface Visitor {
 
     void visit(BeginEndOp beginEndOp);
 
-    void visit(ConstOp constOp);
-
-    void visit(TypeOp typeOp);
 }
