@@ -47,4 +47,8 @@ public class WriteOp extends Node implements StatementOp {
                 ", newLine=" + newLine +
                 '}';
     }
+
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
 }

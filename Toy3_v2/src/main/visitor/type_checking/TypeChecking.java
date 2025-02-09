@@ -5,9 +5,11 @@ import main.nodes.declarations.*;
 import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.ExprOp;
 import main.nodes.expr.FunCallOp;
+import main.nodes.expr.UnaryExprOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
+import main.nodes.types.ConstOp;
 import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 import main.visitor.scoping.SymbolTable;
@@ -27,6 +29,17 @@ public class TypeChecking implements Visitor {
             System.err.println("ERROR: Invalid types in If-Then statement");
             System.exit(1);
         }
+    }
+
+    public void visit(ExprOp expr){
+        if(expr instanceof BinaryExprOp b)
+            visit(b);
+        else if(expr instanceof UnaryExprOp u)
+            visit(u);
+        else if(expr instanceof FunCallOp f)
+            visit(f);
+        else if(expr instanceof ConstOp c)
+            c.accept(this); // da vedere
     }
 
     @Override
@@ -106,11 +119,6 @@ public class TypeChecking implements Visitor {
     }
 
     @Override
-    public void visit(ParDeclOp parDeclOp) {
-
-    }
-
-    @Override
     public void visit(IfThenElseOp ifThenElseOp) {
         ifThenElseOp.getCondition().accept(this);
         ifThenElseOp.getThenBranch().accept(this);
@@ -126,10 +134,6 @@ public class TypeChecking implements Visitor {
         }
     }
 
-    @Override
-    public void visit(VarOptInitOp varOptInitOp) {
-
-    }
 
     @Override
     public void visit(BeginEndOp beginEndOp) {
@@ -185,10 +189,42 @@ public class TypeChecking implements Visitor {
     }
 
     @Override
+    public void visit(WriteOp writeOp) {
+        for(ExprOp expr : writeOp.getExprList())
+            expr.accept(this);
+    }
+
+    @Override
+    public void visit(ReadOp readOp) {
+        for(Identifier id : readOp.getIdentifiers())
+            id.accept(this);
+    }
+
+    @Override
     public void visit(PVarOp pVarOp) {}
 
     @Override
-    public void visit(VarDeclOp varDeclOp) {}
+    public void visit(VarDeclOp varDeclOp) {
+        if(varDeclOp.getTypeOrConstant() instanceof ConstOp c){
+            c.accept(this);
+        }
+
+        ArrayList<VarOptInitOp> varOptInitList = (ArrayList<VarOptInitOp>) varDeclOp.getListVarOptInit();
+        if(varOptInitList != null){
+            for(VarOptInitOp varOptInit : varOptInitList)
+                varOptInit.accept(this);
+        }
+    }
+
+    @Override
+    public void visit(VarOptInitOp varOptInitOp) {
+        varOptInitOp.getId().accept(this);
+        if(varOptInitOp.getExprOp() != null)
+            varOptInitOp.getExprOp().accept(this);
+    }
+
+    @Override
+    public void visit(ParDeclOp parDeclOp) {}
 
     private String[] extractParameters(String type) {
         String[] parts = type.split("\\("); // Divide in base a "("

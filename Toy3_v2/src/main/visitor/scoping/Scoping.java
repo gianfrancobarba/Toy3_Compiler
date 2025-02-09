@@ -291,4 +291,10 @@ public class Scoping implements Visitor {
     @Override
     public void visit(ReturnOp returnOp) {}
 
+    @Override
+    public void visit(WriteOp writeOp) {}
+
+    @Override
+    public void visit(ReadOp readOp) {}
+
 }
