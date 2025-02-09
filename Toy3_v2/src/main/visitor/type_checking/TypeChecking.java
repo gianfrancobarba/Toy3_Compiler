@@ -11,8 +11,8 @@ import main.nodes.statements.*;
 import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 import main.visitor.scoping.SymbolTable;
-import java.util.ArrayList;
-import java.util.Objects;
+
+import java.util.*;
 
 public class TypeChecking implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
@@ -37,11 +37,52 @@ public class TypeChecking implements Visitor {
     @Override
     public void visit(FunDeclOp funDeclOp) {
 
+
     }
 
     @Override
     public void visit(FunCallOp funCallOp) {
 
+        boolean isFun = true;
+        funCallOp.getId().accept(this);
+        String funDeclType = funCallOp.getId().getType().getTypeName();
+        String[] expectedParams = extractParameters(funDeclType);
+        List<ExprOp> actualParams = funCallOp.getExprList();
+
+        if(actualParams != null) {
+
+            if (actualParams.size() != Objects.requireNonNull(expectedParams).length) {
+                System.err.println("ERROR: Number of parameters in function call does not match the number of parameters in the function declaration: " + funCallOp.getId().getLessema());
+                System.exit(1);
+            }
+
+            Map<Integer, String> expectedParamMap = new HashMap<>();
+            for (int i = 0; i < Objects.requireNonNull(expectedParams).length; i++) {
+                expectedParamMap.put(i, expectedParams[i].replace("ref ", ""));
+            }
+
+            for (int i = 0; i < actualParams.size(); i++) {
+                actualParams.get(i).accept(this);
+                if (!actualParams.get(i).getType().getTypeName().equals(expectedParamMap.get(i))) {
+                    System.err.println("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + i + 1);
+                    System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType().getTypeName());
+                    System.exit(1);
+                }
+            }
+
+            for(int i = 0; i < actualParams.size(); i++){
+                if(expectedParams[i].startsWith("ref")){
+                    if(!(actualParams.get(i) instanceof Identifier)){
+                        System.err.println("ERROR: Expected reference parameter at position " + i + 1);
+                        System.exit(1);
+                    }
+                }
+            }
+        }
+
+        funDeclType = extractType(funDeclType);
+        if(!funDeclType.equals("void"))
+            funCallOp.setType(new TypeOp(funDeclType));
     }
 
     @Override
@@ -148,4 +189,14 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(VarDeclOp varDeclOp) {}
+
+    private String[] extractParameters(String type) {
+        String[] parts = type.split("\\("); // Divide in base a "("
+        if (parts.length < 2) return null; // Se non c'è "(", non ci sono parametri
+        return parts[1].replace(")", "").split(","); // Rimuove la parentesi finale e divide in base a ","
+    }
+
+    private String extractType(String type) {
+        return type.split("\\(")[0]; // Prende tutto prima di "("
+    }
 }
