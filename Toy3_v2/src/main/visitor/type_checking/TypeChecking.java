@@ -2,6 +2,7 @@ package main.visitor.type_checking;
 
 import main.nodes.common.Identifier;
 import main.nodes.declarations.*;
+import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.ExprOp;
 import main.nodes.expr.FunCallOp;
 import main.nodes.program.BeginEndOp;
@@ -131,6 +132,15 @@ public class TypeChecking implements Visitor {
             }
         }
 
+    }
+
+    @Override
+    public void visit(BinaryExprOp binaryExprOp) {
+
+    }
+
+    @Override
+    public void visit(ReturnOp returnOp) {
     }
 
     @Override

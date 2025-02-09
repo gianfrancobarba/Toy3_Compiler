@@ -38,4 +38,9 @@ public class ReturnOp extends Node implements StatementOp {
                     " }";
         }
     }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
 }

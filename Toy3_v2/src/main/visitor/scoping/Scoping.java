@@ -1,6 +1,7 @@
 package main.visitor.scoping;
 
 import main.nodes.declarations.*;
+import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.FunCallOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
@@ -283,5 +284,11 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(AssignOp assignOp) {}
+
+    @Override
+    public void visit(BinaryExprOp binaryExprOp) {}
+
+    @Override
+    public void visit(ReturnOp returnOp) {}
 
 }

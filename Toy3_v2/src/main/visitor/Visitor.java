@@ -38,4 +38,7 @@ public interface Visitor {
 
     void visit(AssignOp assignOp);
 
+    void visit(BinaryExprOp binaryExprOp);
+
+    void visit(ReturnOp returnOp);
 }
