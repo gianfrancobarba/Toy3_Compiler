@@ -1,8 +1,11 @@
 package main.nodes.expr;
 
-import main.visitor.NodeInterface;
+import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 
-public interface ExprOp extends NodeInterface {
+public interface ExprOp {
+    TypeOp type = new TypeOp("notype");
+    TypeOp getType();
+    void setType(TypeOp type);
     void accept(Visitor visitor);
 }

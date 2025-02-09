@@ -7,6 +7,7 @@ import main.nodes.expr.FunCallOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
+import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 import main.visitor.scoping.SymbolTable;
 
@@ -20,8 +21,8 @@ public class TypeChecking implements Visitor {
     public void visit(IfThenOp ifThenOp) {
         ifThenOp.getCondition().accept(this);
         ifThenOp.getThenBranch().accept(this);
-        if(ifThenOp.getCondition().getType().equals("bool") && ifThenOp.getThenBranch().getType().equals("notype"))
-            ifThenOp.setType("notype");
+        if(ifThenOp.getCondition().getType().getTypeName().equals("bool") && ifThenOp.getThenBranch().getType().getTypeName().equals("notype"))
+            ifThenOp.setType(new TypeOp("notype"));
         else{
             System.err.println("Invalid types in If-Then statement");
             System.exit(1);
@@ -53,9 +54,9 @@ public class TypeChecking implements Visitor {
         whileOp.getCondition().accept(this);
         whileOp.getBody().accept(this);
         // controllo che il type della condizione sia bool
-        if(whileOp.getCondition().getType().equals("bool")
-            && whileOp.getBody().getType().equals("notype")){
-            whileOp.setType("notype");
+        if(whileOp.getCondition().getType().getTypeName().equals("bool")
+            && whileOp.getBody().getType().getTypeName().equals("notype")){
+            whileOp.setType(new TypeOp("notype"));
         }
         else {
             System.err.print("Invalid type in While statement");
@@ -73,10 +74,10 @@ public class TypeChecking implements Visitor {
         ifThenElseOp.getCondition().accept(this);
         ifThenElseOp.getThenBranch().accept(this);
         ifThenElseOp.getElseBranch().accept(this);
-        if(ifThenElseOp.getCondition().getType().equals("bool")
-            && ifThenElseOp.getThenBranch().getType().equals("notype")
-            && ifThenElseOp.getElseBranch().getType().equals("notype")){
-            ifThenElseOp.setType("notype");
+        if(ifThenElseOp.getCondition().getType().getTypeName().equals("bool")
+            && ifThenElseOp.getThenBranch().getType().getTypeName().equals("notype")
+            && ifThenElseOp.getElseBranch().getType().getTypeName().equals("notype")){
+            ifThenElseOp.setType(new TypeOp("notype"));
         }
         else{
             System.err.println("Invalid types in If-Then-Else statement");
@@ -122,8 +123,8 @@ public class TypeChecking implements Visitor {
             expr.accept(this);
 
         for(Identifier id : idList){
-            String idType = id.getType();
-            String exprType = exprList.get(idList.indexOf(id)).getType();
+            String idType = id.getType().getTypeName();
+            String exprType = String.valueOf(exprList.get(idList.indexOf(id)).getType()); // verificare funzionamento
             if(!Objects.equals(idType,exprType)){
                 System.err.print("ERROR: Conflicting types in assignment: id "+ id.getLessema());
                 System.err.print(" has type " + idType + " but expression has type "+ exprType);

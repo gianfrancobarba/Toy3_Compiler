@@ -1,10 +1,7 @@
 package main.visitor.scoping;
 
-import main.nodes.common.Identifier;
 import main.nodes.declarations.*;
-import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.FunCallOp;
-import main.nodes.expr.UnaryExprOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
