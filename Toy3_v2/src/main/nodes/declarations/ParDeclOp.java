@@ -8,11 +8,11 @@ import java.util.List;
 
 public class ParDeclOp extends Node {
     private List<PVarOp> pVars; // Lista di parametri (possono includere REF ID)
-    private TypeOp type;
+    private TypeOp parDeclType;
 
-    public ParDeclOp(List<PVarOp> pVars, TypeOp type) {
+    public ParDeclOp(List<PVarOp> pVars, TypeOp parDeclType) {
         this.pVars = new ArrayList<>(pVars);
-        this.type = type;
+        this.parDeclType = parDeclType;
     }
 
     public List<PVarOp> getPVars() {
@@ -21,7 +21,7 @@ public class ParDeclOp extends Node {
 
 
     public TypeOp getTypeOp(){
-        return type;
+        return parDeclType;
     }
 
     public void accept(Visitor visitor) {

@@ -1,9 +1,12 @@
 package main.visitor;
 
+import main.nodes.expr.ExprOp;
+import main.nodes.statements.StatementOp;
+import main.nodes.types.TypeOp;
 import main.visitor.scoping.Scope;
 
-public abstract class Node implements NodeInterface{
-    private String type = "notype";
+public abstract class Node {
+    private TypeOp type = new TypeOp("notype");
     private Scope scope;
 
 
@@ -13,9 +16,9 @@ public abstract class Node implements NodeInterface{
 
     public void setScope(Scope scope) { this.scope = scope; }
 
-    public String getType() {
+    public TypeOp getType() {
         return type;
     }
 
-    public void setType(String type) { this.type = type; }
+    public void setType(TypeOp type) { this.type = type; }
 }
