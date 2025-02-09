@@ -18,7 +18,14 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(IfThenOp ifThenOp) {
-
+        ifThenOp.getCondition().accept(this);
+        ifThenOp.getThenBranch().accept(this);
+        if(ifThenOp.getCondition().getType().equals("bool") && ifThenOp.getThenBranch().getType().equals("notype"))
+            ifThenOp.setType("notype");
+        else{
+            System.err.println("Invalid types in If-Then statement");
+            System.exit(1);
+        }
     }
 
     @Override
@@ -63,7 +70,18 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(IfThenElseOp ifThenElseOp) {
-
+        ifThenElseOp.getCondition().accept(this);
+        ifThenElseOp.getThenBranch().accept(this);
+        ifThenElseOp.getElseBranch().accept(this);
+        if(ifThenElseOp.getCondition().getType().equals("bool")
+            && ifThenElseOp.getThenBranch().getType().equals("notype")
+            && ifThenElseOp.getElseBranch().getType().equals("notype")){
+            ifThenElseOp.setType("notype");
+        }
+        else{
+            System.err.println("Invalid types in If-Then-Else statement");
+            System.exit(1);
+        }
     }
 
     @Override
