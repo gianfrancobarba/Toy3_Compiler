@@ -10,7 +10,6 @@ import main.nodes.statements.*;
 import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 import main.visitor.scoping.SymbolTable;
-
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -24,7 +23,7 @@ public class TypeChecking implements Visitor {
         if(ifThenOp.getCondition().getType().getTypeName().equals("bool") && ifThenOp.getThenBranch().getType().getTypeName().equals("notype"))
             ifThenOp.setType(new TypeOp("notype"));
         else{
-            System.err.println("Invalid types in If-Then statement");
+            System.err.println("ERROR: Invalid types in If-Then statement");
             System.exit(1);
         }
     }
@@ -59,7 +58,7 @@ public class TypeChecking implements Visitor {
             whileOp.setType(new TypeOp("notype"));
         }
         else {
-            System.err.print("Invalid type in While statement");
+            System.err.print("ERROR: Invalid type in While statement");
             System.exit(1);
         }
     }
@@ -80,7 +79,7 @@ public class TypeChecking implements Visitor {
             ifThenElseOp.setType(new TypeOp("notype"));
         }
         else{
-            System.err.println("Invalid types in If-Then-Else statement");
+            System.err.println("ERROR: Invalid types in If-Then-Else statement");
             System.exit(1);
         }
     }
@@ -104,7 +103,7 @@ public class TypeChecking implements Visitor {
         if(exprList.size() > 1){
             for(ExprOp exprOp : exprList){
                 if(exprOp instanceof FunCallOp){
-                    System.err.println("Cannot assign a function call to a variable in a multiple assign statement");
+                    System.err.println("ERROR: Cannot assign a function call to a variable in a multiple assign statement");
                     System.exit(1);
                 }
             }
@@ -112,7 +111,7 @@ public class TypeChecking implements Visitor {
 
         // #Identifiers == #expressions negli assegnamenti, altrimenti errore
         if(idList.size() != exprList.size()){
-            System.err.println("Number of identifiers and expressions do not match in assignment");
+            System.err.println("ERROR: Number of identifiers and expressions do not match in assignment");
             System.exit(1);
         }
 
