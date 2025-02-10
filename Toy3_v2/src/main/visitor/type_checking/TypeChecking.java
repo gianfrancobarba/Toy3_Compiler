@@ -22,6 +22,7 @@ import java.util.*;
 public class TypeChecking implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
     private boolean isFun = false;
+    private String currentFunType;
 
     @Override
     public void visit(IfThenOp ifThenOp) {
@@ -36,7 +37,7 @@ public class TypeChecking implements Visitor {
     }
 
     public void visit(ExprOp expr) {
-        switch(expr.getClass().getSimpleName()){
+        switch(expr.getClass().getSimpleName()) {
             case "BinaryExprOp":
                 visit((BinaryExprOp) expr);
                 break;
@@ -49,6 +50,31 @@ public class TypeChecking implements Visitor {
             case "Identifier":
                 visit((Identifier) expr);
                 break;
+        }
+    }
+
+    public void visit(StatementOp stmt) {
+        switch(stmt.getClass().getSimpleName()) {
+            case "IfThenOp":
+                visit((IfThenOp) stmt);
+                break;
+            case "IfThenElseOp":
+                visit((IfThenElseOp) stmt);
+                break;
+            case "WhileOp":
+                visit((WhileOp) stmt);
+                break;
+            case "AssignOp":
+                visit((AssignOp) stmt);
+                break;
+            case "ReadOp":
+                visit((ReadOp) stmt);
+                break;
+            case "WriteOp":
+                visit((WriteOp) stmt);
+                break;
+            case "ReturnOp":
+                visit((ReturnOp) stmt);
         }
     }
 
@@ -126,6 +152,38 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
+        symbolTable.setCurrentScope(funDeclOp.getScope());
+        String funType = symbolTable.lookup(Kind.FUN, funDeclOp.getId().getLessema());
+        currentFunType = extractType(funType);
+        funDeclOp.setType(new TypeOp(currentFunType));
+
+        // Controlla che se la funzione non è di tipo void allora deve contenere almeno un return statement mentre se
+        // è di tipo void non deve contenere alcun return statement;
+        if(funDeclOp.getType().getTypeName().equals("void")) {
+            if(funDeclOp.getBody().getStatements() != null && funDeclOp.getBody().getStatements().stream().anyMatch( stmt -> stmt instanceof ReturnOp)) {
+                System.err.print("Error: Function \"" + funDeclOp.getId().getLessema() + "\" cannot contain a return statement");
+                System.exit(1);
+            }
+        }
+        else {
+            if(funDeclOp.getBody().getStatements() == null || funDeclOp.getBody().getStatements().stream().noneMatch( stmt -> stmt instanceof ReturnOp)) {
+                System.err.print("Error: Function \"" + funDeclOp.getId().getLessema() + "\" requires a return statement");
+                System.exit(1);
+            }
+        }
+
+//        for(StatementOp stmt : funDeclOp.getBody().getStatements()) {
+//            stmt.accept(this);
+//        }
+
+        Optional.ofNullable(funDeclOp.getBody().getStatements())
+                .ifPresent(stmtList -> stmtList.forEach(stmt -> stmt.accept(this)));
+
+        Optional.ofNullable(funDeclOp.getBody().getVarDecls())
+                .ifPresent(varDeclList -> varDeclList.forEach(varDecl -> varDecl.accept(this)));
+
+        Optional.ofNullable(funDeclOp.getParams())
+                .ifPresent(paramDeclList -> paramDeclList.forEach(paramDecl -> paramDecl.accept(this)));
 
     }
 
@@ -176,7 +234,15 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(ProgramOp programOp) {
-
+        symbolTable.setCurrentScope(programOp.getScope());
+        for(Object decl : programOp.getListDecls()) {
+            if (decl instanceof VarDeclOp varDeclOp) {
+                varDeclOp.accept(this);
+            } else if (decl instanceof FunDeclOp funDeclOp) {
+                funDeclOp.accept(this);
+            }
+        }
+        programOp.getBeginEndOp().accept(this);
     }
 
     @Override
@@ -199,21 +265,26 @@ public class TypeChecking implements Visitor {
         ifThenElseOp.getCondition().accept(this);
         ifThenElseOp.getThenBranch().accept(this);
         ifThenElseOp.getElseBranch().accept(this);
+
         if(ifThenElseOp.getCondition().getType().getTypeName().equals("bool")
             && ifThenElseOp.getThenBranch().getType().getTypeName().equals("notype")
             && ifThenElseOp.getElseBranch().getType().getTypeName().equals("notype")){
             ifThenElseOp.setType(new TypeOp("notype"));
         }
-        else{
+        else {
             System.err.println("ERROR: Invalid types in If-Then-Else statement");
             System.exit(1);
         }
     }
 
-
     @Override
     public void visit(BeginEndOp beginEndOp) {
+        symbolTable.setCurrentScope(beginEndOp.getScope());
+        Optional.ofNullable(beginEndOp.getVarDeclList())
+                .ifPresent(varDeclList -> varDeclList.forEach(varDecl -> varDecl.accept(this)));
 
+        Optional.ofNullable(beginEndOp.getStmtList())
+                .ifPresent(stmtList -> stmtList.forEach(stmt -> stmt.accept(this)));
     }
 
     @Override
@@ -257,6 +328,12 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(ReturnOp returnOp) {
+        returnOp.getExpr().accept(this);
+        String returnType = returnOp.getExpr().getType().getTypeName();
+        if(!returnType.equals(currentFunType)){
+            System.err.print("ERROR: Conflicting return type in function " + returnOp.getExpr().getType().getTypeName());
+            System.exit(1);
+        }
     }
 
     @Override
@@ -270,9 +347,6 @@ public class TypeChecking implements Visitor {
         for(Identifier id : readOp.getIdentifiers())
             id.accept(this);
     }
-
-    @Override
-    public void visit(PVarOp pVarOp) {}
 
     @Override
     public void visit(VarDeclOp varDeclOp) {
@@ -296,6 +370,9 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(ParDeclOp parDeclOp) {}
+
+    @Override
+    public void visit(PVarOp pVarOp) {}
 
     private String[] extractParameters(String type) {
         String[] parts = type.split("\\("); // Divide in base a "("
