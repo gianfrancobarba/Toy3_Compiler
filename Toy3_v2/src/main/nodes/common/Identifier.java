@@ -16,5 +16,10 @@ public class Identifier extends Node implements ExprOp {
         return lessema;
     }
 
-    public String toString() {return super.toString();}
+    public String toString() {return "identifier: " + lessema;}
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
 }

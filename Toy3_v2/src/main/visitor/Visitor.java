@@ -7,8 +7,6 @@ import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
-import main.nodes.types.TypeOp;
-
 
 public interface Visitor {
 
@@ -46,4 +44,7 @@ public interface Visitor {
 
     void visit(ReadOp readOp);
 
+    void visit(UnaryExprOp unaryExprOp);
+
+    void visit(Identifier identifier);
 }

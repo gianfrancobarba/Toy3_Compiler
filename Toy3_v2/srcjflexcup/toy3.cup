@@ -28,8 +28,6 @@ import main.nodes.statements.IfThenOp;
 import main.nodes.statements.WhileOp;
 import main.nodes.statements.ReturnOp;
 import main.nodes.statements.BodyOp;
-
-import main.nodes.types.TypeOp;
 import main.nodes.types.ConstOp;
 
 parser code {:
@@ -142,12 +140,12 @@ VarsOptInit ::=  ID:id PIPE VarsOptInit
 // Definizioni di funzione
 DefDecl ::= DEF ID:id LPAR ParDecls:paramList RPAR OptType:t Body:body
             {:
-                RESULT = new FunDeclOp(new Identifier((String) id), (List<ParDeclOp>) paramList, (TypeOp) t, (BodyOp) body);
+                RESULT = new FunDeclOp(new Identifier((String) id), (List<ParDeclOp>) paramList, (String) t, (BodyOp) body);
                 parDeclList.clear();
             :}
           | DEF ID:id LPAR RPAR OptType:t Body:body
             {:
-                RESULT = new FunDeclOp(new Identifier((String) id), null, (TypeOp) t, (BodyOp) body);
+                RESULT = new FunDeclOp(new Identifier((String) id), null, (String) t, (BodyOp) body);
             :};
 
 ParDecls ::= ParDecl:parDecl SEMI ParDecls  {: parDeclList.add(0, (ParDeclOp) parDecl); RESULT = parDeclList; :}
@@ -155,7 +153,7 @@ ParDecls ::= ParDecl:parDecl SEMI ParDecls  {: parDeclList.add(0, (ParDeclOp) pa
 
 ParDecl ::= PVars:pVars COLON Type:t
             {:
-                RESULT = new ParDeclOp((List<PVarOp>) pVars, (TypeOp) t);
+                RESULT = new ParDeclOp((List<PVarOp>) pVars, (String) t);
                 pVarList.clear();
             :};
 
@@ -244,11 +242,11 @@ RelOp ::= GT {: RESULT = ">";  :}
     | EQ     {: RESULT = "=="; :}
     | NE     {: RESULT = "<>"; :};
 
-Type ::= INT    {: RESULT = new TypeOp("int");    :}
-       | BOOL   {: RESULT = new TypeOp("bool");   :}
-       | DOUBLE {: RESULT = new TypeOp("double"); :}
-       | STRING {: RESULT = new TypeOp("string"); :}
-       | CHAR   {: RESULT = new TypeOp("char");   :};
+Type ::= INT    {: RESULT = "int";    :}
+       | BOOL   {: RESULT = "bool";   :}
+       | DOUBLE {: RESULT = "double"; :}
+       | STRING {: RESULT = "string"; :}
+       | CHAR   {: RESULT = "char";   :};
 
 Constant ::= TRUE:bool {: RESULT = new ConstOp(bool); :}
            | FALSE:bool {: RESULT = new ConstOp(bool); :}

@@ -33,7 +33,10 @@ public class VarOptInitOp extends Node {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "VarOptInitOp{" +
+                "id=" + id +
+                ", exprOp=" + exprOp +
+                '}';
     }
 
     public void accept(Visitor visitor) {

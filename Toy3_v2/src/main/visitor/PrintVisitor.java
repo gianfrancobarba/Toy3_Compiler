@@ -7,7 +7,6 @@ import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
-import main.nodes.types.TypeOp;
 
 public class PrintVisitor implements Visitor {
 
@@ -20,9 +19,9 @@ public class PrintVisitor implements Visitor {
         }
     }
 
-    public void visit(TypeOp typeOp) {
+    public void visit(String type) {
         printIndent();
-        System.out.println("TypeOp: " + typeOp.getTypeName());
+        System.out.println("Type: " + type);
     }
 
     public void visit(UnaryExprOp unaryExprOp) {
@@ -61,12 +60,14 @@ public class PrintVisitor implements Visitor {
         System.out.println("VarDeclOp: ");
 
         indentLevel++;
+
+
         for(VarOptInitOp varOptInitOp : varDeclOp.getListVarOptInit()) {
             varOptInitOp.accept(this);
         }
 
-        if(varDeclOp.getTypeOrConstant() instanceof TypeOp) {
-            ((TypeOp) varDeclOp.getTypeOrConstant()).accept(this);
+        if(varDeclOp.getTypeOrConstant() instanceof String) {
+            System.out.println("Type: "+ varDeclOp.getTypeOrConstant());
         } else if(varDeclOp.getTypeOrConstant() instanceof ExprOp) {
             ((ExprOp) varDeclOp.getTypeOrConstant()).accept(this);
         }
@@ -106,14 +107,9 @@ public class PrintVisitor implements Visitor {
                 parDeclOp.accept(this);
           }
 
-        if(funDeclOp.getOptType() != null) {
-            funDeclOp.getOptType().accept(this);
-        }
-        else {
-            printIndent();
-            System.out.println("OptType: void");
-        }
-
+        printIndent();
+        String type = funDeclOp.getOptType() == null ? "void" : funDeclOp.getOptType();
+        System.out.println("Type: " + type);
         if(funDeclOp.getBody() != null) {
             funDeclOp.getBody().accept(this);
         }
@@ -132,10 +128,11 @@ public class PrintVisitor implements Visitor {
 
         funCallOp.getId().accept(this);
 
-        if(funCallOp.getExprList() != null)
-            for(ExprOp expr : funCallOp.getExprList()) {
+        if(funCallOp.getExprList() != null) {
+            for (ExprOp expr : funCallOp.getExprList()) {
                 expr.accept(this);
             }
+        }
 
         indentLevel--;
     }
@@ -202,11 +199,9 @@ public class PrintVisitor implements Visitor {
                 pVarOp.accept(this);
             }
 
-        if(parDeclOp.getTypeOp() != null) {
-            parDeclOp.getTypeOp().accept(this);
-        }
-
-        System.out.println("Type: " + parDeclOp.getTypeOp().getTypeName());
+        printIndent();
+        String type = parDeclOp.getParDeclType() == null ? "void" : parDeclOp.getParDeclType();
+        System.out.println("Type: " + type);
         indentLevel--;
 
     }
@@ -286,7 +281,6 @@ public class PrintVisitor implements Visitor {
         System.out.println("VarOptInitOp: ");
 
         indentLevel++;
-
         varOptInitOp.getId().accept(this);
 
         if(varOptInitOp.getExprOp() != null) {
@@ -339,8 +333,10 @@ public class PrintVisitor implements Visitor {
 
         indentLevel++;
 
-        for(VarDeclOp varDeclOp : bodyOp.getVarDecls()) {
-            varDeclOp.accept(this);
+        if( bodyOp.getVarDecls() != null) {
+            for (VarDeclOp varDeclOp : bodyOp.getVarDecls()) {
+                varDeclOp.accept(this);
+            }
         }
 
         for(StatementOp statementOp : bodyOp.getStatements()) {

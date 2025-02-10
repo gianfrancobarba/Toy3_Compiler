@@ -27,9 +27,7 @@ import main.nodes.statements.IfThenElseOp;
 import main.nodes.statements.IfThenOp;
 import main.nodes.statements.WhileOp;
 import main.nodes.statements.ReturnOp;
-import main.nodes.statements.AssignOp;
 import main.nodes.statements.BodyOp;
-import main.nodes.types.TypeOp;
 import main.nodes.types.ConstOp;
 import java_cup.runtime.XMLElement;
 
@@ -652,7 +650,7 @@ class CUP$parser$actions {
 		int bodyright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object body = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                RESULT = new FunDeclOp(new Identifier((String) id), (List<ParDeclOp>) paramList, (TypeOp) t, (BodyOp) body);
+                RESULT = new FunDeclOp(new Identifier((String) id), (List<ParDeclOp>) paramList, (String) t, (BodyOp) body);
                 parDeclList.clear();
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("DefDecl",8, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-6)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -673,7 +671,7 @@ class CUP$parser$actions {
 		int bodyright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object body = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                RESULT = new FunDeclOp(new Identifier((String) id), null, (TypeOp) t, (BodyOp) body);
+                RESULT = new FunDeclOp(new Identifier((String) id), null, (String) t, (BodyOp) body);
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("DefDecl",8, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-5)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
@@ -714,7 +712,7 @@ class CUP$parser$actions {
 		int tright = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object t = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
 		
-                RESULT = new ParDeclOp((List<PVarOp>) pVars, (TypeOp) t);
+                RESULT = new ParDeclOp((List<PVarOp>) pVars, (String) t);
                 pVarList.clear();
             
               CUP$parser$result = parser.getSymbolFactory().newSymbol("ParDecl",10, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
@@ -1300,7 +1298,7 @@ class CUP$parser$actions {
           case 64: // Type ::= INT 
             {
               Object RESULT =null;
-		 RESULT = new TypeOp("int");    
+		 RESULT = "int";    
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",6, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1309,7 +1307,7 @@ class CUP$parser$actions {
           case 65: // Type ::= BOOL 
             {
               Object RESULT =null;
-		 RESULT = new TypeOp("bool");   
+		 RESULT = "bool";   
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",6, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1318,7 +1316,7 @@ class CUP$parser$actions {
           case 66: // Type ::= DOUBLE 
             {
               Object RESULT =null;
-		 RESULT = new TypeOp("double"); 
+		 RESULT = "double"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",6, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1327,7 +1325,7 @@ class CUP$parser$actions {
           case 67: // Type ::= STRING 
             {
               Object RESULT =null;
-		 RESULT = new TypeOp("string"); 
+		 RESULT = "string"; 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",6, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1336,7 +1334,7 @@ class CUP$parser$actions {
           case 68: // Type ::= CHAR 
             {
               Object RESULT =null;
-		 RESULT = new TypeOp("char");   
+		 RESULT = "char";   
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",6, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

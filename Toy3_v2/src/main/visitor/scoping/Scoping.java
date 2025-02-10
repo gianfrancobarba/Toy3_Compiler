@@ -1,13 +1,14 @@
 package main.visitor.scoping;
 
+import main.nodes.common.Identifier;
 import main.nodes.declarations.*;
 import main.nodes.expr.BinaryExprOp;
 import main.nodes.expr.FunCallOp;
+import main.nodes.expr.UnaryExprOp;
 import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
-import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 
 import java.util.Objects;
@@ -60,8 +61,8 @@ public class Scoping implements Visitor {
 
         if (varDeclOp.getListVarOptInit() != null)
             for(VarOptInitOp varOptInitOp : varDeclOp.getListVarOptInit()) {
-                if (varDeclOp.getTypeOrConstant() instanceof TypeOp type)
-                    tempType = type.getTypeName();
+                if (varDeclOp.getTypeOrConstant() instanceof String type)
+                    tempType = type;
                 else if (varDeclOp.getTypeOrConstant() instanceof ConstOp constant)
                     tempType = constant.getConstantType();
 
@@ -131,7 +132,7 @@ public class Scoping implements Visitor {
     @Override
     public void visit(ParDeclOp parDeclOp) {
         // System.out.println("Visit par decl");
-        tempType = parDeclOp.getTypeOp().getTypeName();
+        tempType = parDeclOp.getParDeclType();
 
         if(parDeclOp.getPVars() != null) {
             for(PVarOp pVarOp : parDeclOp.getPVars()) {
@@ -262,7 +263,7 @@ public class Scoping implements Visitor {
         StringBuilder sb = new StringBuilder();
         String type;
         if (funDeclOp.getOptType() != null) {
-            type = funDeclOp.getOptType().getTypeName();
+            type = funDeclOp.getOptType();
             sb.append(type);
         } else {
             sb.append("void");
@@ -273,7 +274,7 @@ public class Scoping implements Visitor {
             StringJoiner joiner = new StringJoiner(", ");
             for (ParDeclOp parDecl : funDeclOp.getParams()) {
                 for (PVarOp pVarOp : parDecl.getPVars()) {
-                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getTypeOp().getTypeName();
+                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getParDeclType();
                     joiner.add(param);
                 }
             }
@@ -301,5 +302,13 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(ReadOp readOp) {}
+
+    @Override
+    public void visit(UnaryExprOp unaryExprOp) {}
+
+    @Override
+    public void visit(Identifier identifier) {
+
+    }
 
 }

@@ -10,7 +10,6 @@ import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
-import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
 import main.visitor.scoping.Kind;
 import main.visitor.scoping.SymbolTable;
@@ -28,8 +27,8 @@ public class TypeChecking implements Visitor {
     public void visit(IfThenOp ifThenOp) {
         ifThenOp.getCondition().accept(this);
         ifThenOp.getThenBranch().accept(this);
-        if(ifThenOp.getCondition().getType().getTypeName().equals("bool") && ifThenOp.getThenBranch().getType().getTypeName().equals("notype"))
-            ifThenOp.setType(new TypeOp("notype"));
+        if(ifThenOp.getCondition().getType().equals("bool") && ifThenOp.getThenBranch().getType().equals("notype"))
+            ifThenOp.setType("notype");
         else{
             System.err.print("ERROR: Invalid types in If-Then statement");
             System.exit(1);
@@ -83,8 +82,8 @@ public class TypeChecking implements Visitor {
         binaryExprOp.getLeft().accept(this);
         binaryExprOp.getRight().accept(this);
 
-        String leftType = binaryExprOp.getLeft().getType().getTypeName();
-        String rightType = binaryExprOp.getRight().getType().getTypeName();
+        String leftType = binaryExprOp.getLeft().getType();
+        String rightType = binaryExprOp.getRight().getType();
         String operator = binaryExprOp.getOp();
         String result = BinaryOpTable.getResult(operator, leftType, rightType);
 
@@ -93,13 +92,13 @@ public class TypeChecking implements Visitor {
             System.exit(1);
         }
 
-        binaryExprOp.setType(new TypeOp(result));
+        binaryExprOp.setType(result);
     }
 
    // @Override
     public void visit(UnaryExprOp unaryExprOp) {
         unaryExprOp.getExpr().accept(this);
-        String exprType = unaryExprOp.getExpr().getType().getTypeName();
+        String exprType = unaryExprOp.getExpr().getType();
         String operator = unaryExprOp.getOp();
         String result = UnaryOpTable.getResult(operator, exprType);
 
@@ -108,12 +107,12 @@ public class TypeChecking implements Visitor {
             System.exit(1);
         }
 
-        unaryExprOp.setType(new TypeOp(result));
+        unaryExprOp.setType(result);
     }
 
     //@Override
     public void visit(ConstOp constOp) {
-        constOp.setType(new TypeOp(constOp.getConstantType()));
+        constOp.setType(constOp.getConstantType());
     }
 
     //@Override
@@ -134,7 +133,7 @@ public class TypeChecking implements Visitor {
                 System.exit(1);
             }
         }
-        id.setType(new TypeOp(type));
+        id.setType(type);
     }
 
     @Override
@@ -155,11 +154,11 @@ public class TypeChecking implements Visitor {
         symbolTable.setCurrentScope(funDeclOp.getScope());
         String funType = symbolTable.lookup(Kind.FUN, funDeclOp.getId().getLessema());
         currentFunType = extractType(funType);
-        funDeclOp.setType(new TypeOp(currentFunType));
+        funDeclOp.setType(currentFunType);
 
         // Controlla che se la funzione non è di tipo void allora deve contenere almeno un return statement mentre se
         // è di tipo void non deve contenere alcun return statement;
-        if(funDeclOp.getType().getTypeName().equals("void")) {
+        if(funDeclOp.getType().equals("void")) {
             if(funDeclOp.getBody().getStatements() != null && funDeclOp.getBody().getStatements().stream().anyMatch( stmt -> stmt instanceof ReturnOp)) {
                 System.err.print("Error: Function \"" + funDeclOp.getId().getLessema() + "\" cannot contain a return statement");
                 System.exit(1);
@@ -192,7 +191,7 @@ public class TypeChecking implements Visitor {
 
         isFun = true;
         funCallOp.getId().accept(this);
-        String funDeclType = funCallOp.getId().getType().getTypeName();
+        String funDeclType = funCallOp.getId().getType();
         String[] expectedParams = extractParameters(funDeclType);
         List<ExprOp> actualParams = funCallOp.getExprList();
 
@@ -210,9 +209,9 @@ public class TypeChecking implements Visitor {
 
             for (int i = 0; i < actualParams.size(); i++) {
                 actualParams.get(i).accept(this);
-                if (!actualParams.get(i).getType().getTypeName().equals(expectedParamMap.get(i))) {
+                if (!actualParams.get(i).getType().equals(expectedParamMap.get(i))) {
                     System.err.println("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + i + 1);
-                    System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType().getTypeName());
+                    System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
                     System.exit(1);
                 }
             }
@@ -229,7 +228,7 @@ public class TypeChecking implements Visitor {
 
         funDeclType = extractType(funDeclType);
         if(!funDeclType.equals("void"))
-            funCallOp.setType(new TypeOp(funDeclType));
+            funCallOp.setType(funDeclType);
     }
 
     @Override
@@ -250,9 +249,9 @@ public class TypeChecking implements Visitor {
         whileOp.getCondition().accept(this);
         whileOp.getBody().accept(this);
         // controllo che il type della condizione sia bool
-        if(whileOp.getCondition().getType().getTypeName().equals("bool")
-            && whileOp.getBody().getType().getTypeName().equals("notype")){
-            whileOp.setType(new TypeOp("notype"));
+        if(whileOp.getCondition().getType().equals("bool")
+            && whileOp.getBody().getType().equals("notype")){
+            whileOp.setType("notype");
         }
         else {
             System.err.print("ERROR: Invalid type in While statement");
@@ -266,10 +265,10 @@ public class TypeChecking implements Visitor {
         ifThenElseOp.getThenBranch().accept(this);
         ifThenElseOp.getElseBranch().accept(this);
 
-        if(ifThenElseOp.getCondition().getType().getTypeName().equals("bool")
-            && ifThenElseOp.getThenBranch().getType().getTypeName().equals("notype")
-            && ifThenElseOp.getElseBranch().getType().getTypeName().equals("notype")){
-            ifThenElseOp.setType(new TypeOp("notype"));
+        if(ifThenElseOp.getCondition().getType().equals("bool")
+            && ifThenElseOp.getThenBranch().getType().equals("notype")
+            && ifThenElseOp.getElseBranch().getType().equals("notype")){
+            ifThenElseOp.setType("notype");
         }
         else {
             System.err.println("ERROR: Invalid types in If-Then-Else statement");
@@ -315,7 +314,7 @@ public class TypeChecking implements Visitor {
             expr.accept(this);
 
         for(Identifier id : idList){
-            String idType = id.getType().getTypeName();
+            String idType = id.getType();
             String exprType = String.valueOf(exprList.get(idList.indexOf(id)).getType()); // verificare funzionamento
             if(!Objects.equals(idType,exprType)){
                 System.err.print("ERROR: Conflicting types in assignment: id "+ id.getLessema());
@@ -329,9 +328,9 @@ public class TypeChecking implements Visitor {
     @Override
     public void visit(ReturnOp returnOp) {
         returnOp.getExpr().accept(this);
-        String returnType = returnOp.getExpr().getType().getTypeName();
+        String returnType = returnOp.getExpr().getType();
         if(!returnType.equals(currentFunType)){
-            System.err.print("ERROR: Conflicting return type in function " + returnOp.getExpr().getType().getTypeName());
+            System.err.print("ERROR: Conflicting return type in function " + returnOp.getExpr().getType());
             System.exit(1);
         }
     }
