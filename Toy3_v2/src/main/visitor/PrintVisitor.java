@@ -67,6 +67,7 @@ public class PrintVisitor implements Visitor {
         }
 
         if(varDeclOp.getTypeOrConstant() instanceof String) {
+            printIndent();
             System.out.println("Type: "+ varDeclOp.getTypeOrConstant());
         } else if(varDeclOp.getTypeOrConstant() instanceof ExprOp) {
             ((ExprOp) varDeclOp.getTypeOrConstant()).accept(this);
