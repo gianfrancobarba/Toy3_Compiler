@@ -12,12 +12,16 @@ import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.nodes.types.TypeOp;
 import main.visitor.Visitor;
+import main.visitor.scoping.Kind;
 import main.visitor.scoping.SymbolTable;
+import main.visitor.tables.BinaryOpTable;
+import main.visitor.tables.UnaryOpTable;
 
 import java.util.*;
 
 public class TypeChecking implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
+    private boolean isFun = false;
 
     @Override
     public void visit(IfThenOp ifThenOp) {
@@ -26,37 +30,109 @@ public class TypeChecking implements Visitor {
         if(ifThenOp.getCondition().getType().getTypeName().equals("bool") && ifThenOp.getThenBranch().getType().getTypeName().equals("notype"))
             ifThenOp.setType(new TypeOp("notype"));
         else{
-            System.err.println("ERROR: Invalid types in If-Then statement");
+            System.err.print("ERROR: Invalid types in If-Then statement");
             System.exit(1);
         }
     }
 
-    public void visit(ExprOp expr){
-        if(expr instanceof BinaryExprOp b)
-            visit(b);
-        else if(expr instanceof UnaryExprOp u)
-            visit(u);
-        else if(expr instanceof FunCallOp f)
-            visit(f);
-        else if(expr instanceof ConstOp c)
-            c.accept(this); // da vedere
+    public void visit(ExprOp expr) {
+        switch(expr.getClass().getSimpleName()){
+            case "BinaryExprOp":
+                visit((BinaryExprOp) expr);
+                break;
+            case "UnaryExprOp":
+                visit((UnaryExprOp) expr);
+                break;
+            case "ConstOp":
+                visit((ConstOp) expr);
+                break;
+            case "Identifier":
+                visit((Identifier) expr);
+                break;
+        }
+    }
+
+    @Override
+    public void visit(BinaryExprOp binaryExprOp) {
+        binaryExprOp.getLeft().accept(this);
+        binaryExprOp.getRight().accept(this);
+
+        String leftType = binaryExprOp.getLeft().getType().getTypeName();
+        String rightType = binaryExprOp.getRight().getType().getTypeName();
+        String operator = binaryExprOp.getOp();
+        String result = BinaryOpTable.getResult(operator, leftType, rightType);
+
+        if(result == null){
+            System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
+            System.exit(1);
+        }
+
+        binaryExprOp.setType(new TypeOp(result));
+    }
+
+   // @Override
+    public void visit(UnaryExprOp unaryExprOp) {
+        unaryExprOp.getExpr().accept(this);
+        String exprType = unaryExprOp.getExpr().getType().getTypeName();
+        String operator = unaryExprOp.getOp();
+        String result = UnaryOpTable.getResult(operator, exprType);
+
+        if(result == null){
+            System.err.print("ERROR: Invalid types in unary expression \"" + operator + " " + exprType + "\"");
+            System.exit(1);
+        }
+
+        unaryExprOp.setType(new TypeOp(result));
+    }
+
+    //@Override
+    public void visit(ConstOp constOp) {
+        constOp.setType(new TypeOp(constOp.getConstantType()));
+    }
+
+    //@Override
+    public void visit(Identifier id) {
+        String type;
+        if(isFun) {
+            type = symbolTable.lookup(Kind.FUN, id.getLessema());
+            if(type == null){
+                System.err.print("ERROR: Function " + id.getLessema() + " not declared");
+                System.exit(1);
+            }
+            isFun = false;
+        }
+        else {
+            type = symbolTable.lookup(Kind.VAR, id.getLessema());
+            if(type == null){
+                System.err.print("ERROR: Variable " + id.getLessema() + " not declared");
+                System.exit(1);
+            }
+        }
+        id.setType(new TypeOp(type));
     }
 
     @Override
     public void visit(BodyOp bodyOp) {
-
+        symbolTable.setCurrentScope(bodyOp.getScope());
+        if(bodyOp.getVarDecls() != null){
+            for(VarDeclOp varDeclOp : bodyOp.getVarDecls())
+                varDeclOp.accept(this);
+        }
+        if(bodyOp.getStatements() != null){
+            for(StatementOp statOp : bodyOp.getStatements())
+                statOp.accept(this);
+        }
     }
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
-
 
     }
 
     @Override
     public void visit(FunCallOp funCallOp) {
 
-        boolean isFun = true;
+        isFun = true;
         funCallOp.getId().accept(this);
         String funDeclType = funCallOp.getId().getType().getTypeName();
         String[] expectedParams = extractParameters(funDeclType);
@@ -176,11 +252,6 @@ public class TypeChecking implements Visitor {
                 System.exit(1);
             }
         }
-
-    }
-
-    @Override
-    public void visit(BinaryExprOp binaryExprOp) {
 
     }
 

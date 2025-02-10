@@ -215,15 +215,20 @@ public class Scoping implements Visitor {
 
     public void visit(StatementOp statementOp) {
         // System.out.println("Visit stmt");
-       if (statementOp instanceof IfThenOp ifThenOp) {
-           ifThenOp.setFunLabel(statementOp.getFunLabel());
-           visit(ifThenOp);
-        } else if (statementOp instanceof IfThenElseOp ifThenElseOp) {
-           ifThenElseOp.setFunLabel(statementOp.getFunLabel());
-           visit(ifThenElseOp);
-        } else if (statementOp instanceof WhileOp whileOp) {
-           whileOp.setFunLabel(statementOp.getFunLabel());
-           visit(whileOp);
+
+        switch (statementOp.getClass().getSimpleName()) {
+            case "IfThenOp" -> {
+                statementOp.setFunLabel(statementOp.getFunLabel());
+                visit((IfThenOp) statementOp);
+            }
+            case "IfThenElseOp" -> {
+                statementOp.setFunLabel(statementOp.getFunLabel());
+                visit((IfThenElseOp) statementOp);
+            }
+            case "WhileOp" -> {
+                statementOp.setFunLabel(statementOp.getFunLabel());
+                visit((WhileOp) statementOp);
+            }
         }
     }
 
