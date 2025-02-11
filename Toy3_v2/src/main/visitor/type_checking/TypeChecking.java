@@ -383,6 +383,13 @@ public class TypeChecking implements Visitor {
     }
 
     private boolean isCompatible(String type1, String type2) {
+        if (type1.startsWith("ref ")) {
+            type1 = type1.substring(4); // Rimuove "ref"
+        }
+        if (type2.startsWith("ref ")) {
+            type2 = type2.substring(4);
+        }
+
         return type1.equals(type2) || type1.equals("double") && type2.equals("int");
     }
 }
