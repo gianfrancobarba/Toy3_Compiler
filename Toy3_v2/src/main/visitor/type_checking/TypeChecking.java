@@ -85,8 +85,9 @@ public class TypeChecking implements Visitor {
         String leftType = binaryExprOp.getLeft().getType();
         String rightType = binaryExprOp.getRight().getType();
         String operator = binaryExprOp.getOp();
-        String result = BinaryOpTable.getResult(operator, leftType, rightType);
+        String result = BinaryOpTable.getResult(operator, ignoreRef(leftType), ignoreRef(rightType));
         if(result == null){
+            //System.out.println(binaryExprOp);
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
             System.exit(1);
         }
@@ -99,7 +100,7 @@ public class TypeChecking implements Visitor {
         unaryExprOp.getExpr().accept(this);
         String exprType = unaryExprOp.getExpr().getType();
         String operator = unaryExprOp.getOp();
-        String result = UnaryOpTable.getResult(operator, exprType);
+        String result = UnaryOpTable.getResult(operator, ignoreRef(exprType));
 
         if(result == null){
             System.err.print("ERROR: Invalid types in unary expression \"" + operator + " " + exprType + "\"");
@@ -209,7 +210,7 @@ public class TypeChecking implements Visitor {
 
             for (int i = 0; i < actualParams.size(); i++) {
                 actualParams.get(i).accept(this);
-                if (!actualParams.get(i).getType().equals(expectedParamMap.get(i))) {
+                if (! ignoreRef(actualParams.get(i).getType()).equals(ignoreRef(expectedParamMap.get(i)))) {
                     System.err.print("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + (i + 1));
                     System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
                     System.exit(1);
@@ -219,7 +220,7 @@ public class TypeChecking implements Visitor {
             for(int i = 0; i < actualParams.size(); i++){
                 if(expectedParams[i].startsWith("ref")){
                     if(!(actualParams.get(i) instanceof Identifier)){
-                        System.err.println("ERROR: Expected reference parameter at position " + i + 1);
+                        System.err.println("ERROR: Expected reference parameter at position " + (i + 1));
                         System.exit(1);
                     }
                 }
@@ -383,13 +384,15 @@ public class TypeChecking implements Visitor {
     }
 
     private boolean isCompatible(String type1, String type2) {
-        if (type1.startsWith("ref ")) {
-            type1 = type1.substring(4); // Rimuove "ref"
-        }
-        if (type2.startsWith("ref ")) {
-            type2 = type2.substring(4);
-        }
-
+        type1 = ignoreRef(type1);
+        type2 = ignoreRef(type2);
         return type1.equals(type2) || type1.equals("double") && type2.equals("int");
+    }
+
+    private String ignoreRef(String type) {
+        if (type.startsWith("ref ")) {
+            return type.substring(4);
+        }
+        return type;
     }
 }
