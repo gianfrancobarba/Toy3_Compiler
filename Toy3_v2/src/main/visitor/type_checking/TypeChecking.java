@@ -86,7 +86,6 @@ public class TypeChecking implements Visitor {
         String rightType = binaryExprOp.getRight().getType();
         String operator = binaryExprOp.getOp();
         String result = BinaryOpTable.getResult(operator, leftType, rightType);
-
         if(result == null){
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
             System.exit(1);
@@ -95,7 +94,7 @@ public class TypeChecking implements Visitor {
         binaryExprOp.setType(result);
     }
 
-   // @Override
+    @Override
     public void visit(UnaryExprOp unaryExprOp) {
         unaryExprOp.getExpr().accept(this);
         String exprType = unaryExprOp.getExpr().getType();
@@ -110,12 +109,12 @@ public class TypeChecking implements Visitor {
         unaryExprOp.setType(result);
     }
 
-    //@Override
+    @Override
     public void visit(ConstOp constOp) {
         constOp.setType(constOp.getConstantType());
     }
 
-    //@Override
+    @Override
     public void visit(Identifier id) {
         String type;
         if(isFun) {
@@ -195,8 +194,8 @@ public class TypeChecking implements Visitor {
         String[] expectedParams = extractParameters(funDeclType);
         List<ExprOp> actualParams = funCallOp.getExprList();
 
-        if(actualParams != null) {
-
+        if (actualParams != null)
+            if(!actualParams.isEmpty()) {
             if (actualParams.size() != Objects.requireNonNull(expectedParams).length) {
                 System.err.println("ERROR: Number of parameters in function call does not match the number of parameters in the function declaration: " + funCallOp.getId().getLessema());
                 System.exit(1);
@@ -206,11 +205,12 @@ public class TypeChecking implements Visitor {
             for (int i = 0; i < Objects.requireNonNull(expectedParams).length; i++) {
                 expectedParamMap.put(i, expectedParams[i].replace("ref ", ""));
             }
+            //System.out.println(expectedParamMap.toString());
 
             for (int i = 0; i < actualParams.size(); i++) {
                 actualParams.get(i).accept(this);
                 if (!actualParams.get(i).getType().equals(expectedParamMap.get(i))) {
-                    System.err.println("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + i + 1);
+                    System.err.print("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + (i + 1));
                     System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
                     System.exit(1);
                 }
@@ -316,7 +316,7 @@ public class TypeChecking implements Visitor {
         for(Identifier id : idList){
             String idType = id.getType();
             String exprType = String.valueOf(exprList.get(idList.indexOf(id)).getType()); // verificare funzionamento
-            if(!Objects.equals(idType,exprType)){
+            if(!isCompatible(idType, exprType)){
                 System.err.print("ERROR: Conflicting types in assignment: id "+ id.getLessema());
                 System.err.print(" has type " + idType + " but expression has type "+ exprType);
                 System.exit(1);
@@ -374,12 +374,15 @@ public class TypeChecking implements Visitor {
     public void visit(PVarOp pVarOp) {}
 
     private String[] extractParameters(String type) {
-        String[] parts = type.split("\\("); // Divide in base a "("
-        if (parts.length < 2) return null; // Se non c'è "(", non ci sono parametri
-        return parts[1].replace(")", "").split(","); // Rimuove la parentesi finale e divide in base a ","
+        String[] parts = type.split("\\(");// Divide in base a "("
+        return parts[1].replace(")", "").split(", "); // Rimuove la parentesi finale e divide in base a " "
     }
 
     private String extractType(String type) {
         return type.split("\\(")[0]; // Prende tutto prima di "("
+    }
+
+    private boolean isCompatible(String type1, String type2) {
+        return type1.equals(type2) || type1.equals("double") && type2.equals("int");
     }
 }

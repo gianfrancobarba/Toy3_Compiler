@@ -311,4 +311,7 @@ public class Scoping implements Visitor {
 
     }
 
+    @Override
+    public void visit(ConstOp constOp) {}
+
 }

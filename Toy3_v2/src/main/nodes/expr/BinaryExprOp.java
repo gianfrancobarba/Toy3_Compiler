@@ -38,7 +38,14 @@ public class BinaryExprOp extends Node implements ExprOp {
         this.op = op;
     }
 
-    public String toString() {return super.toString();}
+    public String toString() {
+        return "BinaryExprOp{" +
+                "left=" + left +
+                ", right=" + right +
+                ", operator='" + op + '\'' +
+                '}';
+    }
+
     @Override
     public void accept(Visitor visitor) {
         visitor.visit(this);

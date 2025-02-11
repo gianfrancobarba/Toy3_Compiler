@@ -3,6 +3,7 @@ package main.java;
 import main.nodes.program.ProgramOp;
 import main.visitor.*;
 import main.visitor.scoping.Scoping;
+import main.visitor.type_checking.TypeChecking;
 import toy3.Lexer;
 import toy3.parser;
 
@@ -13,7 +14,7 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) {
-        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid1/valid1.txt"))) {
+        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid4/valid4.txt"))) {
             Lexer lexer = new Lexer(fileReader);
             parser p = new parser(lexer);
             try {
@@ -29,11 +30,11 @@ public class Main {
                 System.out.println("** Testing Scoping Visitor **");
                 Scoping scopingVisitor = new Scoping();
                 ast.accept(scopingVisitor);
-//
-//                System.out.println("** Testing TypeChecking Visitor **");
-//                TypeChecking typeChecking = new TypeChecking();
-//                ast.accept(typeChecking);
-//
+
+                System.out.println("** Testing TypeChecking Visitor **");
+                TypeChecking typeChecking = new TypeChecking();
+                ast.accept(typeChecking);
+
 //                System.out.println("** Testing Code Generation **");
 //                CodeGenerator codeGenerator = new CodeGenerator();
 //                ast.accept(codeGenerator);

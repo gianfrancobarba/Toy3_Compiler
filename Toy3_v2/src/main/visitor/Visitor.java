@@ -47,4 +47,6 @@ public interface Visitor {
     void visit(UnaryExprOp unaryExprOp);
 
     void visit(Identifier identifier);
+
+    void visit(ConstOp constOp);
 }

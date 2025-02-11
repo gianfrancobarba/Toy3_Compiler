@@ -37,7 +37,9 @@ public class ConstOp extends Node implements ExprOp {
 
     public String toString() {
         return "Const{ " +
-                ", value= " + value +
+                "value= " + value +
                 " }";
     }
+
+    public void accept(Visitor visitor){ visitor.visit(this); }
 }

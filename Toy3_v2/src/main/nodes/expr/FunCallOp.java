@@ -54,5 +54,10 @@ public class FunCallOp extends Node implements ExprOp, StatementOp {
     }
 
     @Override
-    public String toString() {return super.toString();}
+    public String toString() {
+        return "FunCallOp{" +
+                "id=" + id +
+                ", exprList=" + exprList +
+                '}';
+    }
 }
