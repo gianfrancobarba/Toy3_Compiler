@@ -56,7 +56,7 @@ terminal String ID;
 // Non-terminali
 non terminal Program;
 non terminal Decls, VarDecls, VarDecl, VarsOptInit, TypeOrConstant, Type, Constant, DefDecl, ParDecls, ParDecl, PVars, PVar;
-non terminal OptType, Body, Statements, Stat, Vars, Exprs, FunCall, Expr, ArithOp, BoolOp, RelOp;
+non terminal OptType, Body, Statements, Stat, Vars, Exprs, FunCall, Expr, ArithOp;
 
 // Precedenze e associatività
 precedence left OR;
