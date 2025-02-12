@@ -26,7 +26,7 @@ public class BinaryOpTable {
         addEntry("*", "double", "double", "double");
         addEntry("*", "int", "double", "double");
         addEntry("*", "double", "int", "double");
-        addEntry("/", "int", "int", "int");
+        addEntry("/", "int", "int", "double");
         addEntry("/", "double", "double", "double");
         addEntry("/", "int", "double", "double");
         addEntry("/", "double", "int", "double");
