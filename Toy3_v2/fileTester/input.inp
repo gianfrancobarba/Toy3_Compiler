@@ -1,7 +1,9 @@
 program
 
+def stampa( a , b , c : int ; d : string){
+    x: int;
+    x := a;
+}
 begin
-
-    a := f(4);
 
 end

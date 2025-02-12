@@ -7,15 +7,13 @@ import main.visitor.scoping.Scoping;
 import main.visitor.type_checking.TypeChecking;
 import toy3.Lexer;
 import toy3.parser;
-
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) {
-        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid1/valid1.txt"))) {
+        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/input.inp"))) {
             Lexer lexer = new Lexer(fileReader);
             parser p = new parser(lexer);
             try {

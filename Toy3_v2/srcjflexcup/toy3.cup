@@ -236,8 +236,6 @@ ArithOp ::= PLUS {: RESULT = "+";   :}
     | TIMES      {: RESULT = "*";   :}
     | DIV        {: RESULT = "/";   :};
 
-
-
 Type ::= INT    {: RESULT = "int";    :}
        | BOOL   {: RESULT = "bool";   :}
        | DOUBLE {: RESULT = "double"; :}

@@ -28,7 +28,7 @@ public class CodeGenerator implements Visitor {
 
     public CodeGenerator() throws IOException {
         this.code = new StringBuilder();
-        this.writer = new BufferedWriter(new FileWriter("file_tester/output.c"));
+        this.writer = new BufferedWriter(new FileWriter("filetester/output.c"));
     }
 
     @Override
@@ -74,6 +74,14 @@ public class CodeGenerator implements Visitor {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public void visit(BeginEndOp beginEndOp) {
+        code.append("int main(void){\n");
+        beginEndOp.getVarDeclList().forEach(varDeclOp -> varDeclOp.accept(this));
+        beginEndOp.getStmtList().forEach(statementOp -> statementOp.accept(this));
+        code.append("\nreturn 0;\n}");
     }
 
     @Override
@@ -170,10 +178,7 @@ public class CodeGenerator implements Visitor {
 
     }
 
-    @Override
-    public void visit(BeginEndOp beginEndOp) {
 
-    }
 
     @Override
     public void visit(AssignOp assignOp) {

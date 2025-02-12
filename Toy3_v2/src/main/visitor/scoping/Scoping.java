@@ -138,12 +138,14 @@ public class Scoping implements Visitor {
             for(PVarOp pVarOp : parDeclOp.getPVars()) {
                 pVarOp.accept(this);
             }
+            parDeclOp.setType(parDeclOp.getParDeclType());
         }
     }
 
     @Override
     public void visit(PVarOp pVarOp) {
         // System.out.println("Visit p var " + pVarOp.getId().getLessema());
+
         String varId  = pVarOp.getId().getLessema();
         if(symbolTable.probe(Kind.VAR, varId) ) {
             symbolTable.printTable();
@@ -160,6 +162,7 @@ public class Scoping implements Visitor {
             tempType = "ref " + tempType;
 
         symbolTable.addId(Kind.VAR, varId, tempType);
+        pVarOp.setType(tempType);
         // System.out.println("Visit  + varId + " " + tempType);
     }
 

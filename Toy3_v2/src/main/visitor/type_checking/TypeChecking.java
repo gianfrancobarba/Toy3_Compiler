@@ -316,7 +316,7 @@ public class TypeChecking implements Visitor {
 
         for(Identifier id : idList){
             String idType = id.getType();
-            String exprType = String.valueOf(exprList.get(idList.indexOf(id)).getType()); // verificare funzionamento
+            String exprType = exprList.get(idList.indexOf(id)).getType();
             if(!isCompatible(idType, exprType)){
                 System.err.print("ERROR: Conflicting types in assignment: id "+ id.getLessema());
                 System.err.print(" has type " + idType + " but expression has type "+ exprType);
