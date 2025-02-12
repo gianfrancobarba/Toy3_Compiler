@@ -1,7 +1,8 @@
 package main.java;
 
 import main.nodes.program.ProgramOp;
-import main.visitor.*;
+import main.visitor.ast.PrintVisitor;
+import main.visitor.code_generator.CodeGenerator;
 import main.visitor.scoping.Scoping;
 import main.visitor.type_checking.TypeChecking;
 import toy3.Lexer;
@@ -35,9 +36,9 @@ public class Main {
                 TypeChecking typeChecking = new TypeChecking();
                 ast.accept(typeChecking);
 
-//                System.out.println("** Testing Code Generation **");
-//                CodeGenerator codeGenerator = new CodeGenerator();
-//                ast.accept(codeGenerator);
+                System.out.println("** Testing Code Generation **");
+                CodeGenerator codeGenerator = new CodeGenerator();
+                ast.accept(codeGenerator);
             } catch (Exception e) {
                 e.printStackTrace();
             }

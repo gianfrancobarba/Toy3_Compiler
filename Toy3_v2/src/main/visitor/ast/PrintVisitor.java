@@ -1,4 +1,4 @@
-package main.visitor;
+package main.visitor.ast;
 
 import main.nodes.declarations.*;
 import main.nodes.expr.*;
@@ -7,6 +7,7 @@ import main.nodes.program.BeginEndOp;
 import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
+import main.visitor.Visitor;
 
 public class PrintVisitor implements Visitor {
 
