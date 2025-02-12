@@ -214,8 +214,14 @@ FunCall ::= ID:id LPAR Exprs:e RPAR
           | ID:id LPAR RPAR         {: RESULT = new FunCallOp(new Identifier((String) id), null); :};
 
 Expr ::= Expr:e1 ArithOp:arithOp Expr:e2 {: RESULT = new BinaryExprOp((ExprOp) e1, (String) arithOp, (ExprOp) e2); :}
-       | Expr:e1 BoolOp:bop Expr:e2      {: RESULT = new BinaryExprOp((ExprOp) e1, (String) bop, (ExprOp) e2); :}
-       | Expr:e1 RelOp:relop Expr:e2     {: RESULT = new BinaryExprOp((ExprOp) e1, (String) relop, (ExprOp) e2); :}
+       | Expr:e1 AND Expr:e2              {: RESULT = new BinaryExprOp((ExprOp) e1, "and", (ExprOp) e2); :}
+       | Expr:e1 OR Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, "or", (ExprOp) e2); :}
+       | Expr:e1 GT Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, ">", (ExprOp) e2); :}
+       | Expr:e1 GE Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, ">=", (ExprOp) e2); :}
+       | Expr:e1 LT Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, "<", (ExprOp) e2); :}
+       | Expr:e1 LE Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, "<=", (ExprOp) e2); :}
+       | Expr:e1 EQ Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, "==", (ExprOp) e2); :}
+       | Expr:e1 NE Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, "<>", (ExprOp) e2); :}
        | LPAR Expr:e RPAR                {: RESULT = e; :}
        | MINUS Expr:e                    {: RESULT = new UnaryExprOp("-", (ExprOp) e); :}
        | NOT Expr:e                      {: RESULT = new UnaryExprOp("not", (ExprOp) e); :}
@@ -232,15 +238,7 @@ ArithOp ::= PLUS {: RESULT = "+";   :}
     | TIMES      {: RESULT = "*";   :}
     | DIV        {: RESULT = "/";   :};
 
-BoolOp ::= AND  {: RESULT = "and"; :}
-    | OR        {: RESULT = "or";  :};
 
-RelOp ::= GT {: RESULT = ">";  :}
-    | GE     {: RESULT = ">="; :}
-    | LT     {: RESULT = "<";  :}
-    | LE     {: RESULT = "<="; :}
-    | EQ     {: RESULT = "=="; :}
-    | NE     {: RESULT = "<>"; :};
 
 Type ::= INT    {: RESULT = "int";    :}
        | BOOL   {: RESULT = "bool";   :}
