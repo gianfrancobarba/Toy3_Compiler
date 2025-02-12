@@ -24,6 +24,7 @@ public class CodeGenerator implements Visitor {
 
     private final StringBuilder code;
     private final BufferedWriter writer;
+    private String typeTemp;
 
     public CodeGenerator() throws IOException {
         this.code = new StringBuilder();
@@ -82,7 +83,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(IfThenOp ifThenOp) {
-
+        code.append("if (");
+        ifThenOp.getCondition().accept(this);
+        code.append(") {\n");
+        ifThenOp.getThenBranch().accept(this);
+        code.append("}\n");
     }
 
     @Override
@@ -92,7 +97,21 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
+        code.append(funDeclOp.getType());
+        code.append(" ");
+        code.append(funDeclOp.getId().getLessema());
+        code.append("(");
 
+        List<ParDeclOp> params = funDeclOp.getParams();
+        if(!params.isEmpty()) {
+            for(ParDeclOp parDecl : params) {
+                parDecl.accept(this);
+                code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+            }
+        }
+        code.append(") {\n");
+        funDeclOp.getBody().accept(this);
+        code.append("}\n");
     }
 
     @Override
@@ -112,22 +131,38 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(WhileOp whileOp) {
-
+        code.append("while (");
+        whileOp.getCondition().accept(this);
+        code.append(") {\n");
+        whileOp.getBody().accept(this);
+        code.append("}\n");
     }
 
     @Override
     public void visit(ParDeclOp parDeclOp) {
-
+        parDeclOp.getPVars().forEach(pVar -> {
+            typeTemp = parDeclOp.getType().equals("string") ? "char*" : pVar.getType();
+            pVar.accept(this);
+        });
     }
 
     @Override
     public void visit(IfThenElseOp ifThenElseOp) {
-
+        code.append("if (");
+        ifThenElseOp.getCondition().accept(this);
+        code.append(") {\n");
+        ifThenElseOp.getThenBranch().accept(this);
+        code.append("} else {\n");
+        ifThenElseOp.getElseBranch().accept(this);
+        code.append("}\n");
     }
 
     @Override
     public void visit(PVarOp pVarOp) {
-
+        String refTemp = pVarOp.isRef() ? typeTemp.equals("string") ? "" : "*" : "";
+        code.append(typeTemp).append(" ");
+        code.append(refTemp).append(" ");
+        code.append(pVarOp.getId().getLessema()).append(", ");
     }
 
     @Override
