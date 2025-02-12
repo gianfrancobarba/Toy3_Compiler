@@ -3,6 +3,7 @@ package main.visitor.code_generator;
 import main.nodes.common.Identifier;
 import main.nodes.declarations.*;
 import main.nodes.expr.BinaryExprOp;
+import main.nodes.expr.ExprOp;
 import main.nodes.expr.FunCallOp;
 import main.nodes.expr.UnaryExprOp;
 import main.nodes.program.BeginEndOp;
@@ -14,17 +15,17 @@ import main.visitor.Visitor;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
 
 public class CodeGenerator implements Visitor {
-    private final StringBuilder code;
-    private final BufferedWriter bufferedWriter;
-    private Map<String, String> functionParameters = new HashMap<>();
 
-    public CodeGenerator() throws IOException {
-        code = new StringBuilder();
-        bufferedWriter = new BufferedWriter(new FileWriter("file_tester/output.c"));
+    private final StringBuilder code;
+    private final BufferedWriter writer;
+
+    CodeGenerator() throws IOException {
+        this.code = new StringBuilder();
+        this.writer = new BufferedWriter(new FileWriter("file_tester/output.c"));
     }
 
     @Override
@@ -49,7 +50,17 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunCallOp funCallOp) {
-
+        List<ExprOp> args = funCallOp.getExprList();
+        code.append(funCallOp.getId().getLessema()).append("(");
+        if (!args.isEmpty()) {
+            args.forEach(arg -> {
+                arg.accept(this);
+                code.append(", ");
+            });
+            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+        }
+        code.append(");\n");
+        System.out.println(code.toString()); // Stampiamo il risultato
     }
 
     @Override
