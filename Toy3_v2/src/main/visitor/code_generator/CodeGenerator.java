@@ -169,7 +169,7 @@ public class CodeGenerator implements Visitor {
         ifThenElseOp.getCondition().accept(this);
         code.append(") {\n");
         ifThenElseOp.getThenBranch().accept(this);
-        code.append("} else {\n");
+        code.append("}\nelse {\n");
         ifThenElseOp.getElseBranch().accept(this);
         code.append("}\n");
     }
