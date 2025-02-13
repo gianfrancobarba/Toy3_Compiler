@@ -15,9 +15,7 @@ import main.visitor.Visitor;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 
 
 public class CodeGenerator implements Visitor {
@@ -114,8 +112,8 @@ public class CodeGenerator implements Visitor {
         if(!params.isEmpty()) {
             for(ParDeclOp parDecl : params) {
                 parDecl.accept(this);
-                code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
             }
+            code.deleteCharAt(code.length() - 2);  // Rimuove l'ultima virgola
         }
         code.append(") {\n");
         funDeclOp.getBody().accept(this);
@@ -134,7 +132,7 @@ public class CodeGenerator implements Visitor {
             code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
         }
         code.append(");\n");
-        System.out.println(code.toString()); // Stampiamo il risultato
+        System.out.println(code); // Stampiamo il risultato
     }
 
     @Override
@@ -182,7 +180,20 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(AssignOp assignOp) {
+        List<Identifier> idList = assignOp.getIdentfiers();
+        List<ExprOp> exprList = assignOp.getExpressions();
 
+        for (int i = 0; i < idList.size(); i++) {
+            idList.get(i).accept(this);
+            code.append(" = ");
+            exprList.get(i).accept(this);
+            code.append(", ");
+        }
+        code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+
+        if(!(exprList.get(0) instanceof FunCallOp)) {
+            code.append(";\n");
+        }
     }
 
     @Override
@@ -192,17 +203,48 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ReturnOp returnOp) {
-
+        code.append("return ");
+        returnOp.getExpr().accept(this);
+        code.append(";\n");
     }
 
     @Override
     public void visit(WriteOp writeOp) {
+        List<ExprOp> exprList = writeOp.getExprList();
+        code.append("printf(\"");
+        exprList.forEach(expr -> { getFormatSpecifier(expr.getType()); });
+        code.append("\"");
 
+        if (!exprList.isEmpty()) {
+            code.append(", ");
+            exprList.forEach(expr -> {
+                if(expr instanceof ConstOp con) {
+                    con.accept(this);
+                }
+                code.append(", ");
+            });
+            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+        }
+        code.append(");\n");
     }
 
     @Override
     public void visit(ReadOp readOp) {
+        List<Identifier> idList = readOp.getIdentifiers();
+        code.append("scanf(\"");
+        idList.forEach(id -> { getFormatSpecifier(id.getType()); });
+        code.append("\"");
 
+        if (!idList.isEmpty()) {
+            code.append(", ");
+            idList.forEach(id -> {
+                if(id.getType().equals("string")) code.append("&");
+                id.accept(this);
+                code.append(", ");
+            });
+            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+        }
+        code.append(");\n");
     }
 
     @Override
@@ -217,7 +259,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ConstOp constOp) {
-
+        if (constOp.getType().equals("string"))
+            code.append("\"").append(constOp.getValue()).append("\"");
     }
 
     private void resolveNameConflicts(List<Object> listDecls) {
@@ -282,7 +325,7 @@ public class CodeGenerator implements Visitor {
                         // Costruiamo la stringa per il parametro
                         StringBuilder paramBuilder = new StringBuilder(paramType);
 
-                        // Se il parametro viene passato per riferimento, aggiungiamo "* " salvo il caso di stringa
+                        // Se il parametro viene passato per riferimento, aggiungiamo "*" salvo il caso di stringa
                         if (pVarOp.isRef()) {
                             // Per i parametri di tipo "string" si mantiene solo lo spazio, gia abbiamo messo "char*"
                             paramBuilder.append(parDeclOp.getType().equals("string") ? " " : "* ");
@@ -302,4 +345,13 @@ public class CodeGenerator implements Visitor {
         return paramJoiner.toString();
     }
 
+    private void getFormatSpecifier(String type) {
+        switch (type) {
+            case "int", "bool" -> code.append("%d");
+            case "float" -> code.append("%f");
+            case "char" -> code.append("%c");
+            case "double" -> code.append("%lf");
+            case "string" -> code.append("%s");
+        }
+    }
 }

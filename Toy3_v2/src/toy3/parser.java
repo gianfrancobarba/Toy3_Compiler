@@ -216,7 +216,7 @@ public class parser extends java_cup.runtime.lr_parser {
     "\000\040\006\uffe6\013\uffe6\016\uffe6\024\uffe6\025\uffe6\026" +
     "\uffe6\027\uffe6\032\uffe6\035\uffe6\050\uffe6\060\uffe6\061\uffe6" +
     "\062\uffe6\063\uffe6\064\uffe6\001\002\000\050\007\uffd4\010" +
-    "\uffd4\011\uffd4\014\uffd4\034\057\035\053\036\uffd4\037\uffd4" +
+    "\uffd4\011\uffd4\014\uffd4\034\uffd4\035\uffd4\036\uffd4\037\uffd4" +
     "\042\uffd4\043\uffd4\044\uffd4\045\uffd4\046\uffd4\047\uffd4\051" +
     "\uffd4\052\uffd4\054\uffd4\055\uffd4\057\uffd4\001\002\000\026" +
     "\013\042\024\030\025\037\035\036\050\024\060\034\061" +
@@ -257,9 +257,9 @@ public class parser extends java_cup.runtime.lr_parser {
     "\uffdf\013\uffdf\016\uffdf\024\uffdf\025\uffdf\026\uffdf\027\uffdf" +
     "\032\uffdf\035\uffdf\050\uffdf\060\uffdf\061\uffdf\062\uffdf\063" +
     "\uffdf\064\uffdf\001\002\000\004\002\000\001\002\000\050" +
-    "\007\uffd3\010\uffd3\011\uffd3\014\uffd3\034\057\035\053\036" +
-    "\066\037\064\042\065\043\056\044\071\045\061\046\060" +
-    "\047\070\051\uffd3\052\uffd3\054\uffd3\055\uffd3\057\uffd3\001" +
+    "\007\uffd3\010\uffd3\011\uffd3\014\uffd3\034\uffd3\035\uffd3\036" +
+    "\uffd3\037\uffd3\042\uffd3\043\uffd3\044\uffd3\045\uffd3\046\uffd3" +
+    "\047\uffd3\051\uffd3\052\uffd3\054\uffd3\055\uffd3\057\uffd3\001" +
     "\002\000\026\013\042\024\030\025\037\035\036\050\024" +
     "\060\034\061\021\062\017\063\043\064\046\001\002\000" +
     "\034\014\144\034\057\035\053\036\066\037\064\042\065" +
@@ -1067,7 +1067,7 @@ class CUP$parser$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = new BinaryExprOp((ExprOp) e1, (String) bop, (ExprOp) e2); 
+		  System.out.println("BinaryExprOp: " + e1 + bop + e2); RESULT = new BinaryExprOp((ExprOp) e1, (String) bop, (ExprOp) e2); 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Expr",20, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -1085,7 +1085,7 @@ class CUP$parser$actions {
 		int e2left = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
 		int e2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
 		Object e2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-		 RESULT = new BinaryExprOp((ExprOp) e1, (String) relop, (ExprOp) e2); 
+		  System.out.println("RelExpOp: " + e1 + relop + e2);RESULT = new BinaryExprOp((ExprOp) e1, (String) relop, (ExprOp) e2); 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Expr",20, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
