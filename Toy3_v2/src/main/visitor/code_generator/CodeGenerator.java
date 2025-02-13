@@ -196,9 +196,47 @@ public class CodeGenerator implements Visitor {
         }
     }
 
+    public void visit(ExprOp expr) {
+        switch(expr.getClass().getSimpleName()) {
+            case "BinaryExprOp":
+                visit((BinaryExprOp) expr);
+                break;
+            case "UnaryExprOp":
+                visit((UnaryExprOp) expr);
+                break;
+            case "ConstOp":
+                visit((ConstOp) expr);
+                break;
+            case "Identifier":
+                visit((Identifier) expr);
+                break;
+        }
+    }
+
+    @Override
+    public void visit(Identifier identifier) {
+        code.append(identifier.getLessema());
+    }
+
+    @Override
+    public void visit(ConstOp constOp) {
+        if (constOp.getType().equals("string"))
+            code.append("\"").append(constOp.getValue()).append("\"");
+        else
+            code.append(constOp.getValue());
+    }
+
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
+        binaryExprOp.getLeft().accept(this);
+        code.append(" ").append(binaryExprOp.getOp()).append(" ");
+        binaryExprOp.getRight().accept(this);
+    }
 
+    @Override
+    public void visit(UnaryExprOp unaryExprOp) {
+        code.append(unaryExprOp.getOp());
+        unaryExprOp.getExpr().accept(this);
     }
 
     @Override
@@ -245,22 +283,6 @@ public class CodeGenerator implements Visitor {
             code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
         }
         code.append(");\n");
-    }
-
-    @Override
-    public void visit(UnaryExprOp unaryExprOp) {
-
-    }
-
-    @Override
-    public void visit(Identifier identifier) {
-
-    }
-
-    @Override
-    public void visit(ConstOp constOp) {
-        if (constOp.getType().equals("string"))
-            code.append("\"").append(constOp.getValue()).append("\"");
     }
 
     private void resolveNameConflicts(List<Object> listDecls) {
