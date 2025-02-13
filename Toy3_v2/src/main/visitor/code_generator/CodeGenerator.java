@@ -86,13 +86,16 @@ public class CodeGenerator implements Visitor {
     public void visit(VarDeclOp varDeclOp) {
         String type = varDeclOp.getType().equals("string") ? "char*" : varDeclOp.getType();
         List<VarOptInitOp> listVarOptInit = varDeclOp.getListVarOptInit();
+        code.append(type).append(" ");
 
-        listVarOptInit.forEach(varOptInitOp -> {
-            code.append(type).append(" ");
-            code.append(varOptInitOp.getId().getLessema());
-            code.append(";\n");
+        listVarOptInit.forEach(varOpt -> {
+            varOpt.accept(this);
+            code.append(", ");
         });
-
+         // rimuove l'ultima virgola e l'ultimo spazio
+        code.deleteCharAt(code.length() - 2);
+        // sostituisce l'ultimo spazio con il punto e virgola
+        code.setCharAt(code.length() - 1, ';');
     }
 
     @Override
@@ -186,7 +189,6 @@ public class CodeGenerator implements Visitor {
             code.append(" = ");
             varOptInitOp.getExprOp().accept(this);
         }
-        code.append(";\n");
     }
 
     public void visit(StatementOp stmt){
