@@ -88,7 +88,7 @@ public class TypeChecking implements Visitor {
         String result = BinaryOpTable.getResult(operator, ignoreRef(leftType), ignoreRef(rightType));
         //System.out.println(binaryExprOp);
         if(result == null){
-            //System.out.println(binaryExprOp);
+            System.out.println(binaryExprOp);
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
             System.exit(1);
         }
@@ -370,7 +370,9 @@ public class TypeChecking implements Visitor {
     }
 
     @Override
-    public void visit(ParDeclOp parDeclOp) {}
+    public void visit(ParDeclOp parDeclOp) {
+
+    }
 
     @Override
     public void visit(PVarOp pVarOp) {}
@@ -387,7 +389,7 @@ public class TypeChecking implements Visitor {
     private boolean isCompatible(String type1, String type2) {
         type1 = ignoreRef(type1);
         type2 = ignoreRef(type2);
-        return type1.equals(type2) || type1.equals("double") && type2.equals("int");
+        return type1.equals(type2) || type1.equals("double") && type2.equals("int") || type1.equals("int") && type2.equals("double");
     }
 
     private String ignoreRef(String type) {
