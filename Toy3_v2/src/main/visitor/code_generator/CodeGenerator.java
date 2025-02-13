@@ -40,10 +40,12 @@ public class CodeGenerator implements Visitor {
 
         // Itera su tutte le operazioni del programma (dichiarazioni di variabili e funzioni)
         // e processa quelle che rappresentano dichiarazioni di variabili.
+        code.append("\n");
         for (Object obj : programOp.getListDecls()) {
             // Se l'oggetto è una dichiarazione di variabile, visita l'oggetto per generare il codice
             if (obj instanceof VarDeclOp varDeclOp) {
                 varDeclOp.accept(this);
+                code.append("\n");
             }
         }
 

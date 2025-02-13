@@ -349,18 +349,22 @@ public class TypeChecking implements Visitor {
     public void visit(VarDeclOp varDeclOp) {
         if(varDeclOp.getTypeOrConstant() instanceof ConstOp c){
             c.accept(this);
+            varDeclOp.setType(c.getType());
         }
 
         ArrayList<VarOptInitOp> varOptInitList = (ArrayList<VarOptInitOp>) varDeclOp.getListVarOptInit();
         if(varOptInitList != null){
-            for(VarOptInitOp varOptInit : varOptInitList)
+            for(VarOptInitOp varOptInit : varOptInitList) {
                 varOptInit.accept(this);
+                varDeclOp.setType(varOptInit.getType());
+            }
         }
     }
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
         varOptInitOp.getId().accept(this);
+        varOptInitOp.setType(varOptInitOp.getId().getType());
         if(varOptInitOp.getExprOp() != null)
             varOptInitOp.getExprOp().accept(this);
     }
