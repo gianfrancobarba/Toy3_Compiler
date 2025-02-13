@@ -114,17 +114,14 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
-        code.append(funDeclOp.getType());
+        code.append(isRefConvert(funDeclOp.getType()));
         code.append(" ");
         code.append(funDeclOp.getId().getLessema());
         code.append("(");
 
         List<ParDeclOp> params = funDeclOp.getParams();
         if(!params.isEmpty()) {
-            for(ParDeclOp parDecl : params) {
-                parDecl.accept(this);
-            }
-            code.deleteCharAt(code.length() - 2);  // Rimuove l'ultima virgola
+            code.append(buildParameterString(params));
         }
         code.append(") {\n");
         funDeclOp.getBody().accept(this);
@@ -140,10 +137,9 @@ public class CodeGenerator implements Visitor {
                 arg.accept(this);
                 code.append(", ");
             });
-            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
         }
+        code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
         code.append(");\n");
-        System.out.println(code); // Stampiamo il risultato
     }
 
     @Override
@@ -158,7 +154,7 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(ParDeclOp parDeclOp) {
         parDeclOp.getPVars().forEach(pVar -> {
-            typeTemp = parDeclOp.getType().equals("string") ? "char*" : pVar.getType();
+            typeTemp = isRefConvert(parDeclOp.getType());
             pVar.accept(this);
         });
     }
@@ -346,7 +342,7 @@ public class CodeGenerator implements Visitor {
             }
 
             // Appende la parte iniziale della firma: [tipo di ritorno] [nome funzione](
-            code.append(functionOp.getType())
+            code.append(isRefConvert(functionOp.getType()))
                     .append(" ")
                     .append(functionOp.getId().getLessema())
                     .append("(");
@@ -359,6 +355,18 @@ public class CodeGenerator implements Visitor {
             code.append(");\n");
         }
     }
+
+    private String isRefConvert(String type) {
+        // se la stringa inizia con ref allora resituisce la stringa senza ref e con *
+        if(type.startsWith("ref")) {
+            return type.substring(3) + "*";
+        }
+        else if(type.equals("string")) {
+            return "char*";
+        }
+        return type;
+    }
+
 
     private String buildParameterString(List<ParDeclOp> params) {
         StringJoiner paramJoiner = new StringJoiner(", ");
@@ -391,6 +399,7 @@ public class CodeGenerator implements Visitor {
 
         return paramJoiner.toString();
     }
+
 
     private void getFormatSpecifier(String type) {
         switch (type) {

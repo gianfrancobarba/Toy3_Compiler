@@ -86,9 +86,9 @@ public class TypeChecking implements Visitor {
         String rightType = binaryExprOp.getRight().getType();
         String operator = binaryExprOp.getOp();
         String result = BinaryOpTable.getResult(operator, ignoreRef(leftType), ignoreRef(rightType));
-        System.out.println(binaryExprOp);
+        //System.out.println(binaryExprOp);
         if(result == null){
-            System.out.println(binaryExprOp);
+            //System.out.println(binaryExprOp);
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
             System.exit(1);
         }
@@ -102,7 +102,7 @@ public class TypeChecking implements Visitor {
         String exprType = unaryExprOp.getExpr().getType();
         String operator = unaryExprOp.getOp();
         String result = UnaryOpTable.getResult(operator, ignoreRef(exprType));
-        System.out.println(unaryExprOp);
+        //System.out.println(unaryExprOp);
         if(result == null){
             System.err.print("ERROR: Invalid types in unary expression \"" + operator + " " + exprType + "\"");
             System.exit(1);
