@@ -84,6 +84,14 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VarDeclOp varDeclOp) {
+        String type = varDeclOp.getType().equals("string") ? "char*" : varDeclOp.getType();
+        List<VarOptInitOp> listVarOptInit = varDeclOp.getListVarOptInit();
+
+        listVarOptInit.forEach(varOptInitOp -> {
+            code.append(type).append(" ");
+            code.append(varOptInitOp.getId().getLessema());
+            code.append(";\n");
+        });
 
     }
 
@@ -173,10 +181,25 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
-
+        code.append(varOptInitOp.getId().getLessema());
+        if (varOptInitOp.getExprOp() != null) {
+            code.append(" = ");
+            varOptInitOp.getExprOp().accept(this);
+        }
+        code.append(";\n");
     }
 
-
+    public void visit(StatementOp stmt){
+        switch(stmt.getClass().getSimpleName()) {
+            case "AssignOp" -> visit((AssignOp) stmt);
+            case "IfThenOp" -> visit((IfThenOp) stmt);
+            case "IfThenElseOp" -> visit((IfThenElseOp) stmt);
+            case "WhileOp" -> visit((WhileOp) stmt);
+            case "ReadOp" -> visit((ReadOp) stmt);
+            case "WriteOp" -> visit((WriteOp) stmt);
+            case "ReturnOp" -> visit((ReturnOp) stmt);
+        }
+    }
 
     @Override
     public void visit(AssignOp assignOp) {
