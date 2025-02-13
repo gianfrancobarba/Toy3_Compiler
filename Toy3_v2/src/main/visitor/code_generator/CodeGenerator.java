@@ -98,6 +98,7 @@ public class CodeGenerator implements Visitor {
         code.deleteCharAt(code.length() - 2);
         // sostituisce l'ultimo spazio con il punto e virgola
         code.setCharAt(code.length() - 1, ';');
+        code.append("\n");
     }
 
     @Override
@@ -111,7 +112,8 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BodyOp bodyOp) {
-
+        bodyOp.getVarDecls().forEach(varDecl -> varDecl.accept(this));
+        bodyOp.getStatements().forEach(statementOp -> statementOp.accept(this));
     }
 
     @Override
