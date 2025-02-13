@@ -1,7 +1,23 @@
 // Programma che utilizza BinaryExprOp
 program
+def x(a:int) : double{
+x(23);
+a := x(25);
+return 3.4;
+}
+def x(a:double; x:int) : double{
+x(23);
+return 3.4;
+}
+x: double;
+begin
+x : double;
 
-// Dichiarazione variabili globali
+x(3);
+end
+
+
+/*// Dichiarazione variabili globali
 x | y | z : double;
 res1 | res2 | res3 | res4 | res5 | res6 | res7 : double;
 bool1 | bool2 | bool3 | bool4 : bool;
@@ -42,3 +58,4 @@ begin
 
     "" !>>; // Ritorno a capo finale
 end
+*/

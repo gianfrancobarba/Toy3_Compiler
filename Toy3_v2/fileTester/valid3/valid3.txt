@@ -8,44 +8,44 @@ def scoping(n: int; m: int; ref message: string)
     message := "level 1";
 
     if (n <= 1) then {
-        message := "level 2.1";
+        message : "level 2.1";
 
         if (m <= 1) then {
-            message := "level 3.1";
+            message : "level 3.1";
             message !>>;
         }
         else {
             if ((m > 1) and (m < 5)) then {
-                message := "level 3.2";
+                message : "level 3.2";
                 message !>>;
             }
             else {
-                message := "level 3.3";
+                message : "level 3.3";
                 message !>>;
             }
         }
         message !>>;
     }
     else {
-        message := "level 2.2";
+        message : "level 2.2";
 
         if (m <= 1) then {
-            message := "level 3.4";
+            message : "level 3.4";
             message !>>;
         }
         else {
             if ((m > 1) and (m < 5)) then {
-                message := "level 3.5";
+                message : "level 3.5";
                 message !>>;
             }
             else {
-                message := "level 3.6";
+                message : "level 3.6";
                 message !>>;
             }
         }
         message !>>;
     }
-    // message !>>;
+    message !>>;
 }
 
 def glob(): int
