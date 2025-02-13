@@ -2,24 +2,27 @@
 #include <string.h>
 #include <stdlib.h>
 
-int fun(int a, int* b, char* x);
+double x_fun(int a);
+double x_fun(int a);
+
+double x;
 
 
 int main(void){
-int x;
+double x;
+x_fun(3 );
 
 return 0;
 }
 
-int fun(int a, int* b, char* x) {
-if (a > *b) {
-x = "a" ;
-return a;
+double x_fun(int a) {
+x_fun(23 );
+a = x_fun(25 );
+ return 3.4;
 }
-else {
-x = "b" ;
-return *b;
-}
-return *b;
+
+double x_fun(int a) {
+x_fun(23 );
+return 3.4;
 }
 
