@@ -16,6 +16,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class CodeGenerator implements Visitor {
@@ -24,6 +25,7 @@ public class CodeGenerator implements Visitor {
     private final BufferedWriter writer;
     private String typeTemp;
     private Map<String, String> funConflictMap = new HashMap<>();
+    private Map<String, List<String>> funSignatureMap = new HashMap<>();
 
     public CodeGenerator() throws IOException {
         this.code = new StringBuilder();
@@ -131,6 +133,7 @@ public class CodeGenerator implements Visitor {
                 code.append(buildParameterString(params));
             }
         code.append(") {\n");
+        funSignatureMap.put(funDeclOp.getId().getLessema(), extractParameterType(buildParameterString(params)));
         funDeclOp.getBody().accept(this);
         code.append("}\n");
     }
@@ -142,11 +145,15 @@ public class CodeGenerator implements Visitor {
             funCallOp.getId().setLessema(funConflictMap.get(funCallOp.getId().getLessema()));
 
         code.append(funCallOp.getId().getLessema()).append("(");
-        //String type = funConflictMap.get(funCallOp.getId().getLessema());
-        //type = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
-
         if (!args.isEmpty()) {
+            AtomicInteger i = new AtomicInteger(); // Contatore per la posizione dell'argomento
             args.forEach(arg -> {
+                if(funSignatureMap.get(funCallOp.getId().getLessema()) != null) {
+                    if (funSignatureMap.get(funCallOp.getId().getLessema()).get(i.get()).contains("*") && !arg.getType().equals("string")) {
+                        code.append("&");
+                    }
+                }
+                i.getAndIncrement();
                 arg.accept(this);
                 code.append(", ");
             });
@@ -339,6 +346,7 @@ public class CodeGenerator implements Visitor {
             if (!(op1 instanceof FunDeclOp functionOp)) {
                 continue;
             }
+            functionOp.accept(this);
 
             for (Object op2 : listDecls) {
                 // Considera solo le operazioni che rappresentano una variabile
@@ -447,5 +455,37 @@ public class CodeGenerator implements Visitor {
             case "not": return "!";
             default: return op;
         }
+    }
+
+    private List<String> extractParameterType(String parameters) {
+        List<String> types = new ArrayList<>();
+
+        // Rimuove eventuali spazi bianchi all'inizio e alla fine
+        parameters = parameters.trim();
+
+        // Divide la stringa usando la virgola come separatore
+        String[] paramArray = parameters.split(",");
+
+        for (String param : paramArray) {
+            // Rimuove gli spazi bianchi interni
+            param = param.trim();
+
+            // Divide per lo spazio per separare il tipo dal nome
+            String[] parts = param.split(" ");
+
+            if (parts.length >= 2) {
+                // Ricompone il tipo (gestione di puntatori es. "double*")
+                StringBuilder typeBuilder = new StringBuilder();
+
+                for (int i = 0; i < parts.length - 1; i++) {
+                    if (i > 0) typeBuilder.append(" "); // Aggiunge spazio tra i tipi multipli
+                    typeBuilder.append(parts[i]);
+                }
+
+                types.add(typeBuilder.toString());
+            }
+        }
+
+        return types;
     }
 }
