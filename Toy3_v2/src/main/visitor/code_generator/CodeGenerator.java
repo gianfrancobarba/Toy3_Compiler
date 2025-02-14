@@ -114,7 +114,7 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(BodyOp bodyOp) {
         bodyOp.getVarDecls().forEach(varDecl -> varDecl.accept(this));
-        bodyOp.getStatements().forEach(statementOp -> statementOp.accept(this));
+        bodyOp.getStatements().forEach(stmt -> stmt.accept(this));
     }
 
     @Override
@@ -126,13 +126,12 @@ public class CodeGenerator implements Visitor {
 
         List<ParDeclOp> params = funDeclOp.getParams();
         if(params != null)
-            if (!params.isEmpty()) {
+            if(!params.isEmpty()) {
                 code.append(buildParameterString(params));
             }
         code.append(") {\n");
         funDeclOp.getBody().accept(this);
         code.append("}\n");
-
     }
 
     @Override
@@ -154,7 +153,8 @@ public class CodeGenerator implements Visitor {
             });
         }
         code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
-        code.append(");\n");
+        code.setCharAt(code.length() - 1, ')');
+        code.append(";\n");
     }
 
     @Override
@@ -303,7 +303,12 @@ public class CodeGenerator implements Visitor {
             });
             code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
         }
-        code.append(");\n");
+        if(writeOp.getNewLine() != null) {
+            code.append(", ");
+            code.append("'").append(writeOp.getNewLine()).append("'");
+        }
+        code.setCharAt(code.length() - 1, ')');
+        code.append(";\n");
     }
 
     @Override
@@ -322,7 +327,8 @@ public class CodeGenerator implements Visitor {
             });
             code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
         }
-        code.append(");\n");
+        code.setCharAt(code.length() - 1, ')');
+        code.append(";\n");
     }
 
     private void resolveNameConflicts(List<Object> listDecls) {

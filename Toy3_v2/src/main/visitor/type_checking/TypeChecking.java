@@ -22,6 +22,7 @@ public class TypeChecking implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
     private boolean isFun = false;
     private String currentFunType;
+    private String tempType;
 
     @Override
     public void visit(IfThenOp ifThenOp) {
@@ -86,7 +87,7 @@ public class TypeChecking implements Visitor {
         String rightType = binaryExprOp.getRight().getType();
         String operator = binaryExprOp.getOp();
         String result = BinaryOpTable.getResult(operator, ignoreRef(leftType), ignoreRef(rightType));
-        //System.out.println(binaryExprOp);
+
         if(result == null){
             System.out.println(binaryExprOp);
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
@@ -102,7 +103,7 @@ public class TypeChecking implements Visitor {
         String exprType = unaryExprOp.getExpr().getType();
         String operator = unaryExprOp.getOp();
         String result = UnaryOpTable.getResult(operator, ignoreRef(exprType));
-        //System.out.println(unaryExprOp);
+
         if(result == null){
             System.err.print("ERROR: Invalid types in unary expression \"" + operator + " " + exprType + "\"");
             System.exit(1);
@@ -194,16 +195,15 @@ public class TypeChecking implements Visitor {
 
         if (actualParams != null)
             if(!actualParams.isEmpty()) {
-            if (actualParams.size() != Objects.requireNonNull(expectedParams).length) {
-                System.err.println("ERROR: Number of parameters in function call does not match the number of parameters in the function declaration: " + funCallOp.getId().getLessema());
-                System.exit(1);
-            }
+                if (actualParams.size() != Objects.requireNonNull(expectedParams).length) {
+                    System.err.println("ERROR: Number of parameters in function call does not match the number of parameters in the function declaration: " + funCallOp.getId().getLessema());
+                    System.exit(1);
+                }
 
-            Map<Integer, String> expectedParamMap = new HashMap<>();
-            for (int i = 0; i < Objects.requireNonNull(expectedParams).length; i++) {
-                expectedParamMap.put(i, expectedParams[i].replace("ref ", ""));
-            }
-            //System.out.println(expectedParamMap.toString());
+                Map<Integer, String> expectedParamMap = new HashMap<>();
+                for (int i = 0; i < Objects.requireNonNull(expectedParams).length; i++) {
+                    expectedParamMap.put(i, expectedParams[i].replace("ref ", ""));
+                }
 
             for (int i = 0; i < actualParams.size(); i++) {
                 actualParams.get(i).accept(this);
@@ -214,15 +214,15 @@ public class TypeChecking implements Visitor {
                 }
             }
 
-            for(int i = 0; i < actualParams.size(); i++){
-                if(expectedParams[i].startsWith("ref")){
-                    if(!(actualParams.get(i) instanceof Identifier)){
-                        System.err.println("ERROR: Expected reference parameter at position " + (i + 1));
-                        System.exit(1);
+                for(int i = 0; i < actualParams.size(); i++){
+                    if(expectedParams[i].startsWith("ref")){
+                        if(!(actualParams.get(i) instanceof Identifier)){
+                            System.err.println("ERROR: Expected reference parameter at position " + (i + 1));
+                            System.exit(1);
+                        }
                     }
                 }
             }
-        }
 
         funDeclType = extractType(funDeclType);
         if(!funDeclType.equals("void"))
@@ -371,11 +371,21 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(ParDeclOp parDeclOp) {
+        List<PVarOp> pVarList = parDeclOp.getPVars();
 
+        parDeclOp.setType(parDeclOp.getParDeclType());
+        tempType = parDeclOp.getType();
+
+        pVarList.forEach(pVar -> pVar.accept(this));
     }
 
     @Override
-    public void visit(PVarOp pVarOp) {}
+    public void visit(PVarOp pVarOp) {
+        if(pVarOp.isRef())
+            tempType = "ref " + tempType;
+
+        pVarOp.setType(tempType);
+    }
 
     private String[] extractParameters(String type) {
         String[] parts = type.split("\\(");// Divide in base a "("
