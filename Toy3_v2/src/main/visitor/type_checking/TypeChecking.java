@@ -89,6 +89,7 @@ public class TypeChecking implements Visitor {
         String result = BinaryOpTable.getResult(operator, ignoreRef(leftType), ignoreRef(rightType));
 
         if(result == null){
+            System.out.println(binaryExprOp);
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
             System.exit(1);
         }
@@ -204,14 +205,14 @@ public class TypeChecking implements Visitor {
                     expectedParamMap.put(i, expectedParams[i].replace("ref ", ""));
                 }
 
-                for (int i = 0; i < actualParams.size(); i++) {
-                    actualParams.get(i).accept(this);
-                    if (! ignoreRef(actualParams.get(i).getType()).equals(ignoreRef(expectedParamMap.get(i)))) {
-                        System.err.print("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + (i + 1));
-                        System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
-                        System.exit(1);
-                    }
+            for (int i = 0; i < actualParams.size(); i++) {
+                actualParams.get(i).accept(this);
+                if (!isCompatible(ignoreRef(actualParams.get(i).getType()),(ignoreRef(expectedParamMap.get(i))))){
+                    System.err.print("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + (i + 1));
+                    System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
+                    System.exit(1);
                 }
+            }
 
                 for(int i = 0; i < actualParams.size(); i++){
                     if(expectedParams[i].startsWith("ref")){
@@ -247,7 +248,7 @@ public class TypeChecking implements Visitor {
         whileOp.getBody().accept(this);
         // controllo che il type della condizione sia bool
         if(whileOp.getCondition().getType().equals("bool")
-                && whileOp.getBody().getType().equals("notype")){
+            && whileOp.getBody().getType().equals("notype")){
             whileOp.setType("notype");
         }
         else {
@@ -263,8 +264,8 @@ public class TypeChecking implements Visitor {
         ifThenElseOp.getElseBranch().accept(this);
 
         if(ifThenElseOp.getCondition().getType().equals("bool")
-                && ifThenElseOp.getThenBranch().getType().equals("notype")
-                && ifThenElseOp.getElseBranch().getType().equals("notype")){
+            && ifThenElseOp.getThenBranch().getType().equals("notype")
+            && ifThenElseOp.getElseBranch().getType().equals("notype")){
             ifThenElseOp.setType("notype");
         }
         else {
@@ -398,7 +399,7 @@ public class TypeChecking implements Visitor {
     private boolean isCompatible(String type1, String type2) {
         type1 = ignoreRef(type1);
         type2 = ignoreRef(type2);
-        return type1.equals(type2) || type1.equals("double") && type2.equals("int");
+        return type1.equals(type2) || type1.equals("double") && type2.equals("int") || type1.equals("int") && type2.equals("double");
     }
 
     private String ignoreRef(String type) {

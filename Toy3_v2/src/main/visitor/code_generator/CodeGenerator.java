@@ -23,6 +23,7 @@ public class CodeGenerator implements Visitor {
     private final StringBuilder code;
     private final BufferedWriter writer;
     private String typeTemp;
+    private Map<String, String> funConflictMap = new HashMap<>();
 
     public CodeGenerator() throws IOException {
         this.code = new StringBuilder();
@@ -136,9 +137,17 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(FunCallOp funCallOp) {
         List<ExprOp> args = funCallOp.getExprList();
+        if (funConflictMap.containsKey(funCallOp.getId().getLessema()))
+            funCallOp.getId().setLessema(funConflictMap.get(funCallOp.getId().getLessema()));
+
         code.append(funCallOp.getId().getLessema()).append("(");
+        //String type = funConflictMap.get(funCallOp.getId().getLessema());
+        //type = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
+
         if (!args.isEmpty()) {
             args.forEach(arg -> {
+
+
                 arg.accept(this);
                 code.append(", ");
             });
@@ -242,6 +251,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(Identifier identifier) {
+        if(identifier.getType().startsWith("ref") && !identifier.getType().equals("ref string")) {
+            code.append("*");
+        }
         code.append(identifier.getLessema());
     }
 
@@ -283,9 +295,10 @@ public class CodeGenerator implements Visitor {
         if (!exprList.isEmpty()) {
             code.append(", ");
             exprList.forEach(expr -> {
-                if(expr instanceof ConstOp con) {
+                expr.accept(this);
+                /*if(expr instanceof ConstOp con) {
                     con.accept(this);
-                }
+                }*/
                 code.append(", ");
             });
             code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
@@ -308,7 +321,7 @@ public class CodeGenerator implements Visitor {
         if (!idList.isEmpty()) {
             code.append(", ");
             idList.forEach(id -> {
-                if(id.getType().equals("string")) code.append("&");
+                if(!id.getType().equals("string")) code.append("&");
                 id.accept(this);
                 code.append(", ");
             });
@@ -339,6 +352,8 @@ public class CodeGenerator implements Visitor {
                     // Se i nomi coincidono, modifica il nome della funzione
                     if (functionName.equals(variableName)) {
                         functionOp.getId().setLessema(functionName + "_fun");
+                        // aggiunge alla mappa il vecchio nome della funzione e il nuovo nome
+                        funConflictMap.put(functionName, functionName + "_fun");
                     }
                 }
             }
