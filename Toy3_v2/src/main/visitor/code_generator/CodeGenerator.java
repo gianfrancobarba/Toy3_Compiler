@@ -268,9 +268,11 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
+        code.append("(");
         binaryExprOp.getLeft().accept(this);
         code.append(" ").append(convertOp(binaryExprOp.getOp())).append(" ");
         binaryExprOp.getRight().accept(this);
+        code.append(")");
     }
 
     @Override
@@ -291,6 +293,9 @@ public class CodeGenerator implements Visitor {
         List<ExprOp> exprList = writeOp.getExprList();
         code.append("printf(\"");
         exprList.forEach(expr -> { getFormatSpecifier(expr.getType()); });
+        if(writeOp.getNewLine() != null)
+            code.append("%c");
+
         code.append("\"");
 
         if (!exprList.isEmpty()) {
@@ -306,7 +311,7 @@ public class CodeGenerator implements Visitor {
         }
         if(writeOp.getNewLine() != null) {
             code.append(", ");
-            code.append("'").append(writeOp.getNewLine()).append("'");
+            code.append("'\\n\'").append("\'");
         }
         code.setCharAt(code.length() - 1, ')');
         code.append(";\n");
