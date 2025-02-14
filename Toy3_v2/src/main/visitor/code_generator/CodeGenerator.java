@@ -251,6 +251,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(Identifier identifier) {
+        if(identifier.getType().startsWith("ref") && !identifier.getType().equals("ref string")) {
+            code.append("*");
+        }
         code.append(identifier.getLessema());
     }
 
