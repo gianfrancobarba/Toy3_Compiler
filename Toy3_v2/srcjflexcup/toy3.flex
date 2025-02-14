@@ -163,14 +163,14 @@ ID = [:jletter:][:jletterdigit:]* // lettera seguita da lettere o numeri
 
     {ESCAPE_SEQUENCE} { // Caratteri di escape validi
         switch(yytext().charAt(1)) {
-            case 'b': string.append('\b'); break;
-            case 'f': string.append('\f'); break;
-            case 'n': string.append('\n'); break;
-            case 'r': string.append('\r'); break;
-            case 't': string.append('\t'); break;
-            case '\\': string.append('\\'); break;
-            case '\"': string.append('\"'); break;
-            case '\'': string.append('\''); break;
+            case 'b': string.append("\\b"); break;
+            case 'f': string.append("\\f"); break;
+            case 'n': string.append("\\n"); break;
+            case 'r': string.append("\\r"); break;
+            case 't': string.append("\\t"); break;
+            case '\\': string.append("\\\\"); break;
+            case '\"': string.append("\\\""); break;
+            case '\'': string.append("\\\'"); break;
             default: throw new IllegalArgumentException("Carattere di escape non valido: " + yytext());
         }
     }

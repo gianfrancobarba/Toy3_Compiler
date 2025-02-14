@@ -147,8 +147,6 @@ public class CodeGenerator implements Visitor {
 
         if (!args.isEmpty()) {
             args.forEach(arg -> {
-
-
                 arg.accept(this);
                 code.append(", ");
             });
@@ -260,8 +258,9 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(ConstOp constOp) {
-        if (constOp.getType().equals("string"))
+        if (constOp.getType().equals("string")) {
             code.append("\"").append(constOp.getValue()).append("\"");
+        }
         else
             code.append(constOp.getValue());
     }
@@ -302,9 +301,6 @@ public class CodeGenerator implements Visitor {
             code.append(", ");
             exprList.forEach(expr -> {
                 expr.accept(this);
-                /*if(expr instanceof ConstOp con) {
-                    con.accept(this);
-                }*/
                 code.append(", ");
             });
             code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
