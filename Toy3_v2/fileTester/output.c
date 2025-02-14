@@ -1,70 +1,74 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-void moltiplicazione(double x, double y, double* res, bool* grande);
-char* saluto();
+char* message;
 
-double sommagrande, sommapiccola;
+int n, m, k;
 
-int i;
 
-double x, y, risultato;
+void scoping(int n, int m, char* message) {
+message = "level 1" ;
+if ((n <= 1)) {
+char* message;
+if ((m <= 1)) {
+char* message;
+printf("%s%c", message , '\n');
+}
+else {
+if (((m > 1) && (m < 5))) {
+char* message;
+printf("%s%c", message , '\n');
+}
+else {
+char* message;
+printf("%s%c", message , '\n');
+}
+}
+printf("%s%c", message , '\n');
+}
+else {
+char* message;
+if ((m <= 1)) {
+char* message;
+printf("%s%c", message , '\n');
+}
+else {
+if (((m > 1) && (m < 5))) {
+char* message;
+printf("%s%c", message , '\n');
+}
+else {
+char* message;
+printf("%s%c", message , '\n');
+}
+}
+printf("%s%c", message , '\n');
+}
+printf("%s%c", message , '\n');
+}
 
-bool grande, nonusata;
+int glob() {
+return 100;
+}
 
 
 int main(void){
-sommagrande = 0, sommapiccola = 0 ;
-printf("%s", "Questo programma permette di svolgere una serie di moltiplicazioni" );
-printf("%s", "sommando i risultati < 100 in sommagrande e quelli < 100 in sommapiccola" );
-i = -1 ;
-while (i <= 0) {
-char* saluto;
-printf("%s", "Quante moltiplicazioni vuoi svolgere? (inserire intero > 0)" );
-scanf("%d", &i );
-printf("%s", saluto );
+k = 6 ;
+while ((k >= 1)) {
+printf("%s", "Inserisci n: ");
+scanf("%d", &n);
+printf("%s", "Inserisci m: ");
+scanf("%d", &m);
+printf("%s%d%s%d%c", "I valori inseriti sono ", n, " e ", m , '\n');
+scoping(n, m, message);
+k = (k - 1) ;
 }
-while (i > 0) {
-x = -1 ;
-y = -1 ;
-while (notx > 0 and y > 0) {
-char* saluto;
-printf("%s%d%s", "Moltiplicazione ", i, ": inserisci due numeri positivi" );
-scanf("%lf%lf", &x, &y );
-printf("%s", saluto );
-}
-moltiplicazione(x, y, risultato, grande );
-printf("%lf", risultato );
-if (grande) {
-printf("%s", "il risultato è grande" );
-sommagrande = sommagrande + risultato ;
-}
-else {
-printf("%s", "il risultato è piccolo" );
-sommapiccola = sommapiccola + risultato ;
-}
-i = i - 1 ;
-}
-printf("%s%lf", "
- sommagrande è ", sommagrande );
-printf("%s%lf", "sommapiccola è ", sommapiccola );
+printf("%s%c", message , '\n');
+printf("%d%c", glo);
+ , '\n');
 
 return 0;
-}
-
-void moltiplicazione(double x, double y, double* res, bool* grande) {
-double risultato = x * y, nonusata;
-if (x * y >= 100) {
-grande = true ;
-}
-else {
-grande = false ;
-}
-res = risultato ;
-}
-
-char* saluto() {
-return "ciao";
 }
 

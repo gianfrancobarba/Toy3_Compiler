@@ -39,12 +39,6 @@ public class CodeGenerator implements Visitor {
         code.append("#include <stdlib.h>\n");
         code.append("#include <stdbool.h>\n\n");
 
-        resolveNameConflicts(programOp.getListDecls());
-        appendFunctionSignatures(programOp.getListDecls());
-
-        // Itera su tutte le operazioni del programma (dichiarazioni di variabili e funzioni)
-        // e processa quelle che rappresentano dichiarazioni di variabili.
-        code.append("\n");
         for (Object obj : programOp.getListDecls()) {
             // Se l'oggetto è una dichiarazione di variabile, visita l'oggetto per generare il codice
             if (obj instanceof VarDeclOp varDeclOp) {
@@ -54,20 +48,22 @@ public class CodeGenerator implements Visitor {
         }
 
         code.append("\n");
+        resolveNameConflicts(programOp.getListDecls());
+        programOp.getListDecls().forEach(obj -> {
+            if (obj instanceof FunDeclOp funDeclOp) {
+                funDeclOp.accept(this);
+                code.append("\n");
+            }
+        });
+        //appendFunctionSignatures(programOp.getListDecls());
+
+        code.append("\n");
 
         // Processa il blocco principale del programma (Begin-End)
         // Visitando l'oggetto BeginEndOp si genera il codice relativo al corpo del programma.
         programOp.getBeginEndOp().accept(this);
         code.append("\n\n");
 
-        // Itera nuovamente sulle operazioni del programma per processare le dichiarazioni di funzioni.
-        for (Object obj : programOp.getListDecls()) {
-            // Se l'oggetto è una dichiarazione di funzione, visita l'oggetto per generare il codice
-            if (obj instanceof FunDeclOp funDeclOp) {
-                funDeclOp.accept(this);
-                code.append("\n");
-            }
-        }
 
         // Scrive il codice generato sul file utilizzando il BufferedWriter.
         // In caso di errore durante la scrittura, viene lanciata una RuntimeException.
@@ -346,7 +342,6 @@ public class CodeGenerator implements Visitor {
             if (!(op1 instanceof FunDeclOp functionOp)) {
                 continue;
             }
-            functionOp.accept(this);
 
             for (Object op2 : listDecls) {
                 // Considera solo le operazioni che rappresentano una variabile
@@ -364,6 +359,7 @@ public class CodeGenerator implements Visitor {
                         functionOp.getId().setLessema(functionName + "_fun");
                         // aggiunge alla mappa il vecchio nome della funzione e il nuovo nome
                         funConflictMap.put(functionName, functionName + "_fun");
+                        //functionOp.accept(this);
                     }
                 }
             }
