@@ -26,6 +26,7 @@ public class CodeGenerator implements Visitor {
     private String typeTemp;
     private Map<String, String> funConflictMap = new HashMap<>();
     private Map<String, List<String>> funSignatureMap = new HashMap<>();
+    private boolean isStmt = false;
 
     public CodeGenerator() throws IOException {
         this.code = new StringBuilder();
@@ -80,13 +81,16 @@ public class CodeGenerator implements Visitor {
     public void visit(BeginEndOp beginEndOp) {
         code.append("int main(void){\n");
         beginEndOp.getVarDeclList().forEach(varDeclOp -> varDeclOp.accept(this));
-        beginEndOp.getStmtList().forEach(statementOp -> statementOp.accept(this));
+        beginEndOp.getStmtList().forEach(statementOp -> {
+            setStmt(statementOp, true);
+            statementOp.accept(this);
+        });
         code.append("\nreturn 0;\n}");
     }
 
     @Override
     public void visit(VarDeclOp varDeclOp) {
-        String type = varDeclOp.getType().equals("string") ? "char*" : varDeclOp.getType();
+        String type = varDeclOp.getType().equals("string") ? "char" : varDeclOp.getType();
         List<VarOptInitOp> listVarOptInit = varDeclOp.getListVarOptInit();
         code.append(type).append(" ");
 
@@ -120,7 +124,10 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(BodyOp bodyOp) {
         bodyOp.getVarDecls().forEach(varDecl -> varDecl.accept(this));
-        bodyOp.getStatements().forEach(stmt -> stmt.accept(this));
+        bodyOp.getStatements().forEach(stmt -> {
+                setStmt(stmt, true);
+                stmt.accept(this);
+        });
     }
 
     @Override
@@ -151,6 +158,7 @@ public class CodeGenerator implements Visitor {
         if (!args.isEmpty()) {
             AtomicInteger i = new AtomicInteger(); // Contatore per la posizione dell'argomento
             args.forEach(arg -> {
+                setStmt(arg, false);
                 if(funSignatureMap.get(funCallOp.getId().getLessema()) != null) {
                     if (funSignatureMap.get(funCallOp.getId().getLessema()).get(i.get()).contains("*") && !arg.getType().equals("string")) {
                         code.append("&");
@@ -160,10 +168,15 @@ public class CodeGenerator implements Visitor {
                 arg.accept(this);
                 code.append(", ");
             });
+            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+            code.setCharAt(code.length() - 1, ')');
         }
-        code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
-        code.setCharAt(code.length() - 1, ')');
-        code.append(";\n");
+        else {
+            code.append(")");
+        }
+
+        if (isStmt)
+            code.append(";\n");
     }
 
     @Override
@@ -204,24 +217,30 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
+        if(varOptInitOp.getType().equals("string"))
+            code.append('*');
+
         code.append(varOptInitOp.getId().getLessema());
+
         if (varOptInitOp.getExprOp() != null) {
             code.append(" = ");
+            setStmt(varOptInitOp.getExprOp(), false);
             varOptInitOp.getExprOp().accept(this);
         }
     }
 
-    public void visit(StatementOp stmt){
-        switch(stmt.getClass().getSimpleName()) {
-            case "AssignOp" -> visit((AssignOp) stmt);
-            case "IfThenOp" -> visit((IfThenOp) stmt);
-            case "IfThenElseOp" -> visit((IfThenElseOp) stmt);
-            case "WhileOp" -> visit((WhileOp) stmt);
-            case "ReadOp" -> visit((ReadOp) stmt);
-            case "WriteOp" -> visit((WriteOp) stmt);
-            case "ReturnOp" -> visit((ReturnOp) stmt);
-        }
-    }
+//    public void visit(StatementOp stmt){
+//        switch(stmt.getClass().getSimpleName()) {
+//            case "AssignOp" -> visit((AssignOp) stmt);
+//            case "IfThenOp" -> visit((IfThenOp) stmt);
+//            case "IfThenElseOp" -> visit((IfThenElseOp) stmt);
+//            case "WhileOp" -> visit((WhileOp) stmt);
+//            case "ReturnOp" -> visit((ReturnOp) stmt);
+//            case "WriteOp" -> visit((WriteOp) stmt);
+//            case "ReadOp" -> visit((ReadOp) stmt);
+//            case "FunCallOp" -> visit((FunCallOp) stmt);
+//        }
+//    }
 
     @Override
     public void visit(AssignOp assignOp) {
@@ -231,32 +250,28 @@ public class CodeGenerator implements Visitor {
         for (int i = 0; i < idList.size(); i++) {
             idList.get(i).accept(this);
             code.append(" = ");
+
+            setStmt(exprList.get(i), false);
+
             exprList.get(i).accept(this);
             code.append(", ");
         }
+//        if(!(exprList.get(0) instanceof FunCallOp)) {
+//            code.append(";\n");
+//        }
         code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
-
-        if(!(exprList.get(0) instanceof FunCallOp)) {
-            code.append(";\n");
-        }
+        code.append(";\n");
     }
 
-    public void visit(ExprOp expr) {
-        switch(expr.getClass().getSimpleName()) {
-            case "BinaryExprOp":
-                visit((BinaryExprOp) expr);
-                break;
-            case "UnaryExprOp":
-                visit((UnaryExprOp) expr);
-                break;
-            case "ConstOp":
-                visit((ConstOp) expr);
-                break;
-            case "Identifier":
-                visit((Identifier) expr);
-                break;
-        }
-    }
+//    public void visit(ExprOp expr) {
+//        switch(expr.getClass().getSimpleName()) {
+//            case "BinaryExprOp" -> visit((BinaryExprOp) expr);
+//            case "UnaryExprOp" -> visit((UnaryExprOp) expr);
+//            case "ConstOp" -> visit((ConstOp) expr);
+//            case "Identifier" -> visit((Identifier) expr);
+//            case "FunCallOp" -> visit((FunCallOp) expr);
+//        }
+//    }
 
     @Override
     public void visit(Identifier identifier) {
@@ -278,8 +293,12 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
         code.append("(");
+        setStmt(binaryExprOp.getLeft(), false);
         binaryExprOp.getLeft().accept(this);
+
         code.append(" ").append(convertOp(binaryExprOp.getOp())).append(" ");
+
+        setStmt(binaryExprOp.getRight(), false);
         binaryExprOp.getRight().accept(this);
         code.append(")");
     }
@@ -287,12 +306,14 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(UnaryExprOp unaryExprOp) {
         code.append(convertOp(unaryExprOp.getOp()));
+        setStmt(unaryExprOp.getExpr(), false);
         unaryExprOp.getExpr().accept(this);
     }
 
     @Override
     public void visit(ReturnOp returnOp) {
         code.append("return ");
+        setStmt(returnOp.getExpr(), false);
         returnOp.getExpr().accept(this);
         code.append(";\n");
     }
@@ -310,6 +331,7 @@ public class CodeGenerator implements Visitor {
         if (!exprList.isEmpty()) {
             code.append(", ");
             exprList.forEach(expr -> {
+                setStmt(expr, false);
                 expr.accept(this);
                 code.append(", ");
             });
@@ -451,12 +473,12 @@ public class CodeGenerator implements Visitor {
     }
 
     private String convertOp(String op){
-        switch(op){
-            case "and": return "&&";
-            case "or": return "||";
-            case "not": return "!";
-            default: return op;
-        }
+        return switch (op) {
+            case "and" -> "&&";
+            case "or" -> "||";
+            case "not" -> "!";
+            default -> op;
+        };
     }
 
     private List<String> extractParameterType(String parameters) {
@@ -489,5 +511,10 @@ public class CodeGenerator implements Visitor {
         }
 
         return types;
+    }
+
+    private void setStmt(Object obj, boolean flag) {
+        if(obj instanceof FunCallOp)
+            isStmt = flag;
     }
 }

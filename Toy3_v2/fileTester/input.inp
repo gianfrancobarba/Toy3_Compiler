@@ -1,61 +1,20 @@
-// Programma che utilizza BinaryExprOp
 program
-def x(a:int) : double{
-x(23);
-a := x(25);
-return 3.4;
+
+def fun(x: int) : int {
+    return 0;
 }
-def x(a:double; x:int) : double{
-x(23);
-return 3.4;
-}
-x: double;
-begin
-x : double;
 
-x(3);
-end
-
-
-/*// Dichiarazione variabili globali
-x | y | z : double;
-res1 | res2 | res3 | res4 | res5 | res6 | res7 : double;
-bool1 | bool2 | bool3 | bool4 : bool;
-
-// Definizione della funzione per operazioni binarie
-def operazioni_bin(a: double; b: double; ref sum: double; ref diff: double; ref prod: double; ref quot: double;
-                    ref greater: bool; ref equal: bool; ref logic_and: bool)
-{
-    sum := a + b;
-    diff := a - b;
-    prod := a * b;
-    quot := a / b;
-
-    greater := (a > b);
-    equal := (a == b);
-    logic_and := greater and equal;
+def g() : int {
+    return 0;
 }
 
 begin
-    x := 10.5;
-    y := 2.5;
 
-    operazioni_bin(x, y, res1, res2, res3, res4, bool1, bool2, bool3);
+x | y: int;
+x := fun(y) + 4;
+fun(y);
+g();
+g() >>;
+fun(y) >>;
 
-    // Stampa dei risultati delle operazioni binarie
-    "Somma: " >> res1 !>>;
-    "Differenza: " >> res2 !>>;
-    "Prodotto: " >> res3 !>>;
-    "Quoziente: " >> res4 !>>;
-
-    "x > y: " >> bool1 !>>;
-    "x == y: " >> bool2 !>>;
-    "(x > y) and (x == y): " >> bool3 !>>;
-
-    // Controllo logico con OR
-    bool4 := bool1 or bool2;
-    "Risultato di (x > y) or (x == y): " >> bool4 !>>;
-
-    "" !>>; // Ritorno a capo finale
 end
-*/
