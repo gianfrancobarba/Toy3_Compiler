@@ -35,8 +35,8 @@ def tutteleoperazioni(input1: double; input2: double; ref res1: double; ref res2
 {
     somma(input1, input2, res1);
     sottrazione(input1, input2, res2);
-    res4 := divisione(input1, input2);
     res3 := moltiplicazione(input1, input2);
+    res4 := divisione(input1, input2);
 }
 
 def stampa(stringa: string): string
@@ -55,7 +55,7 @@ begin
         "Inserisci il secondo input: ">>;
         input2 <<;
 
-        "Hai scelto l'operazione ", operazione, " con gli argomenti ", input1, " e ", input2 !>>;
+        "hai scelto l'operazione ", operazione, " con gli argomenti ", input1, " e ", input2 !>>;
 
         if (operazione == "somma") then {
             somma(input1, input2, result);
@@ -88,7 +88,7 @@ begin
             "Il risultato è: ", result !>>;
         }
         else {
-            stampa("I risultati delle 4 operazioni sono \n" + res1 + "\n" + res2 + "\n" + res3 + "\n" + res4 + "\n") !>>;
+            stampa("i risultati delle 4 operazioni sono \n" + res1 + "\n" + res2 + "\n" + res3 + "\n" + res4 + "\n") !>>;
         }
 
         "Vuoi continuare? (1 yes/0 no): ">>;
