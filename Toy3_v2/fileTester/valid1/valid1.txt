@@ -9,7 +9,7 @@ taglia | ans1 | ans : string;
 risultato: double;
 
 // Definizione delle funzioni
-def sommac(a: double; d: double; b: double; ref size: string; ref result: double)
+def sommac(a: int; d: int; b: double; ref size: string; ref result: double)
 {
     result := a + b + c + d;
 
@@ -46,28 +46,28 @@ begin
 
     sommac(a, x, b, taglia, risultato);
 
-    stampa("La somma di " + a + " e " + b + " incrementata di " + c + " è " + taglia);
-    stampa("Ed è pari a " + risultato);
+    stampa("la somma di " + a + " e " + b + " incrementata di " + c + " è " + taglia);
+    stampa("ed è pari a " + risultato);
 
-    "Vuoi continuare? (si/no) - inserisci due volte la risposta\n">>;
+    "vuoi continuare? (si/no) - inserisci due volte la risposta\n">>;
     ans <<;
     ans1 <<;
 
     while (ans == "si") do {
-        "Inserisci un intero: ">>;
+        "inserisci un intero: ">>;
         a <<;
-        "Inserisci un reale: ">>;
+        "inserisci un reale: ">>;
         b <<;
 
         sommac(a, x, b, taglia, risultato);
 
-        stampa("La somma di " + a + " e " + b + " incrementata di " + c + " è " + taglia);
-        stampa("Ed è pari a " + risultato);
+        stampa("la somma di " + a + " e " + b + " incrementata di " + c + " è " + taglia);
+        stampa("ed è pari a " + risultato);
 
-        "Vuoi continuare? (si/no): ">>;
+        "vuoi continuare? (si/no): ">>;
         ans <<;
     }
 
     "" !>>; // Ritorno a capo finale
-    "Ciao" !>>;
+    "ciao" !>>;
 end

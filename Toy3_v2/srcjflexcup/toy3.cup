@@ -65,6 +65,8 @@ precedence right NOT;
 precedence left EQ, NE, LT, LE, GT, GE;
 precedence left PLUS, MINUS;
 precedence left TIMES, DIV;
+precedence right PLUS, MINUS;
+precedence left LPAR, RPAR;
 
 // Inizio della grammatica
 start with Program;
