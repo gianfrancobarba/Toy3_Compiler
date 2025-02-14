@@ -34,7 +34,8 @@ public class CodeGenerator implements Visitor {
     public void visit(ProgramOp programOp) {
         code.append("#include <stdio.h>\n");
         code.append("#include <string.h>\n");
-        code.append("#include <stdlib.h>\n\n");
+        code.append("#include <stdlib.h>\n");
+        code.append("#include <stdbool.h>\n\n");
 
         resolveNameConflicts(programOp.getListDecls());
         appendFunctionSignatures(programOp.getListDecls());
@@ -268,13 +269,13 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
         binaryExprOp.getLeft().accept(this);
-        code.append(" ").append(binaryExprOp.getOp()).append(" ");
+        code.append(" ").append(convertOp(binaryExprOp.getOp())).append(" ");
         binaryExprOp.getRight().accept(this);
     }
 
     @Override
     public void visit(UnaryExprOp unaryExprOp) {
-        code.append(unaryExprOp.getOp());
+        code.append(convertOp(unaryExprOp.getOp()));
         unaryExprOp.getExpr().accept(this);
     }
 
@@ -435,6 +436,15 @@ public class CodeGenerator implements Visitor {
             case "char" -> code.append("%c");
             case "double" -> code.append("%lf");
             case "string" -> code.append("%s");
+        }
+    }
+
+    private String convertOp(String op){
+        switch(op){
+            case "and": return "&&";
+            case "or": return "||";
+            case "not": return "!";
+            default: return op;
         }
     }
 }
