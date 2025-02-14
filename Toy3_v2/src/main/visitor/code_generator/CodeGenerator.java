@@ -97,6 +97,13 @@ public class CodeGenerator implements Visitor {
          // rimuove l'ultima virgola e l'ultimo spazio
         code.deleteCharAt(code.length() - 2);
         // sostituisce l'ultimo spazio con il punto e virgola
+
+        // controlla se l'assegnamento è del tipo ID : constant, se è cosi si aggiunge =
+        if(varDeclOp.getTypeOrConstant() instanceof ConstOp con){
+            code.append(" = ");
+            con.accept(this);
+        }
+
         code.setCharAt(code.length() - 1, ';');
         code.append("\n");
     }
@@ -399,7 +406,6 @@ public class CodeGenerator implements Visitor {
         }
         return type;
     }
-
 
     private String buildParameterString(List<ParDeclOp> params) {
         StringJoiner paramJoiner = new StringJoiner(", ");
