@@ -13,7 +13,7 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) {
-        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/input.inp"))) {
+        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/valid4/valid4.txt"))) {
             Lexer lexer = new Lexer(fileReader);
             parser p = new parser(lexer);
             try {

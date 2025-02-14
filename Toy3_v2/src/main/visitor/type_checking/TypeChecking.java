@@ -207,7 +207,7 @@ public class TypeChecking implements Visitor {
 
             for (int i = 0; i < actualParams.size(); i++) {
                 actualParams.get(i).accept(this);
-                if (! ignoreRef(actualParams.get(i).getType()).equals(ignoreRef(expectedParamMap.get(i)))) {
+                if (!isCompatible(ignoreRef(actualParams.get(i).getType()),(ignoreRef(expectedParamMap.get(i))))){
                     System.err.print("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + (i + 1));
                     System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
                     System.exit(1);

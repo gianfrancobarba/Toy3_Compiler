@@ -125,12 +125,14 @@ public class CodeGenerator implements Visitor {
         code.append("(");
 
         List<ParDeclOp> params = funDeclOp.getParams();
-        if(!params.isEmpty()) {
-            code.append(buildParameterString(params));
-        }
+        if(params != null)
+            if (!params.isEmpty()) {
+                code.append(buildParameterString(params));
+            }
         code.append(") {\n");
         funDeclOp.getBody().accept(this);
         code.append("}\n");
+
     }
 
     @Override
