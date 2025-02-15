@@ -11,6 +11,7 @@ import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.visitor.Visitor;
+import main.visitor.scoping.Scope;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -56,15 +57,10 @@ public class CodeGenerator implements Visitor {
         isGlobal = false;
         code.append("\n");
 
+        // Risolve i conflitti di nomi tra funzioni e variabili (assegna _fun al nome della funzione in caso di conflitto)
         resolveNameConflicts(programOp.getListDecls());
-        programOp.getListDecls().forEach(obj -> {
-            if (obj instanceof FunDeclOp funDeclOp) {
-                funDeclOp.accept(this);
-                code.append("\n");
-            }
-        });
-        //appendFunctionSignatures(programOp.getListDecls());
-
+        // Aggiunge le firme delle funzioni al codice
+        appendFunctionSignatures(programOp.getListDecls());
         code.append("\n");
 
         // Processa il blocco principale del programma (Begin-End)
@@ -72,7 +68,13 @@ public class CodeGenerator implements Visitor {
         programOp.getBeginEndOp().accept(this);
         code.append("\n\n");
 
-
+        // Scrive tutti i corpi delle funzioni dopo il main
+        programOp.getListDecls().forEach(obj -> {
+            if (obj instanceof FunDeclOp funDeclOp) {
+                funDeclOp.accept(this);
+                code.append("\n");
+            }
+        });
         // Scrive il codice generato sul file utilizzando il BufferedWriter.
         // In caso di errore durante la scrittura, viene lanciata una RuntimeException.
         try {

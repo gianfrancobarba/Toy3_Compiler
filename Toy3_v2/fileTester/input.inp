@@ -4,6 +4,7 @@ p : string;
 r : "ciao";
 f = "mondo" : string;
 
+fun : int;
 begin
     x = "ciao" | y = "mondo" | z = "mio" : string;
     a : "bella";
