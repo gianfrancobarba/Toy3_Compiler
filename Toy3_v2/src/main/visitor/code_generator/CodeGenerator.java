@@ -27,6 +27,8 @@ public class CodeGenerator implements Visitor {
     private Map<String, String> funConflictMap = new HashMap<>();
     private Map<String, List<String>> funSignatureMap = new HashMap<>();
     private boolean isStmt = false;
+    private boolean isGlobal = false;
+    private List<VarDeclOp> listStringGlobal = new ArrayList<>();
 
     public CodeGenerator() throws IOException {
         this.code = new StringBuilder();
@@ -40,15 +42,20 @@ public class CodeGenerator implements Visitor {
         code.append("#include <stdlib.h>\n");
         code.append("#include <stdbool.h>\n\n");
 
+        printMallocFun();
+        printReallocFun();
+
         for (Object obj : programOp.getListDecls()) {
+            isGlobal = true;
             // Se l'oggetto è una dichiarazione di variabile, visita l'oggetto per generare il codice
             if (obj instanceof VarDeclOp varDeclOp) {
                 varDeclOp.accept(this);
                 code.append("\n");
             }
         }
-
+        isGlobal = false;
         code.append("\n");
+
         resolveNameConflicts(programOp.getListDecls());
         programOp.getListDecls().forEach(obj -> {
             if (obj instanceof FunDeclOp funDeclOp) {
@@ -80,6 +87,7 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(BeginEndOp beginEndOp) {
         code.append("int main(void){\n");
+        globalStringAllocate();
         beginEndOp.getVarDeclList().forEach(varDeclOp -> varDeclOp.accept(this));
         beginEndOp.getStmtList().forEach(statementOp -> {
             setStmt(statementOp, true);
@@ -88,28 +96,59 @@ public class CodeGenerator implements Visitor {
         code.append("\nreturn 0;\n}");
     }
 
+    private void globalStringAllocate() {
+        listStringGlobal.forEach(varDeclOp -> {
+//            code.append(varDeclOp.getType()).append(" ");
+//            varDeclOp.getListVarOptInit().forEach(varOptInitOp -> {
+//                code.append("*").append(varOptInitOp.getId().getLessema()).append(" = allocate_string(256);\n");
+//            });
+
+            varDeclOp.accept(this);
+        });
+    }
+
     @Override
     public void visit(VarDeclOp varDeclOp) {
-        String type = varDeclOp.getType().equals("string") ? "char" : varDeclOp.getType();
         List<VarOptInitOp> listVarOptInit = varDeclOp.getListVarOptInit();
-        code.append(type).append(" ");
+        String type = varDeclOp.getType();
 
-        listVarOptInit.forEach(varOpt -> {
-            varOpt.accept(this);
-            code.append(", ");
-        });
-         // rimuove l'ultima virgola e l'ultimo spazio
-        code.deleteCharAt(code.length() - 2);
-        // sostituisce l'ultimo spazio con il punto e virgola
+        if(type.equals("string")) {
+            if(isGlobal) { listStringGlobal.add(varDeclOp); }
 
-        // controlla se l'assegnamento è del tipo ID : constant, se è cosi si aggiunge =
-        if(varDeclOp.getTypeOrConstant() instanceof ConstOp con){
-            code.append(" = ");
-            con.accept(this);
+            listVarOptInit.forEach(varOpt -> {
+                code.append("char").append(" ");
+                varOpt.accept(this);
+                code.append(";\n");
+            });
+            if(!isGlobal) {
+                if (varDeclOp.getTypeOrConstant() instanceof ConstOp con) {
+                    code.append("strcpy(").append(varDeclOp.getListVarOptInit().get(0).getId().getLessema()).append(", ");
+                    con.accept(this);
+                    code.append(");\n");
+                }
+            }
         }
+        else {
 
-        code.setCharAt(code.length() - 1, ';');
-        code.append("\n");
+            code.append(type).append(" ");
+
+            listVarOptInit.forEach(varOpt -> {
+                varOpt.accept(this);
+                code.append(", ");
+            });
+            // rimuove l'ultima virgola e l'ultimo spazio
+            code.deleteCharAt(code.length() - 2);
+
+            // controlla se l'assegnamento è del tipo ID : constant, se è cosi si aggiunge = e la costante assegnata
+            if (varDeclOp.getTypeOrConstant() instanceof ConstOp con) {
+                code.append(" = ");
+                con.accept(this);
+                code.append(" ");
+            }
+            // aggiunge il punto e virgola alla fine della dichiarazione
+            code.setCharAt(code.length() - 1, ';');
+            code.append("\n");
+        }
     }
 
     @Override
@@ -217,15 +256,26 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
-        if(varOptInitOp.getType().equals("string"))
+        if(varOptInitOp.getType().equals("string")) {
             code.append('*');
-
-        code.append(varOptInitOp.getId().getLessema());
-
-        if (varOptInitOp.getExprOp() != null) {
-            code.append(" = ");
-            setStmt(varOptInitOp.getExprOp(), false);
-            varOptInitOp.getExprOp().accept(this);
+            code.append(varOptInitOp.getId().getLessema());
+            if(!isGlobal) {
+                code.append(" = allocate_string(256)");
+                if (varOptInitOp.getExprOp() != null) {
+                    code.append(";\nstrcpy(").append(varOptInitOp.getId().getLessema()).append(", ");
+                    setStmt(varOptInitOp.getExprOp(), false);
+                    varOptInitOp.getExprOp().accept(this);
+                    code.append(")");
+                }
+            }
+        }
+        else {
+            code.append(varOptInitOp.getId().getLessema());
+            if (varOptInitOp.getExprOp() != null) {
+                code.append(" = ");
+                setStmt(varOptInitOp.getExprOp(), false);
+                varOptInitOp.getExprOp().accept(this);
+            }
         }
     }
 
@@ -516,5 +566,31 @@ public class CodeGenerator implements Visitor {
     private void setStmt(Object obj, boolean flag) {
         if(obj instanceof FunCallOp)
             isStmt = flag;
+    }
+
+    void printMallocFun() {
+        // **Definizione delle funzioni di gestione delle stringhe**
+        code.append("// Funzione per allocare dinamicamente una stringa\n");
+        code.append("char* allocate_string(size_t size) {\n");
+        code.append("    char* str = (char*)malloc(size * sizeof(char));\n");
+        code.append("    if (str == NULL) {\n");
+        code.append("        printf(\"Errore di allocazione!\\n\");\n");
+        code.append("        exit(1);\n");
+        code.append("    }\n");
+        code.append("    str[0] = '\\0';  // Inizializza la stringa vuota\n");
+        code.append("    return str;\n");
+        code.append("}\n\n");
+    }
+
+    void printReallocFun() {
+        code.append("// Funzione per riallocare dinamicamente una stringa\n");
+        code.append("char* reallocate_string(char* str, size_t new_size) {\n");
+        code.append("    char* temp = (char*)realloc(str, new_size * sizeof(char));\n");
+        code.append("    if (temp == NULL) {\n");
+        code.append("        printf(\"Errore di riallocazione!\\n\");\n");
+        code.append("        exit(1);\n");
+        code.append("    }\n");
+        code.append("    return temp;\n");
+        code.append("}\n\n");
     }
 }

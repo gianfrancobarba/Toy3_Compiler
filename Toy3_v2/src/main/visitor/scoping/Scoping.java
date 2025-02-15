@@ -20,7 +20,6 @@ public class Scoping implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
     private String tempType;
     private String funTemp;
-    private String isFun;
 
     @Override
     public void visit(ProgramOp programOp) {
@@ -251,41 +250,6 @@ public class Scoping implements Visitor {
     }
 
     @Override
-    public void visit(WhileOp whileOp) {
-        System.out.println("\n---- Scope WhileOp [" + whileOp.getFunLabel()+"] ----");
-
-        whileOp.getBody().setFunLabel("WhileOp <- "+ whileOp.getFunLabel());
-        whileOp.getBody().accept(this);
-    }
-
-    private String functionSignature(FunDeclOp funDeclOp) {
-
-        StringBuilder sb = new StringBuilder();
-        String type;
-        if (funDeclOp.getOptType() != null) {
-            type = funDeclOp.getOptType();
-            sb.append(type);
-        } else {
-            sb.append("void");
-        }
-        sb.append("(");
-
-        if (funDeclOp.getParams() != null) {
-            StringJoiner joiner = new StringJoiner(", ");
-            for (ParDeclOp parDecl : funDeclOp.getParams()) {
-                for (PVarOp pVarOp : parDecl.getPVars()) {
-                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getParDeclType();
-                    joiner.add(param);
-                }
-            }
-            sb.append(joiner);
-        }
-
-        sb.append(")");
-        return sb.toString();
-    }
-
-    @Override
     public void visit(FunCallOp funCallOp) {
         funTemp = funCallOp.getId().getLessema();
         if(symbolTable.lookup(Kind.FUN, funTemp) == null){
@@ -329,10 +293,45 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(Identifier identifier) {
-        if(symbolTable.lookup(Kind.VAR, identifier.getLessema()) == null) {
+        if (symbolTable.lookup(Kind.VAR, identifier.getLessema()) == null) {
             System.err.print("ERROR: Variable " + identifier.getLessema() + " not declared");
             System.exit(1);
         }
+    }
+
+    @Override
+    public void visit(WhileOp whileOp) {
+        System.out.println("\n---- Scope WhileOp [" + whileOp.getFunLabel()+"] ----");
+
+        whileOp.getBody().setFunLabel("WhileOp <- "+ whileOp.getFunLabel());
+        whileOp.getBody().accept(this);
+    }
+
+    private String functionSignature(FunDeclOp funDeclOp) {
+
+        StringBuilder sb = new StringBuilder();
+        String type;
+        if (funDeclOp.getOptType() != null) {
+            type = funDeclOp.getOptType();
+            sb.append(type);
+        } else {
+            sb.append("void");
+        }
+        sb.append("(");
+
+        if (funDeclOp.getParams() != null) {
+            StringJoiner joiner = new StringJoiner(", ");
+            for (ParDeclOp parDecl : funDeclOp.getParams()) {
+                for (PVarOp pVarOp : parDecl.getPVars()) {
+                    String param = (pVarOp.isRef() ? "ref " : "") + parDecl.getParDeclType();
+                    joiner.add(param);
+                }
+            }
+            sb.append(joiner);
+        }
+
+        sb.append(")");
+        return sb.toString();
     }
 
     @Override

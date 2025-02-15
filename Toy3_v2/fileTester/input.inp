@@ -1,20 +1,11 @@
 program
 
-def fun(x: int) : int {
-    return 0;
-}
-
-def g() : int {
-    return 0;
-}
+p : string;
+r : "ciao";
+f = "mondo" : string;
 
 begin
-
-x | y: int;
-x := fun(y) + 4;
-fun(y);
-g();
-g() >>;
-fun(y) >>;
-
+    x = "ciao" | y = "mondo" | z = "mio" : string;
+    a : "bella";
+    b | c = "stronza" | d : string;
 end
