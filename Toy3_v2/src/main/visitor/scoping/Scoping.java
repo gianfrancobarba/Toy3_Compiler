@@ -3,6 +3,7 @@ package main.visitor.scoping;
 import main.nodes.common.Identifier;
 import main.nodes.declarations.*;
 import main.nodes.expr.BinaryExprOp;
+import main.nodes.expr.ExprOp;
 import main.nodes.expr.FunCallOp;
 import main.nodes.expr.UnaryExprOp;
 import main.nodes.program.BeginEndOp;
@@ -11,6 +12,7 @@ import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.visitor.Visitor;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -18,6 +20,7 @@ public class Scoping implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
     private String tempType;
     private String funTemp;
+    private String isFun;
 
     @Override
     public void visit(ProgramOp programOp) {
@@ -93,7 +96,7 @@ public class Scoping implements Visitor {
         String funId = funDeclOp.getId().getLessema();
 
         if(symbolTable.probe(Kind.FUN, funId)){
-            System.err.print("ERROR: Function "+ funId + " already declared with type: "+symbolTable.lookup(Kind.FUN, funId));
+            System.err.print("ERROR: Function "+ funId + " already declared with type: "+ symbolTable.lookup(Kind.FUN, funId));
             System.exit(1);
         }
 
@@ -283,32 +286,57 @@ public class Scoping implements Visitor {
     }
 
     @Override
-    public void visit(FunCallOp funCallOp) {}
+    public void visit(FunCallOp funCallOp) {
+        funTemp = funCallOp.getId().getLessema();
+        if(symbolTable.lookup(Kind.FUN, funTemp) == null){
+            System.err.print("ERROR: Function " + funTemp + " not declared");
+            System.exit(1);
+        }
 
-    @Override
-    public void visit(AssignOp assignOp) {}
-
-    @Override
-    public void visit(BinaryExprOp binaryExprOp) {}
-
-    @Override
-    public void visit(ReturnOp returnOp) {}
-
-    @Override
-    public void visit(WriteOp writeOp) {}
-
-    @Override
-    public void visit(ReadOp readOp) {}
-
-    @Override
-    public void visit(UnaryExprOp unaryExprOp) {}
-
-    @Override
-    public void visit(Identifier identifier) {
-
+        funCallOp.getExprList().forEach(expr -> expr.accept(this));
     }
 
     @Override
-    public void visit(ConstOp constOp) {}
+    public void visit(AssignOp assignOp) {
+        assignOp.getIdentfiers().forEach(id -> id.accept(this));
+    }
+
+    @Override
+    public void visit(BinaryExprOp binaryExprOp) {
+        binaryExprOp.getLeft().accept(this);
+        binaryExprOp.getRight().accept(this);
+    }
+
+    @Override
+    public void visit(ReturnOp returnOp) {
+        returnOp.getExpr().accept(this);
+    }
+
+    @Override
+    public void visit(WriteOp writeOp) {
+        writeOp.getExprList().forEach(expr -> expr.accept(this));
+    }
+
+    @Override
+    public void visit(ReadOp readOp) {
+        readOp.getIdentifiers().forEach(id -> id.accept(this));
+    }
+
+    @Override
+    public void visit(UnaryExprOp unaryExprOp) {
+        unaryExprOp.getExpr().accept(this);
+    }
+
+    @Override
+    public void visit(Identifier identifier) {
+        if(symbolTable.lookup(Kind.VAR, identifier.getLessema()) == null) {
+            System.err.print("ERROR: Variable " + identifier.getLessema() + " not declared");
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void visit(ConstOp constOp) {
+    }
 
 }
