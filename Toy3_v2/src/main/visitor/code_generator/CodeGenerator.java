@@ -11,6 +11,7 @@ import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.visitor.Visitor;
+import main.visitor.scoping.Scope;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -47,17 +48,10 @@ public class CodeGenerator implements Visitor {
                 code.append("\n");
             }
         }
-
-        code.append("\n");
+        // Risolve i conflitti di nomi tra funzioni e variabili (assegna _fun al nome della funzione in caso di conflitto)
         resolveNameConflicts(programOp.getListDecls());
-        programOp.getListDecls().forEach(obj -> {
-            if (obj instanceof FunDeclOp funDeclOp) {
-                funDeclOp.accept(this);
-                code.append("\n");
-            }
-        });
-        //appendFunctionSignatures(programOp.getListDecls());
-
+        // Aggiunge le firme delle funzioni al codice
+        appendFunctionSignatures(programOp.getListDecls());
         code.append("\n");
 
         // Processa il blocco principale del programma (Begin-End)
@@ -65,7 +59,13 @@ public class CodeGenerator implements Visitor {
         programOp.getBeginEndOp().accept(this);
         code.append("\n\n");
 
-
+        // Scrive tutti i corpi delle funzioni dopo il main
+        programOp.getListDecls().forEach(obj -> {
+            if (obj instanceof FunDeclOp funDeclOp) {
+                funDeclOp.accept(this);
+                code.append("\n");
+            }
+        });
         // Scrive il codice generato sul file utilizzando il BufferedWriter.
         // In caso di errore durante la scrittura, viene lanciata una RuntimeException.
         try {
@@ -123,7 +123,18 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BodyOp bodyOp) {
-        bodyOp.getVarDecls().forEach(varDecl -> varDecl.accept(this));
+        bodyOp.getVarDecls().forEach(varDecl ->{
+            /*Scope bodyScope = bodyOp.getScope();
+            List<VarOptInitOp> listVarOptInit = varDecl.getListVarOptInit();
+            // cicla su tutti i lessemi degli identifier di listVarOptInit e controlla se sono presenti nella mappa
+            // se sono presenti allora chiama accept di varoptinitop
+            listVarOptInit.forEach(varOptInitOp -> {
+                if(bodyScope.lookup(varOptInitOp.getId().getLessema()) != null) {
+                    varOptInitOp.accept(this);
+                }
+            });*/
+            varDecl.accept(this);
+        });
         bodyOp.getStatements().forEach(stmt -> {
                 setStmt(stmt, true);
                 stmt.accept(this);

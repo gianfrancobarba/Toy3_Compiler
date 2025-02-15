@@ -9,6 +9,7 @@ def scoping(n: int; m: int; ref message: string)
 
     if (n <= 1) then {
         message : "level 2.1";
+        n : 10;
 
         if (m <= 1) then {
             message : "level 3.1";

@@ -8,6 +8,7 @@ def g() : int {
     return 0;
 }
 
+fun : int;
 begin
 
 x | y: int;
