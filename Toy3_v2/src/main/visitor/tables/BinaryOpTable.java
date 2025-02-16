@@ -34,8 +34,10 @@ public class BinaryOpTable {
         addEntry("or", "bool", "bool", "bool");
         addEntry(">", "int", "int", "bool");
         addEntry(">", "double", "double", "bool");
+        addEntry(">", "string", "string", "bool");
         addEntry(">", "int", "double", "bool");
         addEntry(">", "double", "int", "bool");
+        addEntry("<", "string", "string", "bool");
         addEntry("<", "int", "int", "bool");
         addEntry("<", "double", "double", "bool");
         addEntry("<", "int", "double", "bool");
@@ -44,10 +46,12 @@ public class BinaryOpTable {
         addEntry(">=", "double", "double", "bool");
         addEntry(">=", "int", "double", "bool");
         addEntry(">=", "double", "int", "bool");
+        addEntry(">=", "string", "string", "bool");
         addEntry("<=", "int", "int", "bool");
         addEntry("<=", "double", "double", "bool");
         addEntry("<=", "int", "double", "bool");
         addEntry("<=", "double", "int", "bool");
+        addEntry("<=", "string", "string", "bool");
         addEntry("==", "int", "int", "bool");
         addEntry("==", "double", "double", "bool");
         addEntry("==", "int", "double", "bool");

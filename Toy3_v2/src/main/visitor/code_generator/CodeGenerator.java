@@ -50,6 +50,7 @@ public class CodeGenerator implements Visitor {
         printReallocFun();
         printStrcpyFun();
         printStrcatFun();
+        printToStringFun();
         printSafeScanFun();
 
         for (Object obj : programOp.getListDecls()) {
@@ -96,7 +97,7 @@ public class CodeGenerator implements Visitor {
     public void visit(BeginEndOp beginEndOp) {
         List<VarDeclOp> listVarDecl = beginEndOp.getVarDeclList();
         code.append("int main(void){\n");
-        code.append("char* temp = allocate_string(1);\n");
+        code.append("temp = allocate_string(1);\n");
         globalStringAllocate();
         listVarDecl.forEach(varDeclOp -> varDeclOp.accept(this));
         beginEndOp.getStmtList().forEach(statementOp -> {
@@ -125,7 +126,9 @@ public class CodeGenerator implements Visitor {
 
     private void globalStringAllocate() {
         listStringGlobal.forEach(varDeclOp -> {
-            varDeclOp.accept(this);
+            varDeclOp.getListVarOptInit().forEach(varOpt -> {
+                code.append(varOpt.getId().getLessema()).append(" = allocate_string(256);\n");
+            });
         });
     }
 
@@ -383,19 +386,34 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
-        if(binaryExprOp.getLeft().getType().equals("string")) {
-            if(binaryExprOp.getType().equals("bool")) {
+
+//        System.out.println("CIAO SONO  QUI : " + binaryExprOp.toString());
+//        System.out.println("\n\n tipo sx: " + binaryExprOp.getLeft().getType() + " tipo dx: " + binaryExprOp.getRight().getType());
+        if(binaryExprOp.getLeft().getType().equals("string") || binaryExprOp.getRight().getType().equals("string")) {
+            if (binaryExprOp.getType().equals("bool")) {
                 getStringComparison(binaryExprOp.getLeft(), binaryExprOp.getOp(), binaryExprOp.getRight());
-            }
-            else {
+            } else {
                 code.append("safe_strcat(");
-                setStmt(binaryExprOp.getLeft(), false);
-                binaryExprOp.getLeft().accept(this);
-                code.append(", ");
-                setStmt(binaryExprOp.getRight(), false);
-                binaryExprOp.getRight().accept(this);
-                code.append(")");
+                if (!binaryExprOp.getLeft().getType().equals("string")) {
+                    code.append("to_string(&");
+                    binaryExprOp.getLeft().accept(this);
+                    code.append(", \"").append(binaryExprOp.getLeft().getType()).append("\")");
+                } else {
+                    binaryExprOp.getLeft().accept(this);
+                }
             }
+
+            code.append(", ");
+
+            if (!binaryExprOp.getRight().getType().equals("string")) {
+                code.append("to_string(&");
+                binaryExprOp.getRight().accept(this);
+                code.append(", \"").append(binaryExprOp.getRight().getType()).append("\")");
+            } else {
+                binaryExprOp.getRight().accept(this);
+            }
+
+            code.append(")");
         }
         else {
             code.append("(");
@@ -641,7 +659,7 @@ public class CodeGenerator implements Visitor {
             isStmt = flag;
     }
 
-    void printMallocFun() {
+    private void printMallocFun() {
         // **Definizione delle funzioni di gestione delle stringhe**
         code.append("// Funzione per allocare dinamicamente una stringa\n");
         code.append("char* allocate_string(size_t size) {\n");
@@ -655,7 +673,7 @@ public class CodeGenerator implements Visitor {
         code.append("}\n\n");
     }
 
-    void printReallocFun() {
+    private void printReallocFun() {
         code.append("// Funzione per riallocare dinamicamente una stringa\n");
         code.append("char* reallocate_string(char* str, size_t new_size) {\n");
         code.append("    char* temp = (char*)realloc(str, new_size * sizeof(char));\n");
@@ -666,7 +684,7 @@ public class CodeGenerator implements Visitor {
         code.append("    return temp;\n");
         code.append("}\n\n");
     }
-    void printStrcpyFun() {
+    private void printStrcpyFun() {
         code.append("// Funzione per copiare una stringa in modo sicuro con gestione dinamica della memoria\n");
         code.append("void safe_strcpy(char** dest, const char* src) {\n");
         code.append("    size_t src_len = strlen(src) + 1;\n"); // +1 per il terminatore '\0'
@@ -675,7 +693,7 @@ public class CodeGenerator implements Visitor {
         code.append("}\n\n");
     }
 
-    void printStrcatFun() {
+    private void printStrcatFun() {
         code.append("// Funzione per concatenare due stringhe in modo sicuro con gestione dinamica della memoria\n");
         code.append("char* safe_strcat(const char* s1, const char* s2) {\n");
         code.append("    if (!s1 && !s2) return allocate_string(1);\n");
@@ -684,18 +702,23 @@ public class CodeGenerator implements Visitor {
 
         code.append("    size_t len1 = strlen(s1);\n");
         code.append("    size_t len2 = strlen(s2);\n");
-        code.append("    temp = reallocate_string(temp, len1 + len2 + 1);\n"); // **Usiamo temp**
+
+        // Usa una variabile temporanea per evitare problemi di realloc su `temp`
+        code.append("    char* new_temp = reallocate_string(temp, len1 + len2 + 1);\n");
+        code.append("    if (!new_temp) {\n");
+        code.append("        printf(\"Errore di allocazione in safe_strcat!\\n\");\n");
+        code.append("        exit(1);\n");
+        code.append("    }\n");
+        code.append("    temp = new_temp;\n");
+
         code.append("    strcpy(temp, s1);\n");
         code.append("    strcat(temp, s2);\n");
-
-        code.append("    return temp;\n"); // **Restituiamo temp**
+        code.append("    return temp;\n");
         code.append("}\n\n");
     }
 
 
-
-
-    void printSafeScanFun() {
+   private void printSafeScanFun() {
         code.append("// Funzione per leggere una stringa dinamica evitando problemi di buffer\n");
         code.append("void safe_scanf(char** dest) {\n");
         code.append("    size_t size = INITIAL_SIZE;\n");
@@ -733,4 +756,44 @@ public class CodeGenerator implements Visitor {
         code.append("    (*dest)[len] = '\\0'; // Termina correttamente la stringa\n");
         code.append("}\n\n");
     }
+
+    private void printToStringFun() {
+        code.append("// Funzione per convertire diversi tipi in stringa usando temp\n");
+        code.append("char* to_string(void* value, const char* type) {\n");
+
+        // Conversione per interi
+        code.append("    if (strcmp(type, \"int\") == 0) {\n");
+        code.append("        temp = reallocate_string(temp, 32);\n");
+        code.append("        sprintf(temp, \"%d\", *(int*)value);\n");
+
+        // Conversione per double
+        code.append("    } else if (strcmp(type, \"double\") == 0) {\n");
+        code.append("        temp = reallocate_string(temp, 32);\n");
+        code.append("        sprintf(temp, \"%lf\", *(double*)value);\n");
+
+        // Conversione per booleani
+        code.append("    } else if (strcmp(type, \"bool\") == 0) {\n");
+        code.append("        temp = reallocate_string(temp, 6);\n");
+        code.append("        strcpy(temp, *(int*)value ? \"true\" : \"false\");\n");
+
+        // Conversione per char
+        code.append("    } else if (strcmp(type, \"char\") == 0) {\n");
+        code.append("        temp = reallocate_string(temp, 2);\n");
+        code.append("        temp[0] = *(char*)value;\n");
+        code.append("        temp[1] = '\\0';\n");
+
+        // Conversione per stringhe
+        code.append("    } else if (strcmp(type, \"string\") == 0) {\n");
+        code.append("        return (char*)value;\n");
+
+        // Tipo sconosciuto
+        code.append("    } else {\n");
+        code.append("        temp = reallocate_string(temp, 16);\n");
+        code.append("        strcpy(temp, \"UNKNOWN\");\n");
+        code.append("    }\n");
+
+        code.append("    return temp;\n");
+        code.append("}\n\n");
+    }
+
 }
