@@ -206,7 +206,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
-        code.append(isRefConvert(funDeclOp.getType()));
+        code.append(isRefConvert(extractType(funDeclOp.getType())));
         code.append(" ");
         code.append(funDeclOp.getId().getLessema());
         code.append("(");
@@ -526,7 +526,8 @@ public class CodeGenerator implements Visitor {
             }
 
             // Appende la parte iniziale della firma: [tipo di ritorno] [nome funzione](
-            code.append(isRefConvert(functionOp.getType()))
+
+            code.append(isRefConvert(extractType(functionOp.getType())))
                     .append(" ")
                     .append(functionOp.getId().getLessema())
                     .append("(");
@@ -652,6 +653,10 @@ public class CodeGenerator implements Visitor {
         }
 
         return types;
+    }
+
+    private String extractType(String type) {
+        return type.split("\\(")[0]; // Prende tutto prima di "("
     }
 
     private void setStmt(Object obj, boolean flag) {

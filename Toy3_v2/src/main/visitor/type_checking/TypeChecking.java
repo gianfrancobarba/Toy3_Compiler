@@ -149,84 +149,154 @@ public class TypeChecking implements Visitor {
             for(StatementOp statOp : bodyOp.getStatements())
                 statOp.accept(this);
         }
+        symbolTable.setCurrentScope(symbolTable.getCurrentScope().getParent());
     }
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
+        // Imposta lo scope corrente
         symbolTable.setCurrentScope(funDeclOp.getScope());
+
+        // Recupera il tipo della funzione dalla symbol table e lo imposta nell'AST
         String funType = symbolTable.lookup(Kind.FUN, funDeclOp.getId().getLessema());
+        funDeclOp.setType(funType);
         currentFunType = extractType(funType);
-        funDeclOp.setType(currentFunType);
 
-        // Controlla che se la funzione non è di tipo void allora deve contenere almeno un return statement mentre se
-        // è di tipo void non deve contenere alcun return statement;
-        if(funDeclOp.getType().equals("void")) {
-            if(funDeclOp.getBody().getStatements() != null && funDeclOp.getBody().getStatements().stream().anyMatch( stmt -> stmt instanceof ReturnOp)) {
-                System.err.print("Error: Function \"" + funDeclOp.getId().getLessema() + "\" cannot contain a return statement");
+        // Se la funzione è di tipo void, non deve contenere alcun return statement
+        if (currentFunType.equals("void")) {
+            if (funDeclOp.getBody().getStatements() != null &&
+                    funDeclOp.getBody().getStatements().stream().anyMatch(stmt -> stmt instanceof ReturnOp)) {
+                System.err.println("Error: Function \"" + funDeclOp.getId().getLessema() + "\" cannot contain a return statement");
                 System.exit(1);
             }
         }
+        // Se la funzione non è void, deve garantire che ogni percorso di esecuzione restituisca un valore
         else {
-            if(funDeclOp.getBody().getStatements() == null || funDeclOp.getBody().getStatements().stream().noneMatch( stmt -> stmt instanceof ReturnOp)) {
-                System.err.print("Error: Function \"" + funDeclOp.getId().getLessema() + "\" requires a return statement");
-                System.exit(1);
-            }
-        }
+            boolean hasReturnOp = false;
+            List<StatementOp> statements = funDeclOp.getBody().getStatements();
 
-        Optional.ofNullable(funDeclOp.getBody().getStatements())
-                .ifPresent(stmtList -> stmtList.forEach(stmt -> stmt.accept(this)));
+            if (statements != null) {
+                // Verifica se esiste un return statement diretto nel corpo della funzione
+                hasReturnOp = statements.stream().anyMatch(stmt -> stmt instanceof ReturnOp);
 
-        Optional.ofNullable(funDeclOp.getBody().getVarDecls())
-                .ifPresent(varDeclList -> varDeclList.forEach(varDecl -> varDecl.accept(this)));
+                // Se non c'è un return diretto, controlla se esistono degli if-then-else che garantiscono il return in entrambi i rami
+                if (!hasReturnOp) {
+                    for (StatementOp stmt : statements) {
+                        if (stmt instanceof IfThenElseOp) {
+                            IfThenElseOp ifStmt = (IfThenElseOp) stmt;
 
-        Optional.ofNullable(funDeclOp.getParams())
-                .ifPresent(paramDeclList -> paramDeclList.forEach(paramDecl -> paramDecl.accept(this)));
+                            boolean thenHasReturn = ifStmt.getThenBranch() != null &&
+                                    ifStmt.getThenBranch().getStatements() != null &&
+                                    ifStmt.getThenBranch().getStatements().stream().anyMatch(s -> s instanceof ReturnOp);
 
-    }
+                            boolean elseHasReturn = ifStmt.getElseBranch() != null &&
+                                    ifStmt.getElseBranch().getStatements() != null &&
+                                    ifStmt.getElseBranch().getStatements().stream().anyMatch(s -> s instanceof ReturnOp);
 
-    @Override
-    public void visit(FunCallOp funCallOp) {
-
-        isFun = true;
-        funCallOp.getId().accept(this);
-        String funDeclType = funCallOp.getId().getType();
-        String[] expectedParams = extractParameters(funDeclType);
-        List<ExprOp> actualParams = funCallOp.getExprList();
-
-        if (actualParams != null)
-            if(!actualParams.isEmpty()) {
-                if (actualParams.size() != Objects.requireNonNull(expectedParams).length) {
-                    System.err.println("ERROR: Number of parameters in function call does not match the number of parameters in the function declaration: " + funCallOp.getId().getLessema());
-                    System.exit(1);
-                }
-
-                Map<Integer, String> expectedParamMap = new HashMap<>();
-                for (int i = 0; i < Objects.requireNonNull(expectedParams).length; i++) {
-                    expectedParamMap.put(i, expectedParams[i].replace("ref ", ""));
-                }
-
-            for (int i = 0; i < actualParams.size(); i++) {
-                actualParams.get(i).accept(this);
-                if (!isCompatible(ignoreRef(actualParams.get(i).getType()),(ignoreRef(expectedParamMap.get(i))))){
-                    System.err.print("ERROR: Parameter type mismatch in function call " + funCallOp.getId().getLessema() + " at position " + (i + 1));
-                    System.err.print("; expected " + expectedParamMap.get(i) + " but got " + actualParams.get(i).getType());
-                    System.exit(1);
-                }
-            }
-
-                for(int i = 0; i < actualParams.size(); i++){
-                    if(expectedParams[i].startsWith("ref")){
-                        if(!(actualParams.get(i) instanceof Identifier)){
-                            System.err.println("ERROR: Expected reference parameter at position " + (i + 1));
-                            System.exit(1);
+                            if (!thenHasReturn) {
+                                System.err.println("Error: Missing return in the then branch of the if-then-else statement in function \"" + funDeclOp.getId().getLessema() + "\"");
+                                System.exit(1);
+                            } else if (!elseHasReturn) {
+                                System.err.println("Error: Missing return in the else branch of the if-then-else statement in function \"" + funDeclOp.getId().getLessema() + "\"");
+                                System.exit(1);
+                            } else {
+                                // Se entrambi i rami contengono il return, consideriamo questo percorso valido
+                                hasReturnOp = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
 
-        funDeclType = extractType(funDeclType);
-        if(!funDeclType.equals("void"))
-            funCallOp.setType(funDeclType);
+            if (!hasReturnOp) {
+                System.err.println("Error: Function \"" + funDeclOp.getId().getLessema() + "\" requires at least one return statement");
+                System.exit(1);
+            }
+        }
+
+        // Visita i parametri della funzione
+        Optional.ofNullable(funDeclOp.getParams())
+                .ifPresent(paramList -> paramList.forEach(param -> param.accept(this)));
+
+        // Visita le dichiarazioni delle variabili nel corpo della funzione
+        Optional.ofNullable(funDeclOp.getBody().getVarDecls())
+                .ifPresent(varDeclList -> varDeclList.forEach(varDecl -> varDecl.accept(this)));
+
+        // Visita gli statement del corpo della funzione
+        Optional.ofNullable(funDeclOp.getBody().getStatements())
+                .ifPresent(stmtList -> stmtList.forEach(stmt -> stmt.accept(this)));
+
+        // Ripristina lo scope corrente al parent
+        symbolTable.setCurrentScope(symbolTable.getCurrentScope().getParent());
+    }
+
+
+    @Override
+    public void visit(FunCallOp funCallOp) {
+        isFun = true;
+
+        // Visita l'identificatore della funzione per determinare il suo tipo (firma)
+        funCallOp.getId().accept(this);
+        String functionSignature = funCallOp.getId().getType();
+        // Estrai i tipi dei parametri attesi dalla firma della funzione
+        List<String> expectedParamTypes;
+        String paramsSection = functionSignature.substring(functionSignature.indexOf("(") + 1, functionSignature.indexOf(")")).trim();
+        if (paramsSection.isEmpty()) {
+            expectedParamTypes = null;
+        } else {
+            // La firma viene processata per ottenere la stringa dei parametri e poi divisa in una lista
+            functionSignature = extractParameters(functionSignature);
+            expectedParamTypes = new ArrayList<>(List.of(functionSignature.split(", ")));
+        }
+
+        // Ottieni la lista degli argomenti effettivi passati nella chiamata
+        List<ExprOp> actualArguments = funCallOp.getExprList();
+
+        // Controllo sul numero degli argomenti
+        if (expectedParamTypes == null && actualArguments != null) {
+            System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with " + actualArguments.size());
+            System.err.println(" parameters, but it does not require parameters");
+            System.exit(1);
+        } else if (expectedParamTypes != null && actualArguments == null) {
+            System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with 0 parameters, but it requires " + expectedParamTypes.size());
+            System.exit(1);
+        }
+
+        if (actualArguments != null) {
+            if (expectedParamTypes.size() != actualArguments.size()) {
+                System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with " + actualArguments.size());
+                System.err.println(" parameters, but it requires " + expectedParamTypes.size());
+                System.exit(1);
+            }
+
+            // Per ogni argomento, verifica che il tipo sia compatibile con quello atteso
+            for (int i = 0; i < expectedParamTypes.size(); i++) {
+                String expectedParamType = ignoreRef(expectedParamTypes.get(i));
+                ExprOp argument = actualArguments.get(i);
+                argument.accept(this);
+                String actualArgType = ignoreRef(argument.getType());
+
+                if (!isCompatible(expectedParamType, actualArgType)) {
+                    System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with parameter at position ");
+                    System.err.println((i + 1) + " of type " + actualArgType + " but it requires " + expectedParamTypes.get(i));
+                    System.exit(1);
+                }
+            }
+
+            // Se il parametro è passato per riferimento, controlla che l'argomento sia una variabile
+            for (int i = 0; i < expectedParamTypes.size(); i++) {
+                if (expectedParamTypes.get(i).startsWith("ref") && !(actualArguments.get(i) instanceof Identifier)) {
+                    System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with non-variable argument at position " + (i + 1));
+                    System.exit(1);
+                }
+            }
+        }
+
+        // Estrai il tipo della funzione (senza la parte relativa ai parametri)
+        String functionType = extractType(funCallOp.getId().getType());
+        if (!functionType.equals("void"))
+            funCallOp.setType(functionType);
     }
 
     @Override
@@ -247,8 +317,7 @@ public class TypeChecking implements Visitor {
         whileOp.getCondition().accept(this);
         whileOp.getBody().accept(this);
         // controllo che il type della condizione sia bool
-        if(whileOp.getCondition().getType().equals("bool")
-            && whileOp.getBody().getType().equals("notype")){
+        if(whileOp.getCondition().getType().equals("bool") && whileOp.getBody().getType().equals("notype")){
             whileOp.setType("notype");
         }
         else {
@@ -314,29 +383,42 @@ public class TypeChecking implements Visitor {
         for(Identifier id : idList){
             String idType = id.getType();
             String exprType = exprList.get(idList.indexOf(id)).getType();
-            if(!isCompatible(idType, exprType)){
+            if(!isCompatible(ignoreRef(idType), ignoreRef(exprType))){
                 System.err.print("ERROR: Conflicting types in assignment: id "+ id.getLessema());
                 System.err.print(" has type " + idType + " but expression has type "+ exprType);
                 System.exit(1);
             }
         }
-
+        assignOp.setType("notype");
     }
 
     @Override
     public void visit(ReturnOp returnOp) {
-        returnOp.getExpr().accept(this);
-        String returnType = returnOp.getExpr().getType();
-        if(!returnType.equals(currentFunType)){
-            System.err.print("ERROR: Conflicting return type in function " + returnOp.getExpr().getType());
+        // Controlla che non sia presente un return statement in un procedura
+        if (currentFunType.equals("void")) {
+            System.err.print("ERROR: Return statement in a procedure");
             System.exit(1);
         }
+        returnOp.getExpr().accept(this);
+        // Controlla che il tipo dell'espressione sia lo stesso tipo di ritorno della funzione
+        String returnType = returnOp.getExpr().getType();
+        if (!isCompatible(returnType, currentFunType)) {
+            System.err.print("ERROR: Invalid return type " + returnType + " for function " + returnOp.getFunLabel()+ ": "+ currentFunType);
+            System.exit(1);
+        }
+        returnOp.setType(currentFunType);
     }
 
     @Override
     public void visit(WriteOp writeOp) {
-        for(ExprOp expr : writeOp.getExprList())
+        for(ExprOp expr : writeOp.getExprList()) {
             expr.accept(this);
+
+            if(expr instanceof FunCallOp funCallOp && funCallOp.getType().equals("notype")){
+                System.err.print("ERROR: Invalid use of void expression in write operation");
+                System.exit(1);
+            }
+        }
     }
 
     @Override
@@ -387,9 +469,8 @@ public class TypeChecking implements Visitor {
         pVarOp.setType(tempType);
     }
 
-    private String[] extractParameters(String type) {
-        String[] parts = type.split("\\(");// Divide in base a "("
-        return parts[1].replace(")", "").split(", "); // Rimuove la parentesi finale e divide in base a " "
+    private String extractParameters(String type) {
+        return type.substring(type.indexOf("(") + 1, type.indexOf(")"));
     }
 
     private String extractType(String type) {

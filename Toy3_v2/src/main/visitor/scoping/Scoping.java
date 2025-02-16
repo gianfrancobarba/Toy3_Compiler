@@ -20,6 +20,7 @@ public class Scoping implements Visitor {
     private final SymbolTable symbolTable = new SymbolTable();
     private String tempType;
     private String funTemp;
+    private String isFun;
 
     @Override
     public void visit(ProgramOp programOp) {
@@ -74,8 +75,9 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
-        // System.out.println("Visit var init");
+        // Controllo se la variabile è già stata dichiarata nello scope corrente
         if (symbolTable.probe(Kind.VAR, varOptInitOp.getId().getLessema())) {
+            // controllo se il tipo della variabile è uguale a quello dichiarato
             if (Objects.equals(symbolTable.lookup(Kind.VAR, varOptInitOp.getId().getLessema()), tempType)) {
                 System.err.print("ERROR: Redeclaration of " + varOptInitOp.getId().getLessema());
                 System.exit(1);
@@ -85,15 +87,13 @@ public class Scoping implements Visitor {
             System.exit(1);
         }
         symbolTable.addId(Kind.VAR, varOptInitOp.getId().getLessema(), tempType);
-// System.out.println("Visit  + varOptInitOp.getId().getLessema() + " " + tempType);
+        //varOptInitOp.getId().setType(tempType); // setto il tipo della variabile
     }
 
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
-        // System.out.println("Visit fun decl");
         String funId = funDeclOp.getId().getLessema();
-
         if(symbolTable.probe(Kind.FUN, funId)){
             System.err.print("ERROR: Function "+ funId + " already declared with type: "+ symbolTable.lookup(Kind.FUN, funId));
             System.exit(1);
@@ -102,8 +102,6 @@ public class Scoping implements Visitor {
         String signature = functionSignature(funDeclOp);
         // aggiungiamo la firma del metodo in Globals
         symbolTable.addId(Kind.FUN, funId, signature);
-// System.out.println("Visit  + funId + " " + signature);
-
         // nuovo scope per il body della funzione
         symbolTable.enterScope();
         funDeclOp.setScope(symbolTable.getCurrentScope());
@@ -164,10 +162,8 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(BeginEndOp beginEndOp) {
-
         beginEndOp.setFunLabel("main");
 
-        // System.out.println("Visit begin end");
         symbolTable.enterScope();
         beginEndOp.setScope(symbolTable.getCurrentScope());
         if(beginEndOp.getVarDeclList() != null){
@@ -191,7 +187,6 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(BodyOp bodyOp) {
-        // System.out.println("Visit body");
         symbolTable.enterScope();
         bodyOp.setScope(symbolTable.getCurrentScope());
         if(bodyOp.getVarDecls() != null){
@@ -214,8 +209,6 @@ public class Scoping implements Visitor {
     }
 
     public void visit(StatementOp statementOp) {
-        // System.out.println("Visit stmt");
-
         switch (statementOp.getClass().getSimpleName()) {
             case "IfThenOp" -> {
                 statementOp.setFunLabel(statementOp.getFunLabel());
@@ -247,6 +240,14 @@ public class Scoping implements Visitor {
 
         ifThenElseOp.getThenBranch().accept(this);
         ifThenElseOp.getElseBranch().accept(this);
+    }
+
+    @Override
+    public void visit(WhileOp whileOp) {
+        System.out.println("\n---- Scope WhileOp [" + whileOp.getFunLabel()+"] ----");
+        whileOp.getBody().setFunLabel("WhileOp <- "+ whileOp.getFunLabel());
+
+        whileOp.getBody().accept(this);
     }
 
     @Override
@@ -293,18 +294,14 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(Identifier identifier) {
-        if (symbolTable.lookup(Kind.VAR, identifier.getLessema()) == null) {
+        if(symbolTable.lookup(Kind.VAR, identifier.getLessema()) == null) {
             System.err.print("ERROR: Variable " + identifier.getLessema() + " not declared");
             System.exit(1);
         }
     }
 
     @Override
-    public void visit(WhileOp whileOp) {
-        System.out.println("\n---- Scope WhileOp [" + whileOp.getFunLabel()+"] ----");
-
-        whileOp.getBody().setFunLabel("WhileOp <- "+ whileOp.getFunLabel());
-        whileOp.getBody().accept(this);
+    public void visit(ConstOp constOp) {
     }
 
     private String functionSignature(FunDeclOp funDeclOp) {
@@ -333,9 +330,4 @@ public class Scoping implements Visitor {
         sb.append(")");
         return sb.toString();
     }
-
-    @Override
-    public void visit(ConstOp constOp) {
-    }
-
 }
