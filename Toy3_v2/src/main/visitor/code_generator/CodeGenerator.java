@@ -532,10 +532,12 @@ public class CodeGenerator implements Visitor {
                     .append(functionOp.getId().getLessema())
                     .append("(");
 
-            // Usa il nuovo metodo per ottenere la lista dei parametri formattata
             String paramList = buildParameterString(functionOp.getParams());
             code.append(paramList);
 
+            // creiamo la mappa signature con il nome della funzione e la lista dei parametri
+            String funName = functionOp.getId().getLessema(); // dovrebbe essere gia sistemato con _fun in teoria
+            funSignatureMap.put(funName, extractParameterType(paramList));
             // Completa la firma della funzione
             code.append(");\n");
         }
