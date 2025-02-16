@@ -42,9 +42,15 @@ public class CodeGenerator implements Visitor {
         code.append("#include <string.h>\n");
         code.append("#include <stdlib.h>\n");
         code.append("#include <stdbool.h>\n\n");
+        code.append("#define INITIAL_SIZE 32\n");
+        code.append("#define INCREMENT_SIZE 32\n\n");
+        code.append("char* temp;\n\n");
 
         printMallocFun();
         printReallocFun();
+        printStrcpyFun();
+        printStrcatFun();
+        printSafeScanFun();
 
         for (Object obj : programOp.getListDecls()) {
             isGlobal = true;
@@ -88,23 +94,37 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BeginEndOp beginEndOp) {
+        List<VarDeclOp> listVarDecl = beginEndOp.getVarDeclList();
         code.append("int main(void){\n");
+        code.append("char* temp = allocate_string(1);\n");
         globalStringAllocate();
-        beginEndOp.getVarDeclList().forEach(varDeclOp -> varDeclOp.accept(this));
+        listVarDecl.forEach(varDeclOp -> varDeclOp.accept(this));
         beginEndOp.getStmtList().forEach(statementOp -> {
             setStmt(statementOp, true);
             statementOp.accept(this);
         });
+
+        listStringGlobal.forEach(varDeclOp -> {
+            varDeclOp.getListVarOptInit().forEach(varOpt -> {
+                code.append("free(").append(varOpt.getId().getLessema()).append(");\n");
+            });
+        });
+
+        code.append("\n\n\n");
+        listVarDecl.forEach(varDecl -> {
+            if(varDecl.getType().equals("string")) {
+                varDecl.getListVarOptInit().forEach(varOpt -> {
+                    code.append("free(").append(varOpt.getId().getLessema()).append(");\n");
+                });
+            }
+        });
+
+        code.append("free(temp);\n");
         code.append("\nreturn 0;\n}");
     }
 
     private void globalStringAllocate() {
         listStringGlobal.forEach(varDeclOp -> {
-//            code.append(varDeclOp.getType()).append(" ");
-//            varDeclOp.getListVarOptInit().forEach(varOptInitOp -> {
-//                code.append("*").append(varOptInitOp.getId().getLessema()).append(" = allocate_string(256);\n");
-//            });
-
             varDeclOp.accept(this);
         });
     }
@@ -124,7 +144,7 @@ public class CodeGenerator implements Visitor {
             });
             if(!isGlobal) {
                 if (varDeclOp.getTypeOrConstant() instanceof ConstOp con) {
-                    code.append("strcpy(").append(varDeclOp.getListVarOptInit().get(0).getId().getLessema()).append(", ");
+                    code.append("safe_strcpy(&").append(varDeclOp.getListVarOptInit().get(0).getId().getLessema()).append(", ");
                     con.accept(this);
                     code.append(");\n");
                 }
@@ -164,11 +184,21 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BodyOp bodyOp) {
-        bodyOp.getVarDecls().forEach(varDecl -> varDecl.accept(this));
+        List<VarDeclOp> listVarDecl = bodyOp.getVarDecls();
+        listVarDecl.forEach(varDecl -> varDecl.accept(this));
         bodyOp.getStatements().forEach(stmt -> {
-                setStmt(stmt, true);
-                stmt.accept(this);
+            setStmt(stmt, true);
+            stmt.accept(this);
         });
+
+        listVarDecl.forEach(varDecl -> {
+            if(varDecl.getType().equals("string")) {
+                varDecl.getListVarOptInit().forEach(varOpt -> {
+                    code.append("free(").append(varOpt.getId().getLessema()).append(");\n");
+                });
+            }
+        });
+
     }
 
     @Override
@@ -264,7 +294,7 @@ public class CodeGenerator implements Visitor {
             if(!isGlobal) {
                 code.append(" = allocate_string(256)");
                 if (varOptInitOp.getExprOp() != null) {
-                    code.append(";\nstrcpy(").append(varOptInitOp.getId().getLessema()).append(", ");
+                    code.append(";\nsafe_strcpy(&").append(varOptInitOp.getId().getLessema()).append(", ");
                     setStmt(varOptInitOp.getExprOp(), false);
                     varOptInitOp.getExprOp().accept(this);
                     code.append(")");
@@ -300,19 +330,28 @@ public class CodeGenerator implements Visitor {
         List<ExprOp> exprList = assignOp.getExpressions();
 
         for (int i = 0; i < idList.size(); i++) {
-            idList.get(i).accept(this);
-            code.append(" = ");
+            if(exprList.get(i).getType().equals("string")) {
+                code.append("safe_strcpy(&");
+                idList.get(i).accept(this);
+                code.append(", ");
+                setStmt(exprList.get(i), false);
+                exprList.get(i).accept(this);
+                code.append(" ), ");
+            }
+            else {
+                idList.get(i).accept(this);
+                code.append(" = ");
 
-            setStmt(exprList.get(i), false);
+                setStmt(exprList.get(i), false);
 
-            exprList.get(i).accept(this);
-            code.append(", ");
+                exprList.get(i).accept(this);
+                code.append(", ");
+            }
         }
-//        if(!(exprList.get(0) instanceof FunCallOp)) {
-//            code.append(";\n");
-//        }
+
         code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
-        code.append(";\n");
+        code.setCharAt(code.length() - 1, ';');
+        code.append("\n");
     }
 
 //    public void visit(ExprOp expr) {
@@ -344,15 +383,30 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
-        code.append("(");
-        setStmt(binaryExprOp.getLeft(), false);
-        binaryExprOp.getLeft().accept(this);
+        if(binaryExprOp.getLeft().getType().equals("string")) {
+            if(binaryExprOp.getType().equals("bool")) {
+                getStringComparison(binaryExprOp.getLeft(), binaryExprOp.getOp(), binaryExprOp.getRight());
+            }
+            else {
+                code.append("safe_strcat(");
+                setStmt(binaryExprOp.getLeft(), false);
+                binaryExprOp.getLeft().accept(this);
+                code.append(", ");
+                setStmt(binaryExprOp.getRight(), false);
+                binaryExprOp.getRight().accept(this);
+                code.append(")");
+            }
+        }
+        else {
+            code.append("(");
+            setStmt(binaryExprOp.getLeft(), false);
+            binaryExprOp.getLeft().accept(this);
+            code.append(" ").append(convertOp(binaryExprOp.getOp())).append(" ");
 
-        code.append(" ").append(convertOp(binaryExprOp.getOp())).append(" ");
-
-        setStmt(binaryExprOp.getRight(), false);
-        binaryExprOp.getRight().accept(this);
-        code.append(")");
+            setStmt(binaryExprOp.getRight(), false);
+            binaryExprOp.getRight().accept(this);
+            code.append(")");
+        }
     }
 
     @Override
@@ -400,21 +454,19 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(ReadOp readOp) {
         List<Identifier> idList = readOp.getIdentifiers();
-        code.append("scanf(\"");
-        idList.forEach(id -> { getFormatSpecifier(id.getType()); });
-        code.append("\"");
-
-        if (!idList.isEmpty()) {
-            code.append(", ");
-            idList.forEach(id -> {
-                if(!id.getType().equals("string")) code.append("&");
+        idList.forEach(id -> {
+            if(id.getType().equals("string")) {
+                code.append("safe_scanf(&");
                 id.accept(this);
-                code.append(", ");
-            });
-            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
-        }
-        code.setCharAt(code.length() - 1, ')');
-        code.append(";\n");
+            }
+            else {
+                code.append("scanf(\"");
+                getFormatSpecifier(id.getType());
+                code.append("\", &");
+                id.accept(this);
+            }
+            code.append(");\n");
+        });
     }
 
     private void resolveNameConflicts(List<Object> listDecls) {
@@ -513,7 +565,6 @@ public class CodeGenerator implements Visitor {
         return paramJoiner.toString();
     }
 
-
     private void getFormatSpecifier(String type) {
         switch (type) {
             case "int", "bool" -> code.append("%d");
@@ -532,6 +583,26 @@ public class CodeGenerator implements Visitor {
             default -> op;
         };
     }
+
+    private void getStringComparison(ExprOp left, String op, ExprOp right) {
+        code.append("(strcmp(");
+        setStmt(left, false);
+        left.accept(this);
+        code.append(", ");
+        setStmt(right, false);
+        right.accept(this);
+        code.append(") ");
+        switch (op) {
+            case "==" -> code.append("== 0");
+            case "<>" -> code.append("!= 0");
+            case "<" -> code.append("< 0");
+            case "<=" -> code.append("<= 0");
+            case ">" -> code.append("> 0");
+            case ">=" -> code.append(">= 0");
+        }
+        code.append(")");
+    }
+
 
     private List<String> extractParameterType(String parameters) {
         List<String> types = new ArrayList<>();
@@ -593,6 +664,73 @@ public class CodeGenerator implements Visitor {
         code.append("        exit(1);\n");
         code.append("    }\n");
         code.append("    return temp;\n");
+        code.append("}\n\n");
+    }
+    void printStrcpyFun() {
+        code.append("// Funzione per copiare una stringa in modo sicuro con gestione dinamica della memoria\n");
+        code.append("void safe_strcpy(char** dest, const char* src) {\n");
+        code.append("    size_t src_len = strlen(src) + 1;\n"); // +1 per il terminatore '\0'
+        code.append("    *dest = reallocate_string(*dest, src_len);\n"); // Rialloca memoria se necessario
+        code.append("    strcpy(*dest, src);\n");
+        code.append("}\n\n");
+    }
+
+    void printStrcatFun() {
+        code.append("// Funzione per concatenare due stringhe in modo sicuro con gestione dinamica della memoria\n");
+        code.append("char* safe_strcat(const char* s1, const char* s2) {\n");
+        code.append("    if (!s1 && !s2) return allocate_string(1);\n");
+        code.append("    if (!s1) return strdup(s2);\n");
+        code.append("    if (!s2) return strdup(s1);\n\n");
+
+        code.append("    size_t len1 = strlen(s1);\n");
+        code.append("    size_t len2 = strlen(s2);\n");
+        code.append("    temp = reallocate_string(temp, len1 + len2 + 1);\n"); // **Usiamo temp**
+        code.append("    strcpy(temp, s1);\n");
+        code.append("    strcat(temp, s2);\n");
+
+        code.append("    return temp;\n"); // **Restituiamo temp**
+        code.append("}\n\n");
+    }
+
+
+
+
+    void printSafeScanFun() {
+        code.append("// Funzione per leggere una stringa dinamica evitando problemi di buffer\n");
+        code.append("void safe_scanf(char** dest) {\n");
+        code.append("    size_t size = INITIAL_SIZE;\n");
+
+        // Se la stringa è già stata allocata, rialloca invece di fare malloc
+        code.append("    if (*dest == NULL) {\n");
+        code.append("        *dest = (char*)malloc(size * sizeof(char));\n");
+        code.append("    } else {\n");
+        code.append("        *dest = reallocate_string(*dest, size);\n");
+        code.append("    }\n");
+
+        code.append("    if (*dest == NULL) {\n");
+        code.append("        printf(\"Errore di allocazione!\\n\");\n");
+        code.append("        exit(1);\n");
+        code.append("    }\n");
+
+        code.append("    size_t len = 0;\n");
+        code.append("    int c;\n");
+
+        // Pulizia del buffer per evitare problemi con scanf()
+        code.append("    while ((c = getchar()) == '\\n');\n");
+
+        code.append("    if (c != EOF) {\n");
+        code.append("        (*dest)[len++] = (char)c;\n");
+        code.append("    }\n");
+
+        code.append("    while ((c = fgetc(stdin)) != '\\n' && c != EOF) {\n");
+        code.append("        if (len + 1 >= size) {\n");
+        code.append("            size += INCREMENT_SIZE;\n");
+        code.append("            *dest = reallocate_string(*dest, size);\n");
+        code.append("        }\n");
+        code.append("        (*dest)[len++] = (char)c;\n");
+        code.append("    }\n");
+
+        code.append("    (*dest)[len] = '\\0'; // Termina correttamente la stringa\n");
         code.append("}\n\n");
     }
 }

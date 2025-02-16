@@ -1,12 +1,23 @@
 program
 
-p : string;
-r : "ciao";
-f = "mondo" : string;
+mamma: string;
 
-fun : int;
 begin
-    x = "ciao" | y = "mondo" | z = "mio" : string;
-    a : "bella";
-    b | c = "stronza" | d : string;
+
+x | y | z : string;
+
+x := "ciao";
+y := "mamma";
+z := "ciao";
+
+if( (x + y + z) == ("ciao" + "mamma" + "ciao")) then {
+    "sono uguali" !>>;
+}
+else {
+    "sono diversi" !>>;
+}
+
+x := y + z;
+x !>>;
+
 end
