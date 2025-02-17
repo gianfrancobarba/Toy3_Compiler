@@ -11,7 +11,6 @@ import main.nodes.program.ProgramOp;
 import main.nodes.statements.*;
 import main.nodes.types.ConstOp;
 import main.visitor.Visitor;
-import main.visitor.scoping.Scope;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -42,16 +41,19 @@ public class CodeGenerator implements Visitor {
         code.append("#include <string.h>\n");
         code.append("#include <stdlib.h>\n");
         code.append("#include <stdbool.h>\n\n");
+        code.append("\n\n // DICHIARAZIONI FUNZIONI E VARIABILI DI SERVIZIO\n\n");
         code.append("#define INITIAL_SIZE 32\n");
         code.append("#define INCREMENT_SIZE 32\n\n");
-        code.append("char* temp;\n\n");
+        code.append("char* tempString;\n\n");
 
-        printMallocFun();
-        printReallocFun();
-        printStrcpyFun();
-        printStrcatFun();
+        printAllocateStringFun();
+        printReallocateStringFun();
+        printSafeStrcpyFun();
+        printSafeStrcatFun();
+        printSafeScanfFun();
         printToStringFun();
-        printSafeScanFun();
+
+        code.append("\n\n\n// INIZIO DEL CODICE GENERATO\n\n");
 
         for (Object obj : programOp.getListDecls()) {
             isGlobal = true;
@@ -97,7 +99,7 @@ public class CodeGenerator implements Visitor {
     public void visit(BeginEndOp beginEndOp) {
         List<VarDeclOp> listVarDecl = beginEndOp.getVarDeclList();
         code.append("int main(void){\n");
-        code.append("temp = allocate_string(1);\n");
+        code.append("allocate_string(&tempString, 1);\n");
         globalStringAllocate();
         listVarDecl.forEach(varDeclOp -> varDeclOp.accept(this));
         beginEndOp.getStmtList().forEach(statementOp -> {
@@ -120,15 +122,26 @@ public class CodeGenerator implements Visitor {
             }
         });
 
-        code.append("free(temp);\n");
+        code.append("free(tempString);\n");
         code.append("\nreturn 0;\n}");
     }
 
     private void globalStringAllocate() {
         listStringGlobal.forEach(varDeclOp -> {
             varDeclOp.getListVarOptInit().forEach(varOpt -> {
-                code.append(varOpt.getId().getLessema()).append(" = allocate_string(256);\n");
+                code.append("allocate_string(&").append(varOpt.getId().getLessema()).append(", 256);\n");
+                if(varOpt.getExprOp() != null) {
+                    code.append("safe_strcpy(&").append(varOpt.getId().getLessema()).append(", ");
+                    setStmt(varOpt.getExprOp(), false);
+                    varOpt.getExprOp().accept(this);
+                    code.append(");\n");
+                }
             });
+            if (varDeclOp.getTypeOrConstant() instanceof ConstOp con) {
+                code.append("safe_strcpy(&").append(varDeclOp.getListVarOptInit().get(0).getId().getLessema()).append(", ");
+                con.accept(this);
+                code.append(");\n");
+            }
         });
     }
 
@@ -291,13 +304,13 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
+        String id = varOptInitOp.getId().getLessema();
         if(varOptInitOp.getType().equals("string")) {
-            code.append('*');
-            code.append(varOptInitOp.getId().getLessema());
+            code.append('*').append(id);
             if(!isGlobal) {
-                code.append(" = allocate_string(256)");
+                code.append(";\nallocate_string(&").append(id).append(", 256)");
                 if (varOptInitOp.getExprOp() != null) {
-                    code.append(";\nsafe_strcpy(&").append(varOptInitOp.getId().getLessema()).append(", ");
+                    code.append(";\nsafe_strcpy(&").append(id).append(", ");
                     setStmt(varOptInitOp.getExprOp(), false);
                     varOptInitOp.getExprOp().accept(this);
                     code.append(")");
@@ -305,7 +318,7 @@ public class CodeGenerator implements Visitor {
             }
         }
         else {
-            code.append(varOptInitOp.getId().getLessema());
+            code.append(id);
             if (varOptInitOp.getExprOp() != null) {
                 code.append(" = ");
                 setStmt(varOptInitOp.getExprOp(), false);
@@ -669,23 +682,23 @@ public class CodeGenerator implements Visitor {
             isStmt = flag;
     }
 
-    private void printMallocFun() {
+    void printAllocateStringFun() {
         code.append("// Funzione per allocare dinamicamente una stringa\n");
-        code.append("char* allocate_string(size_t size) {\n");
-        code.append("    char* str = (char*)malloc(size);\n");
-        code.append("    if (str == NULL) {\n");
+        code.append("void allocate_string(char** str, size_t size) {\n");
+        code.append("    *str = (char *) malloc(size);\n");
+        code.append("    if (*str == NULL) {\n");
         code.append("        printf(\"Errore di allocazione!\\n\");\n");
         code.append("        exit(1);\n");
         code.append("    }\n");
-        code.append("    str[0] = '\\0';  // Inizializza la stringa vuota\n");
-        code.append("    return str;\n");
+        code.append("    (*str)[0] = '\\0'; // Inizializza la stringa vuota\n");
         code.append("}\n\n");
     }
 
-    private void printReallocFun() {
+
+    void printReallocateStringFun() {
         code.append("// Funzione per riallocare dinamicamente una stringa\n");
         code.append("char* reallocate_string(char* str, size_t new_size) {\n");
-        code.append("    char* temp = (char*)realloc(str, new_size);\n");
+        code.append("    char* temp = (char*) realloc(str, new_size);\n");
         code.append("    if (temp == NULL) {\n");
         code.append("        printf(\"Errore di riallocazione!\\n\");\n");
         code.append("        free(str);\n");
@@ -695,12 +708,13 @@ public class CodeGenerator implements Visitor {
         code.append("}\n\n");
     }
 
-    private void printStrcpyFun() {
+
+    void printSafeStrcpyFun() {
         code.append("// Funzione per copiare una stringa in modo sicuro con gestione dinamica della memoria\n");
         code.append("void safe_strcpy(char** dest, const char* src) {\n");
         code.append("    if (!src) return;\n");
         code.append("    size_t src_len = strlen(src) + 1;\n");
-        code.append("    *dest = (char*)realloc(*dest, src_len);\n");
+        code.append("    *dest = (char*) realloc(*dest, src_len);\n");
         code.append("    if (*dest == NULL) {\n");
         code.append("        printf(\"Errore di allocazione in safe_strcpy!\\n\");\n");
         code.append("        exit(1);\n");
@@ -709,35 +723,42 @@ public class CodeGenerator implements Visitor {
         code.append("}\n\n");
     }
 
-    private void printStrcatFun() {
+
+    void printSafeStrcatFun() {
         code.append("// Funzione per concatenare due stringhe in modo sicuro con gestione dinamica della memoria\n");
         code.append("char* safe_strcat(const char* s1, const char* s2) {\n");
-        code.append("    if (!s1 && !s2) return allocate_string(1);\n");
+        code.append("    if (!s1 && !s2) return NULL;\n");
         code.append("    if (!s1) return strdup(s2);\n");
-        code.append("    if (!s2) return strdup(s1);\n\n");
+        code.append("    if (!s2) return strdup(s1);\n");
 
         code.append("    size_t len1 = strlen(s1);\n");
         code.append("    size_t len2 = strlen(s2);\n");
-        code.append("    char* new_str = (char*)malloc(len1 + len2 + 1);\n");
-        code.append("    if (!new_str) {\n");
-        code.append("        printf(\"Errore di allocazione in safe_strcat!\\n\");\n");
-        code.append("        exit(1);\n");
-        code.append("    }\n");
-        code.append("    strcpy(new_str, s1);\n");
-        code.append("    strcat(new_str, s2);\n");
-        code.append("    return new_str;\n");
+
+        code.append("    char* new_temp;\n");
+        code.append("    allocate_string(&new_temp, len1 + len2 + 1);\n");
+
+        code.append("    strcpy(new_temp, s1);\n");
+        code.append("    strcat(new_temp, s2);\n");
+
+        code.append("    safe_strcpy(&tempString, new_temp);\n");
+        code.append("    free(new_temp);\n");
+
+        code.append("    return tempString;\n");
         code.append("}\n\n");
     }
 
-    private void printSafeScanFun() {
+
+    void printSafeScanfFun() {
         code.append("// Funzione per leggere una stringa dinamica evitando problemi di buffer\n");
         code.append("void safe_scanf(char** dest) {\n");
         code.append("    size_t size = INITIAL_SIZE;\n");
+
         code.append("    if (*dest == NULL) {\n");
-        code.append("        *dest = (char*)malloc(size);\n");
+        code.append("        allocate_string(dest, size);\n");
         code.append("    } else {\n");
-        code.append("        *dest = (char*)realloc(*dest, size);\n");
+        code.append("        *dest = (char*) realloc(*dest, size);\n");
         code.append("    }\n");
+
         code.append("    if (*dest == NULL) {\n");
         code.append("        printf(\"Errore di allocazione!\\n\");\n");
         code.append("        exit(1);\n");
@@ -754,7 +775,7 @@ public class CodeGenerator implements Visitor {
         code.append("    while ((c = fgetc(stdin)) != '\\n' && c != EOF) {\n");
         code.append("        if (len + 1 >= size) {\n");
         code.append("            size += INCREMENT_SIZE;\n");
-        code.append("            *dest = (char*)realloc(*dest, size);\n");
+        code.append("            *dest = (char*) realloc(*dest, size);\n");
         code.append("        }\n");
         code.append("        (*dest)[len++] = (char)c;\n");
         code.append("    }\n");
@@ -763,34 +784,33 @@ public class CodeGenerator implements Visitor {
         code.append("}\n\n");
     }
 
-    private void printToStringFun() {
-        code.append("// Funzione per convertire diversi tipi in stringa in modo sicuro\n");
-        code.append("char* to_string(void* value, const char* type) {\n");
-        code.append("    char* temp = (char*)malloc(32);\n");
-        code.append("    if (!temp) {\n");
-        code.append("        printf(\"Errore di allocazione in to_string!\\n\");\n");
-        code.append("        exit(1);\n");
-        code.append("    }\n");
+
+    void printToStringFun() {
+        code.append("// Funzione per convertire diversi tipi in stringa\n");
+        code.append("const char* to_string(void* value, const char* type) {\n");
+        code.append("    static char buffer[INITIAL_SIZE]; // Buffer statico condiviso\n");
 
         code.append("    if (strcmp(type, \"int\") == 0) {\n");
-        code.append("        sprintf(temp, \"%d\", *(int*)value);\n");
+        code.append("        snprintf(buffer, INITIAL_SIZE, \"%d\", *(int*)value);\n");
+
         code.append("    } else if (strcmp(type, \"double\") == 0) {\n");
-        code.append("        sprintf(temp, \"%lf\", *(double*)value);\n");
+        code.append("        snprintf(buffer, INITIAL_SIZE, \"%.6f\", *(double*)value);\n");
+
         code.append("    } else if (strcmp(type, \"bool\") == 0) {\n");
-        code.append("        strcpy(temp, *(int*)value ? \"true\" : \"false\");\n");
+        code.append("        return *(int*)value ? \"true\" : \"false\";\n");
+
         code.append("    } else if (strcmp(type, \"char\") == 0) {\n");
-        code.append("        temp[0] = *(char*)value;\n");
-        code.append("        temp[1] = '\\0';\n");
+        code.append("        buffer[0] = *(char*)value;\n");
+        code.append("        buffer[1] = '\\0';\n");
+
         code.append("    } else if (strcmp(type, \"string\") == 0) {\n");
-        code.append("        free(temp);\n");
-        code.append("        return strdup((char*)value);\n");
+        code.append("        return (char*)value;\n");
+
         code.append("    } else {\n");
-        code.append("        strcpy(temp, \"UNKNOWN\");\n");
+        code.append("        return \"UNKNOWN\";\n");
         code.append("    }\n");
 
-        code.append("    return temp;\n");
+        code.append("    return buffer;\n");
         code.append("}\n\n");
     }
-
-
 }
