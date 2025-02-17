@@ -1,22 +1,12 @@
 program
-s1: string;
-
-s2 = "ciao" : string;
-
-s3 : "ciao mamma";
 
 begin
 
-s4: string;
-s5 = "mamma" : string;
-s6 : "mamma ciao";
 
-"inserisci s1: " !>>;
-s1 <<;
+if(true) then {
+    x : "mamma";
+}
 
-"inserisci s2: " !>>;
-s4<<;
-
-"s1: " + s1 + "\ns2: " + s2 + "\ns3: " + s3 + "\ns4: " + s4 + "\ns5: " + s5 + "\ns6: " + s6 !>>;
+x !>>;
 
 end

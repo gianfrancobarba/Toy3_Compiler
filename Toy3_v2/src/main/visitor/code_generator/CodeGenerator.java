@@ -219,7 +219,7 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(FunDeclOp funDeclOp) {
-        code.append(isRefConvert(extractType(funDeclOp.getType())));
+        code.append(typeConvert(extractType(funDeclOp.getType())));
         code.append(" ");
         code.append(funDeclOp.getId().getLessema());
         code.append("(");
@@ -278,7 +278,7 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(ParDeclOp parDeclOp) {
         parDeclOp.getPVars().forEach(pVar -> {
-            typeTemp = isRefConvert(parDeclOp.getType());
+            typeTemp = typeConvert(parDeclOp.getType());
             pVar.accept(this);
         });
     }
@@ -462,7 +462,9 @@ public class CodeGenerator implements Visitor {
     public void visit(WriteOp writeOp) {
         List<ExprOp> exprList = writeOp.getExprList();
         code.append("printf(\"");
-        exprList.forEach(expr -> { getFormatSpecifier(expr.getType()); });
+        exprList.forEach(expr -> {
+            getFormatSpecifier(typeConvert(expr.getType()));
+        });
         if(writeOp.getNewLine() != null)
             code.append("%c");
 
@@ -495,7 +497,7 @@ public class CodeGenerator implements Visitor {
             }
             else {
                 code.append("scanf(\"");
-                getFormatSpecifier(id.getType());
+                getFormatSpecifier(typeConvert(id.getType()));
                 code.append("\", &");
                 id.accept(this);
             }
@@ -543,7 +545,7 @@ public class CodeGenerator implements Visitor {
 
             // Appende la parte iniziale della firma: [tipo di ritorno] [nome funzione](
 
-            code.append(isRefConvert(extractType(functionOp.getType())))
+            code.append(typeConvert((extractType(functionOp.getType()))))
                     .append(" ")
                     .append(functionOp.getId().getLessema())
                     .append("(");
@@ -559,13 +561,13 @@ public class CodeGenerator implements Visitor {
         }
     }
 
-    private String isRefConvert(String type) {
+    private String typeConvert(String type) {
         // se la stringa inizia con ref allora resituisce la stringa senza ref e con *
-        if(type.startsWith("ref")) {
-            return type.substring(3) + "*";
-        }
-        else if(type.equals("string")) {
+        if(type.equals("string") || type.equals("ref string")) {
             return "char*";
+        }
+        else if(type.startsWith("ref")) {
+            return type.concat("*").replace("ref ", "");
         }
         return type;
     }
@@ -604,11 +606,11 @@ public class CodeGenerator implements Visitor {
 
     private void getFormatSpecifier(String type) {
         switch (type) {
-            case "int", "bool" -> code.append("%d");
-            case "float" -> code.append("%f");
+            case "int", "bool", "int*", "bool*" -> code.append("%d");
+            case "float", "float*" -> code.append("%f");
             case "char" -> code.append("%c");
-            case "double" -> code.append("%lf");
-            case "string" -> code.append("%s");
+            case "double", "double*" -> code.append("%lf");
+            case "char*" -> code.append("%s");
         }
     }
 
@@ -767,7 +769,7 @@ public class CodeGenerator implements Visitor {
         code.append("    size_t len = 0;\n");
         code.append("    int c;\n");
 
-        code.append("    while ((c = getchar()) == '\\n');\n");
+        code.append("    while ((c = getchar()) == '\\n'){}\n");
         code.append("    if (c != EOF) {\n");
         code.append("        (*dest)[len++] = (char)c;\n");
         code.append("    }\n");
