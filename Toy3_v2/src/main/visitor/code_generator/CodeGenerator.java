@@ -386,36 +386,38 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BinaryExprOp binaryExprOp) {
+        boolean isLeftString = binaryExprOp.getLeft().getType().equals("string");
+        boolean isRightString = binaryExprOp.getRight().getType().equals("string");
 
-//        System.out.println("CIAO SONO  QUI : " + binaryExprOp.toString());
-//        System.out.println("\n\n tipo sx: " + binaryExprOp.getLeft().getType() + " tipo dx: " + binaryExprOp.getRight().getType());
-        if(binaryExprOp.getLeft().getType().equals("string") || binaryExprOp.getRight().getType().equals("string")) {
-            if (binaryExprOp.getType().equals("bool")) {
+        // Se uno dei due operandi è una stringa, allora si tratta di una concatenazione
+        if (isLeftString || isRightString) {
+            if (binaryExprOp.getType().equals("bool")) { // Se il tipo è booleano, allora si tratta di un confronto tra stringhe
+                // Evita di aggiungere ulteriori elementi dopo il confronto
                 getStringComparison(binaryExprOp.getLeft(), binaryExprOp.getOp(), binaryExprOp.getRight());
-            } else {
+                return;
+            } else { // Altrimenti si tratta di una concatenazione di stringhe
                 code.append("safe_strcat(");
-                if (!binaryExprOp.getLeft().getType().equals("string")) {
+                if (!isLeftString) { // Se il primo operando non è una stringa, lo converte in stringa
                     code.append("to_string(&");
                     binaryExprOp.getLeft().accept(this);
                     code.append(", \"").append(binaryExprOp.getLeft().getType()).append("\")");
-                } else {
+                } else { // Altrimenti visita normalmente il primo operando
                     binaryExprOp.getLeft().accept(this);
                 }
+
+                code.append(", ");
+
+                if (!isRightString) { // Se il secondo operando non è una stringa, lo converte in stringa
+                    code.append("to_string(&");
+                    binaryExprOp.getRight().accept(this);
+                    code.append(", \"").append(binaryExprOp.getRight().getType()).append("\")");
+                } else { // Altrimenti visita normalmente il secondo operando
+                    binaryExprOp.getRight().accept(this);
+                }
+
+                code.append(")");
             }
-
-            code.append(", ");
-
-            if (!binaryExprOp.getRight().getType().equals("string")) {
-                code.append("to_string(&");
-                binaryExprOp.getRight().accept(this);
-                code.append(", \"").append(binaryExprOp.getRight().getType()).append("\")");
-            } else {
-                binaryExprOp.getRight().accept(this);
-            }
-
-            code.append(")");
-        }
-        else {
+        } else { // Altrimenti si tratta di una normale operazione binaria
             code.append("(");
             setStmt(binaryExprOp.getLeft(), false);
             binaryExprOp.getLeft().accept(this);
@@ -426,6 +428,7 @@ public class CodeGenerator implements Visitor {
             code.append(")");
         }
     }
+
 
     @Override
     public void visit(UnaryExprOp unaryExprOp) {
@@ -667,10 +670,9 @@ public class CodeGenerator implements Visitor {
     }
 
     private void printMallocFun() {
-        // **Definizione delle funzioni di gestione delle stringhe**
         code.append("// Funzione per allocare dinamicamente una stringa\n");
         code.append("char* allocate_string(size_t size) {\n");
-        code.append("    char* str = (char*)malloc(size * sizeof(char));\n");
+        code.append("    char* str = (char*)malloc(size);\n");
         code.append("    if (str == NULL) {\n");
         code.append("        printf(\"Errore di allocazione!\\n\");\n");
         code.append("        exit(1);\n");
@@ -683,19 +685,26 @@ public class CodeGenerator implements Visitor {
     private void printReallocFun() {
         code.append("// Funzione per riallocare dinamicamente una stringa\n");
         code.append("char* reallocate_string(char* str, size_t new_size) {\n");
-        code.append("    char* temp = (char*)realloc(str, new_size * sizeof(char));\n");
+        code.append("    char* temp = (char*)realloc(str, new_size);\n");
         code.append("    if (temp == NULL) {\n");
         code.append("        printf(\"Errore di riallocazione!\\n\");\n");
+        code.append("        free(str);\n");
         code.append("        exit(1);\n");
         code.append("    }\n");
         code.append("    return temp;\n");
         code.append("}\n\n");
     }
+
     private void printStrcpyFun() {
         code.append("// Funzione per copiare una stringa in modo sicuro con gestione dinamica della memoria\n");
         code.append("void safe_strcpy(char** dest, const char* src) {\n");
-        code.append("    size_t src_len = strlen(src) + 1;\n"); // +1 per il terminatore '\0'
-        code.append("    *dest = reallocate_string(*dest, src_len);\n"); // Rialloca memoria se necessario
+        code.append("    if (!src) return;\n");
+        code.append("    size_t src_len = strlen(src) + 1;\n");
+        code.append("    *dest = (char*)realloc(*dest, src_len);\n");
+        code.append("    if (*dest == NULL) {\n");
+        code.append("        printf(\"Errore di allocazione in safe_strcpy!\\n\");\n");
+        code.append("        exit(1);\n");
+        code.append("    }\n");
         code.append("    strcpy(*dest, src);\n");
         code.append("}\n\n");
     }
@@ -709,34 +718,26 @@ public class CodeGenerator implements Visitor {
 
         code.append("    size_t len1 = strlen(s1);\n");
         code.append("    size_t len2 = strlen(s2);\n");
-
-        // Usa una variabile temporanea per evitare problemi di realloc su `temp`
-        code.append("    char* new_temp = reallocate_string(temp, len1 + len2 + 1);\n");
-        code.append("    if (!new_temp) {\n");
+        code.append("    char* new_str = (char*)malloc(len1 + len2 + 1);\n");
+        code.append("    if (!new_str) {\n");
         code.append("        printf(\"Errore di allocazione in safe_strcat!\\n\");\n");
         code.append("        exit(1);\n");
         code.append("    }\n");
-        code.append("    temp = new_temp;\n");
-
-        code.append("    strcpy(temp, s1);\n");
-        code.append("    strcat(temp, s2);\n");
-        code.append("    return temp;\n");
+        code.append("    strcpy(new_str, s1);\n");
+        code.append("    strcat(new_str, s2);\n");
+        code.append("    return new_str;\n");
         code.append("}\n\n");
     }
 
-
-   private void printSafeScanFun() {
+    private void printSafeScanFun() {
         code.append("// Funzione per leggere una stringa dinamica evitando problemi di buffer\n");
         code.append("void safe_scanf(char** dest) {\n");
         code.append("    size_t size = INITIAL_SIZE;\n");
-
-        // Se la stringa è già stata allocata, rialloca invece di fare malloc
         code.append("    if (*dest == NULL) {\n");
-        code.append("        *dest = (char*)malloc(size * sizeof(char));\n");
+        code.append("        *dest = (char*)malloc(size);\n");
         code.append("    } else {\n");
-        code.append("        *dest = reallocate_string(*dest, size);\n");
+        code.append("        *dest = (char*)realloc(*dest, size);\n");
         code.append("    }\n");
-
         code.append("    if (*dest == NULL) {\n");
         code.append("        printf(\"Errore di allocazione!\\n\");\n");
         code.append("        exit(1);\n");
@@ -745,9 +746,7 @@ public class CodeGenerator implements Visitor {
         code.append("    size_t len = 0;\n");
         code.append("    int c;\n");
 
-        // Pulizia del buffer per evitare problemi con scanf()
         code.append("    while ((c = getchar()) == '\\n');\n");
-
         code.append("    if (c != EOF) {\n");
         code.append("        (*dest)[len++] = (char)c;\n");
         code.append("    }\n");
@@ -755,7 +754,7 @@ public class CodeGenerator implements Visitor {
         code.append("    while ((c = fgetc(stdin)) != '\\n' && c != EOF) {\n");
         code.append("        if (len + 1 >= size) {\n");
         code.append("            size += INCREMENT_SIZE;\n");
-        code.append("            *dest = reallocate_string(*dest, size);\n");
+        code.append("            *dest = (char*)realloc(*dest, size);\n");
         code.append("        }\n");
         code.append("        (*dest)[len++] = (char)c;\n");
         code.append("    }\n");
@@ -765,42 +764,33 @@ public class CodeGenerator implements Visitor {
     }
 
     private void printToStringFun() {
-        code.append("// Funzione per convertire diversi tipi in stringa usando temp\n");
+        code.append("// Funzione per convertire diversi tipi in stringa in modo sicuro\n");
         code.append("char* to_string(void* value, const char* type) {\n");
+        code.append("    char* temp = (char*)malloc(32);\n");
+        code.append("    if (!temp) {\n");
+        code.append("        printf(\"Errore di allocazione in to_string!\\n\");\n");
+        code.append("        exit(1);\n");
+        code.append("    }\n");
 
-        // Conversione per interi
         code.append("    if (strcmp(type, \"int\") == 0) {\n");
-        code.append("        temp = reallocate_string(temp, 32);\n");
         code.append("        sprintf(temp, \"%d\", *(int*)value);\n");
-
-        // Conversione per double
         code.append("    } else if (strcmp(type, \"double\") == 0) {\n");
-        code.append("        temp = reallocate_string(temp, 32);\n");
         code.append("        sprintf(temp, \"%lf\", *(double*)value);\n");
-
-        // Conversione per booleani
         code.append("    } else if (strcmp(type, \"bool\") == 0) {\n");
-        code.append("        temp = reallocate_string(temp, 6);\n");
         code.append("        strcpy(temp, *(int*)value ? \"true\" : \"false\");\n");
-
-        // Conversione per char
         code.append("    } else if (strcmp(type, \"char\") == 0) {\n");
-        code.append("        temp = reallocate_string(temp, 2);\n");
         code.append("        temp[0] = *(char*)value;\n");
         code.append("        temp[1] = '\\0';\n");
-
-        // Conversione per stringhe
         code.append("    } else if (strcmp(type, \"string\") == 0) {\n");
-        code.append("        return (char*)value;\n");
-
-        // Tipo sconosciuto
+        code.append("        free(temp);\n");
+        code.append("        return strdup((char*)value);\n");
         code.append("    } else {\n");
-        code.append("        temp = reallocate_string(temp, 16);\n");
         code.append("        strcpy(temp, \"UNKNOWN\");\n");
         code.append("    }\n");
 
         code.append("    return temp;\n");
         code.append("}\n\n");
     }
+
 
 }

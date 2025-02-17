@@ -182,9 +182,7 @@ public class TypeChecking implements Visitor {
                 // Se non c'è un return diretto, controlla se esistono degli if-then-else che garantiscono il return in entrambi i rami
                 if (!hasReturnOp) {
                     for (StatementOp stmt : statements) {
-                        if (stmt instanceof IfThenElseOp) {
-                            IfThenElseOp ifStmt = (IfThenElseOp) stmt;
-
+                        if (stmt instanceof IfThenElseOp ifStmt) {
                             boolean thenHasReturn = ifStmt.getThenBranch() != null &&
                                     ifStmt.getThenBranch().getStatements() != null &&
                                     ifStmt.getThenBranch().getStatements().stream().anyMatch(s -> s instanceof ReturnOp);
@@ -252,18 +250,17 @@ public class TypeChecking implements Visitor {
 
         // Ottieni la lista degli argomenti effettivi passati nella chiamata
         List<ExprOp> actualArguments = funCallOp.getExprList();
-
         // Controllo sul numero degli argomenti
-        if (expectedParamTypes == null && actualArguments != null) {
+        if (expectedParamTypes == null && !actualArguments.isEmpty()) {
             System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with " + actualArguments.size());
             System.err.println(" parameters, but it does not require parameters");
             System.exit(1);
-        } else if (expectedParamTypes != null && actualArguments == null) {
+        } else if (expectedParamTypes != null && actualArguments.isEmpty()) {
             System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with 0 parameters, but it requires " + expectedParamTypes.size());
             System.exit(1);
         }
 
-        if (actualArguments != null) {
+        if (!actualArguments.isEmpty()) {
             if (expectedParamTypes.size() != actualArguments.size()) {
                 System.err.print("ERROR: Function " + funCallOp.getId().getLessema() + " called with " + actualArguments.size());
                 System.err.println(" parameters, but it requires " + expectedParamTypes.size());
