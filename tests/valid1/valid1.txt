@@ -1,0 +1,15 @@
+program
+
+begin
+
+x : "ciao";
+y: "mamma";
+
+if((x + y) == (y + x)) then {
+    "sono uguali" !>>;
+}
+else {
+    "sono diversi" !>>;
+}
+
+end

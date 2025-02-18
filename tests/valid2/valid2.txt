@@ -1,0 +1,105 @@
+// Programma principale in sintassi Toy3
+
+program
+
+// Dichiarazione variabili globali
+operazione: string;
+input1 | input2 | answer | result | res1 | res2 | res3 | res4 : double;
+flag: bool;
+
+def somma(input1: double; input2: double; ref result: double)
+{
+    result := input1 + input2;
+}
+
+def sottrazione(input1: double; input2: double; ref result: double)
+{
+    result := input1 - input2;
+}
+
+def moltiplicazione(input1: double; input2: double): double
+{
+    return input1 * input2;
+}
+
+def divisione(input1: double; input2: double): double
+{
+    if (input2 == 0) then {
+        "Errore: divisione per zero" !>>;
+        return 0.0;
+    }
+    return input1 / input2;
+}
+
+def tutteleoperazioni(input1: double; input2: double; ref res1: double; ref res2: double; ref res3: double; ref res4: double)
+{
+    somma(input1, input2, res1);
+    sottrazione(input1, input2, res2);
+    res3 := divisione(input1, input2);
+    res4 := moltiplicazione(input1, input2);
+}
+
+def stampa(stringa: string): string
+{
+    return "Ciao! " + stringa;
+}
+
+begin
+    flag := true;
+
+    while (flag) do {
+        "Inserisci l'operazione da effettuare (somma, sottrazione, divisione, moltiplicazione, tutteleoperazioni): ">>;
+        operazione <<;
+        "Inserisci il primo input: ">>;
+        input1 <<;
+        "Inserisci il secondo input: ">>;
+        input2 <<;
+
+        "Hai scelto l'operazione ", operazione, " con gli argomenti ", input1, " e ", input2 !>>;
+
+        if (operazione == "somma") then {
+            somma(input1, input2, result);
+        }
+        else {
+            if (operazione == "sottrazione") then {
+                sottrazione(input1, input2, result);
+            }
+            else {
+                if (operazione == "divisione") then {
+                    result := divisione(input1, input2);
+                }
+                else {
+                    if (operazione == "moltiplicazione") then {
+                        result := moltiplicazione(input1, input2);
+                    }
+                    else {
+                        if (operazione == "tutteleoperazioni") then {
+                            tutteleoperazioni(input1, input2, res1, res2, res3, res4);
+                        }
+                        else {
+                            "Operazione non consentita" !>>;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (operazione <> "tutteleoperazioni") then {
+            "Il risultato è: ", result !>>;
+        }
+        else {
+            stampa("I risultati delle 4 operazioni sono \n" + res1 + "\n" + res2 + "\n" + res3 + "\n" + res4 + "\n") !>>;
+        }
+
+        "Vuoi continuare? (1 yes/0 no): ">>;
+        answer <<;
+
+        if (answer == 1) then {
+            flag := true;
+        }
+        else {
+            flag := false;
+        }
+    }
+
+end

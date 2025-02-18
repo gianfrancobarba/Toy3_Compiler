@@ -1,0 +1,72 @@
+/* Esempio base del linguaggio Toy3 */
+
+program
+
+ sommagrande | sommapiccola: double;
+ i:0;
+ x | y | risultato : double;
+ grande | nonusata: bool;
+
+ def moltiplicazione( x: double; y: double; ref res : double; ref  grande: bool)
+ {
+	risultato= x*y | nonusata : double;
+
+	if ((x*y) >= 100) then {
+		grande := true;
+	}
+	else{
+		grande := false;
+	}
+	res := risultato;                   // commento di prova
+ }
+
+ def saluto(): string
+ {
+	return "ciao";
+ }
+
+
+begin
+
+sommagrande | sommapiccola := 0, 0;
+
+"Questo programma permette di svolgere una serie di moltiplicazioni" !>>;
+"sommando i risultati < 100 in sommagrande e quelli < 100 in sommapiccola" !>>;
+
+i := -1;
+while (i <= 0) do{
+	saluto : "ciao";
+	"Quante moltiplicazioni vuoi svolgere? (inserire intero > 0)">>;
+	i <<;
+	saluto !>>;
+}
+
+while (i > 0) do{
+
+	x := -1;
+	y := -1;
+
+	while (not(x > 0 and y >0)) do
+	{
+		saluto :"byebye";
+		"Moltiplicazione " , i , ": inserisci due numeri positivi" !>>;
+		x | y <<;
+		saluto !>>;
+	}
+
+	moltiplicazione(x, y , risultato, grande);
+	risultato !>>;
+
+	if(grande) then{
+		"il risultato e grande" !>>;
+		sommagrande := sommagrande + risultato;
+	}else{
+		"il risultato e piccolo" !>>;
+		sommapiccola := sommapiccola + risultato;
+	}
+	i := i-1;
+}
+	"\n sommagrande e ", sommagrande !>>;
+	"sommapiccola e ", sommapiccola !>>;
+
+end
