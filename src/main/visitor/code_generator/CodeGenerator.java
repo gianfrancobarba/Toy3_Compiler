@@ -32,7 +32,7 @@ public class CodeGenerator implements Visitor {
 
     public CodeGenerator(String outputFileName) throws IOException {
         this.code = new StringBuilder();
-        this.writer = new BufferedWriter(new FileWriter("fileTester/c_out/"+ outputFileName + ".c"));
+        this.writer = new BufferedWriter(new FileWriter("test_files/c_out/"+ outputFileName + ".c"));
     }
 
     @Override
