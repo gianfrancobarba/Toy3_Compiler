@@ -43,8 +43,12 @@ public class CodeGenerator implements Visitor {
         code.append("#include <stdbool.h>\n\n");
         code.append("\n\n // DICHIARAZIONI FUNZIONI E VARIABILI DI SERVIZIO\n\n");
         code.append("#define INITIAL_SIZE 32\n");
-        code.append("#define INCREMENT_SIZE 32\n\n");
-        code.append("char* tempString;\n\n");
+        code.append("#define INCREMENT_SIZE 32\n");
+        code.append("#define MAX_CONCAT_SIZE 1024\n\n");
+
+        code.append("char* tempString;\n");
+        code.append("char* arrayConcat[MAX_CONCAT_SIZE];\n");
+        code.append("int currentIndex = 0;\n\n");
 
         printAllocateStringFun();
         printReallocateStringFun();
@@ -97,10 +101,16 @@ public class CodeGenerator implements Visitor {
 
     @Override
     public void visit(BeginEndOp beginEndOp) {
-        List<VarDeclOp> listVarDecl = beginEndOp.getVarDeclList();
         code.append("int main(void){\n");
         code.append("allocate_string(&tempString, 1);\n");
+
         globalStringAllocate();
+
+        code.append("for (int i = 0; i < MAX_CONCAT_SIZE; i++) {\n");
+        code.append("    allocate_string(&arrayConcat[i], 256);\n");
+        code.append("}\n\n");
+
+        List<VarDeclOp> listVarDecl = beginEndOp.getVarDeclList();
         listVarDecl.forEach(varDeclOp -> varDeclOp.accept(this));
         beginEndOp.getStmtList().forEach(statementOp -> {
             setStmt(statementOp, true);
@@ -121,8 +131,11 @@ public class CodeGenerator implements Visitor {
                 });
             }
         });
-
+        // Libera la memoria allocata per le stringhe e buffer di temp
         code.append("free(tempString);\n");
+        code.append("for (int i = 0; i < MAX_CONCAT_SIZE; i++) {\n");
+        code.append("    free(arrayConcat[i]);\n");
+        code.append("}\n");
         code.append("\nreturn 0;\n}");
     }
 
@@ -336,19 +349,6 @@ public class CodeGenerator implements Visitor {
         }
     }
 
-//    public void visit(StatementOp stmt){
-//        switch(stmt.getClass().getSimpleName()) {
-//            case "AssignOp" -> visit((AssignOp) stmt);
-//            case "IfThenOp" -> visit((IfThenOp) stmt);
-//            case "IfThenElseOp" -> visit((IfThenElseOp) stmt);
-//            case "WhileOp" -> visit((WhileOp) stmt);
-//            case "ReturnOp" -> visit((ReturnOp) stmt);
-//            case "WriteOp" -> visit((WriteOp) stmt);
-//            case "ReadOp" -> visit((ReadOp) stmt);
-//            case "FunCallOp" -> visit((FunCallOp) stmt);
-//        }
-//    }
-
     @Override
     public void visit(AssignOp assignOp) {
         List<Identifier> idList = assignOp.getIdentfiers();
@@ -379,16 +379,6 @@ public class CodeGenerator implements Visitor {
         code.append("\n");
     }
 
-//    public void visit(ExprOp expr) {
-//        switch(expr.getClass().getSimpleName()) {
-//            case "BinaryExprOp" -> visit((BinaryExprOp) expr);
-//            case "UnaryExprOp" -> visit((UnaryExprOp) expr);
-//            case "ConstOp" -> visit((ConstOp) expr);
-//            case "Identifier" -> visit((Identifier) expr);
-//            case "FunCallOp" -> visit((FunCallOp) expr);
-//        }
-//    }
-
     @Override
     public void visit(Identifier identifier) {
         if(identifier.getType().startsWith("ref") && !identifier.getType().equals("ref string")) {
@@ -418,18 +408,12 @@ public class CodeGenerator implements Visitor {
                 getStringComparison(binaryExprOp.getLeft(), binaryExprOp.getOp(), binaryExprOp.getRight());
                 return;
             } else { // Altrimenti si tratta di una concatenazione di stringhe
-                code.append("safe_strcat(");
+                code.append("strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(");
+
                 if (!isLeftString) { // Se il primo operando non è una stringa, lo converte in stringa
-                    if(binaryExprOp.getLeft() instanceof Identifier id) {
-                        code.append("to_string(&");
-                        binaryExprOp.getLeft().accept(this);
-                        code.append(", \"").append(binaryExprOp.getLeft().getType()).append("\")");
-                    }
-                    else {
-                        code.append("to_string((int[]){");
-                        binaryExprOp.getLeft().accept(this);
-                        code.append("},\"").append(binaryExprOp.getLeft().getType()).append("\")");
-                    }
+                    code.append("to_string((void*){");
+                    binaryExprOp.getLeft().accept(this);
+                    code.append("},\"").append(binaryExprOp.getLeft().getType()).append("\")");
                 } else { // Altrimenti visita normalmente il primo operando
                     binaryExprOp.getLeft().accept(this);
                 }
@@ -437,22 +421,13 @@ public class CodeGenerator implements Visitor {
                 code.append(", ");
 
                 if (!isRightString) { // Se il secondo operando non è una stringa, lo converte in stringa
-                    if(binaryExprOp.getRight() instanceof Identifier id) {
-                        code.append("to_string(&");
-                        binaryExprOp.getRight().accept(this);
-                        code.append(", \"").append(binaryExprOp.getRight().getType()).append("\")");
-                    }
-                    else {
-                        code.append("to_string((int[]){");
-                        binaryExprOp.getRight().accept(this);
-                        code.append("}, \"").append(binaryExprOp.getRight().getType()).append("\")");
-                    }
-
+                    code.append("to_string((void*){");
+                    binaryExprOp.getRight().accept(this);
+                    code.append("}, \"").append(binaryExprOp.getRight().getType()).append("\")");
                 } else { // Altrimenti visita normalmente il secondo operando
                     binaryExprOp.getRight().accept(this);
                 }
-
-                code.append(")");
+                code.append("))");
             }
         } else { // Altrimenti si tratta di una normale operazione binaria
             code.append("(");
@@ -835,7 +810,6 @@ public class CodeGenerator implements Visitor {
         code.append("    } else {\n");
         code.append("        return \"UNKNOWN\";\n");
         code.append("    }\n");
-//        code.append("    printf(\"TOSTRING %s \\n \", buffer);\n");
         code.append("    return buffer;\n");
         code.append("}\n\n");
     }

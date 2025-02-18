@@ -9,8 +9,11 @@
 
 #define INITIAL_SIZE 32
 #define INCREMENT_SIZE 32
+#define MAX_CONCAT_SIZE 1024
 
 char* tempString;
+char* arrayConcat[MAX_CONCAT_SIZE];
+int currentIndex = 0;
 
 // Funzione per allocare dinamicamente una stringa
 void allocate_string(char** str, size_t size) {
@@ -50,7 +53,6 @@ char* safe_strcat(const char* s1, const char* s2) {
     if (!s1 && !s2) return NULL;
     if (!s1) return strdup(s2);
     if (!s2) return strdup(s1);
-    printf("%s -> %s \n ", s1,s2);
     size_t len1 = strlen(s1);
     size_t len2 = strlen(s2);
     char* new_temp;
@@ -107,7 +109,6 @@ const char* to_string(void* value, const char* type) {
     } else {
         return "UNKNOWN";
     }
-    printf("TOSTRING %s \n ", buffer);
     return buffer;
 }
 
@@ -116,82 +117,36 @@ const char* to_string(void* value, const char* type) {
 
 // INIZIO DEL CODICE GENERATO
 
-int c  = 1;
 
-double a, b, x;
-
-char *taglia;
-char *ans1;
-char *ans;
-
-double risultato;
-
-
-void sommac(int a, int d, double b, char* size, double* result);
-char* stampa(char* messaggio);
 
 int main(void){
 allocate_string(&tempString, 1);
-allocate_string(&taglia, 256);
-allocate_string(&ans1, 256);
-allocate_string(&ans, 256);
-a = 1;
-b = 2.2;
-x = 3;
-risultato = 0.0;
-safe_strcpy(&ans, "no" );
-sommac(a, x, b, taglia, &risultato);
-stampa(safe_strcat("la somma di ", safe_strcat(to_string(&a, "double"), safe_strcat(" e ", safe_strcat(to_string(&b, "double"), safe_strcat(" incrementata di ", safe_strcat(to_string(&c, "int"), safe_strcat(" è ", taglia))))))));
-stampa(safe_strcat("ed è pari a ", to_string(&risultato, "double")));
-printf("%s", "vuoi continuare? (si/no) - inserisci due volte la risposta\n");
-safe_scanf(&ans);
-safe_scanf(&ans1);
-while ((strcmp(ans, "si") == 0)) {
-printf("%s", "inserisci un intero: ");
-scanf("%lf", &a);
-printf("%s", "inserisci un reale: ");
-scanf("%lf", &b);
-sommac(a, x, b, taglia, &risultato);
-stampa(safe_strcat("la somma di ", safe_strcat(to_string(&a, "double"), safe_strcat(" e ", safe_strcat(to_string(&b, "double"), safe_strcat(" incrementata di ", safe_strcat(to_string(&c, "int"), safe_strcat(" è ", taglia))))))));
-stampa(safe_strcat("ed è pari a ", to_string(&risultato, "double")));
-printf("%s", "vuoi continuare? (si/no): ");
-safe_scanf(&ans);
+for (int i = 0; i < MAX_CONCAT_SIZE; i++) {
+    allocate_string(&arrayConcat[i], 256);
 }
-printf("%s%c", "" , '\n');
-printf("%s%c", "ciao" , '\n');
-free(taglia);
-free(ans1);
-free(ans);
+
+char *x;
+allocate_string(&x, 256);
+safe_strcpy(&x, "ciao");
+char *y;
+allocate_string(&y, 256);
+safe_strcpy(&y, "mamma");
+if ((((((((((strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0)) && (strcmp(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y)))))))))))))))))))))))))))))), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(y, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(x, y))))))))))))))))))))))))))))))) == 0))) {
+printf("%s%c", "uguali" , '\n');
+}
+else {
+printf("%s%c", "diversi" , '\n');
+}
 
 
 
+free(x);
+free(y);
 free(tempString);
+for (int i = 0; i < MAX_CONCAT_SIZE; i++) {
+    free(arrayConcat[i]);
+}
 
 return 0;
-}
-
-void sommac(int a, int d, double b, char* size, double* result) {
-*result = (a + (b + (c + d)));
-if ((*result > 100)) {
-safe_strcpy(&size, "grande" );
-}
-else {
-if ((*result > 50)) {
-safe_strcpy(&size, "media" );
-}
-else {
-safe_strcpy(&size, "piccola" );
-}
-}
-}
-
-char* stampa(char* messaggio) {
-int i  = 0;
-while ((i < 4)) {
-printf("%s%c", "" , '\n');
-i = (i + 1);
-}
-printf("%s%c", messaggio , '\n');
-return "ok";
 }
 
