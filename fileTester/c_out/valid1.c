@@ -117,26 +117,59 @@ const char* to_string(void* value, const char* type) {
 
 // INIZIO DEL CODICE GENERATO
 
+int c  = 1;
 
-int fun(int a, int b);
-char* fun2(int* a, int b);
+double a, b, x;
+
+char *taglia;
+char *ans1;
+char *ans;
+
+double risultato;
+
+
+void sommac(int a, int d, double b, char* size, double* result);
+char* stampa(char* messaggio);
 
 int main(void){
 allocate_string(&tempString, 1);
+allocate_string(&taglia, 256);
+allocate_string(&ans1, 256);
+allocate_string(&ans, 256);
 for (int i = 0; i < MAX_CONCAT_SIZE; i++) {
     allocate_string(&arrayConcat[i], 256);
 }
 
-int a = 2, b = 4;
-char *x;
-allocate_string(&x, 256);
-safe_strcpy(&x, "ciao");
-bool y;
-printf("%s%c", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat("stampa: ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(to_string((bool[]){(fun(a, b) == fun(a, b))},"bool"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" e ", fun2(&a, b))))))) , '\n');
+a = 1;
+b = 2.2;
+x = 3;
+risultato = 0.0;
+safe_strcpy(&ans, "no" );
+sommac(a, x, b, taglia, &risultato);
+stampa(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat("la somma di ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(a},"double"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" e ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(b},"double"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" incrementata di ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(c},"int"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" è ", taglia)))))))))))))));
+stampa(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat("ed è pari a ", risultato}, "double"))));
+printf("%s", "vuoi continuare? (si/no) - inserisci due volte la risposta\n");
+safe_scanf(&ans);
+safe_scanf(&ans1);
+while ((strcmp(ans, "si") == 0)) {
+printf("%s", "inserisci un intero: ");
+scanf("%lf", &a);
+printf("%s", "inserisci un reale: ");
+scanf("%lf", &b);
+sommac(a, x, b, taglia, &risultato);
+stampa(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat("la somma di ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(a},"double"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" e ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(b},"double"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" incrementata di ", strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(c},"int"), strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(" è ", taglia)))))))))))))));
+stampa(strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat("ed è pari a ", risultato}, "double"))));
+printf("%s", "vuoi continuare? (si/no): ");
+safe_scanf(&ans);
+}
+printf("%s%c", "" , '\n');
+printf("%s%c", "ciao" , '\n');
+free(taglia);
+free(ans1);
+free(ans);
 
 
 
-free(x);
 free(tempString);
 for (int i = 0; i < MAX_CONCAT_SIZE; i++) {
     free(arrayConcat[i]);
@@ -145,11 +178,28 @@ for (int i = 0; i < MAX_CONCAT_SIZE; i++) {
 return 0;
 }
 
-int fun(int a, int b) {
-return (a + b);
+void sommac(int a, int d, double b, char* size, double* result) {
+*result = (a + (b + (c + d)));
+if ((*result > 100)) {
+safe_strcpy(&size, "grande" );
+}
+else {
+if ((*result > 50)) {
+safe_strcpy(&size, "media" );
+}
+else {
+safe_strcpy(&size, "piccola" );
+}
+}
 }
 
-char* fun2(int* a, int b) {
-return strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat("", to_string((int[]){(*a + b)}, "int")));
+char* stampa(char* messaggio) {
+int i  = 0;
+while ((i < 4)) {
+printf("%s%c", "" , '\n');
+i = (i + 1);
+}
+printf("%s%c", messaggio , '\n');
+return "ok";
 }
 

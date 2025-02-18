@@ -10,10 +10,19 @@ import toy3.parser;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
+//    private static final String[] files = {"valid1.txt", "valid2.txt", "valid3.txt", "valid4.txt"}; //, "test_program.txt", "valid1.txt", "valid2.txt", "valid3.txt", "valid4.txt"};
+
     public static void main(String[] args) {
-        try (Reader fileReader = new BufferedReader(new FileReader("fileTester/input.inp"))) {
+
+        Path inputPath = Paths.get(args[0]);
+        String inputFileName = inputPath.toString();
+        String outputFileName = inputPath.getFileName().toString().replace(".txt", "");
+        try (Reader fileReader = new BufferedReader(new FileReader(inputFileName))) {
+//                System.out.println("File: " + files[i]);
             Lexer lexer = new Lexer(fileReader);
             parser p = new parser(lexer);
             try {
@@ -35,14 +44,16 @@ public class Main {
                 ast.accept(typeChecking);
 
                 System.out.println("** Testing Code Generation **");
-                CodeGenerator codeGenerator = new CodeGenerator();
+                CodeGenerator codeGenerator = new CodeGenerator(outputFileName);
                 ast.accept(codeGenerator);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+//        }
     }
 }
 

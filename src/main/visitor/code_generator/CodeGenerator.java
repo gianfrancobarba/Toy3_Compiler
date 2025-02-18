@@ -30,9 +30,9 @@ public class CodeGenerator implements Visitor {
     private boolean isGlobal = false;
     private List<VarDeclOp> listStringGlobal = new ArrayList<>();
 
-    public CodeGenerator() throws IOException {
+    public CodeGenerator(String outputFileName) throws IOException {
         this.code = new StringBuilder();
-        this.writer = new BufferedWriter(new FileWriter("filetester/output.c"));
+        this.writer = new BufferedWriter(new FileWriter("fileTester/c_out/"+ outputFileName + ".c"));
     }
 
     @Override
