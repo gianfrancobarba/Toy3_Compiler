@@ -411,7 +411,7 @@ public class CodeGenerator implements Visitor {
                 code.append("strcpy(arrayConcat[(currentIndex++)%MAX_CONCAT_SIZE], safe_strcat(");
 
                 if (!isLeftString) { // Se il primo operando non è una stringa, lo converte in stringa
-                    code.append("to_string((void*){");
+                    toStringType(binaryExprOp.getLeft());
                     binaryExprOp.getLeft().accept(this);
                     code.append("},\"").append(binaryExprOp.getLeft().getType()).append("\")");
                 } else { // Altrimenti visita normalmente il primo operando
@@ -420,8 +420,8 @@ public class CodeGenerator implements Visitor {
 
                 code.append(", ");
 
-                if (!isRightString) { // Se il secondo operando non è una stringa, lo converte in stringa
-                    code.append("to_string((void*){");
+                if (!isRightString) {
+                    toStringType(binaryExprOp.getRight());
                     binaryExprOp.getRight().accept(this);
                     code.append("}, \"").append(binaryExprOp.getRight().getType()).append("\")");
                 } else { // Altrimenti visita normalmente il secondo operando
@@ -441,6 +441,33 @@ public class CodeGenerator implements Visitor {
         }
     }
 
+    private void toStringType(ExprOp expr) {
+        if (expr instanceof ConstOp) {
+            switch (expr.getType()) {
+                case "int" -> code.append("to_string((int[]){");
+                case "double" -> code.append("to_string((double[]){");
+                case "char" -> code.append("to_string((char[]){");
+                case "bool" -> code.append("to_string((bool[]){");
+            }
+        } else if (expr instanceof BinaryExprOp || expr instanceof UnaryExprOp) {
+            if (!expr.getType().equals("string")) {
+                switch (expr.getType()) {
+                    case "int" -> code.append("to_string((int[]){");
+                    case "double" -> code.append("to_string((double[]){");
+                    case "char" -> code.append("to_string((char[]){");
+                    case "bool" -> code.append("to_string((bool[]){");
+                }
+            }
+        }
+        else if (expr instanceof FunCallOp funCall) {
+                switch (funCall.getType()) {
+                    case "int" -> code.append("to_string((int[]){");
+                    case "double" -> code.append("to_string((double[]){");
+                    case "char" -> code.append("to_string((char[]){");
+                    case "bool" -> code.append("to_string((bool[]){");
+                }
+            }
+        }
 
     @Override
     public void visit(UnaryExprOp unaryExprOp) {

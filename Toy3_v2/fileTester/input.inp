@@ -1,12 +1,19 @@
 program
-begin
-x = "ciao" : string;
-y = "mamma" : string;
 
-if(x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y and x+y+x+x+x+y+y+y+y+y+y+y+x+x+x+y == x+x+x+x+x+y+y+y+y+y+y+y+x+x+x+y  ) then{
-    "uguali" !>>;
+def fun(a: int; b: int) : int {
+    return a + b;
 }
-else{
-    "diversi" !>>;
+
+def fun2(ref a: int; b: int) : string {
+    return "" + a + b;
 }
+
+begin
+
+a = 2 | b = 4 : int;
+x = "ciao" : string;
+y: bool;
+
+"stampa: " + (fun(a,b) == fun(a, b)) + " e " + fun2(a, b) !>>;
+
 end

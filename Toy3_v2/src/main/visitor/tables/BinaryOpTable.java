@@ -18,6 +18,8 @@ public class BinaryOpTable {
         addEntry("+", "int", "string", "string");
         addEntry("+", "string", "double", "string");
         addEntry("+", "double", "string", "string");
+        addEntry("+", "bool", "string", "string");
+        addEntry("+", "string", "bool", "string");
         addEntry("-", "int", "int", "int");
         addEntry("-", "double", "double", "double");
         addEntry("-", "int", "double", "double");
