@@ -32,4 +32,12 @@ public class Scope {
     public void setParent(Scope parent) {
         this.parent = parent;
     }
+
+    @Override
+    public String toString() {
+        return "Scope{" +
+                "scope=" + scope +
+                ", parent=" + parent +
+                '}';
+    }
 }

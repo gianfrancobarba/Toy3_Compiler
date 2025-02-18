@@ -50,6 +50,7 @@ char* safe_strcat(const char* s1, const char* s2) {
     if (!s1 && !s2) return NULL;
     if (!s1) return strdup(s2);
     if (!s2) return strdup(s1);
+    printf("%s -> %s \n ", s1,s2);
     size_t len1 = strlen(s1);
     size_t len2 = strlen(s2);
     char* new_temp;
@@ -106,6 +107,7 @@ const char* to_string(void* value, const char* type) {
     } else {
         return "UNKNOWN";
     }
+    printf("TOSTRING %s \n ", buffer);
     return buffer;
 }
 
@@ -114,31 +116,52 @@ const char* to_string(void* value, const char* type) {
 
 // INIZIO DEL CODICE GENERATO
 
-char *message;
+int c  = 1;
 
-int n, m, k;
+double a, b, x;
+
+char *taglia;
+char *ans1;
+char *ans;
+
+double risultato;
 
 
-void scoping(int n, int m, char* message);
-int glob();
+void sommac(int a, int d, double b, char* size, double* result);
+char* stampa(char* messaggio);
 
 int main(void){
 allocate_string(&tempString, 1);
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 0");
-k = 6;
-while ((k >= 1)) {
-printf("%s", "Inserisci n: ");
-scanf("%d", &n);
-printf("%s", "Inserisci m: ");
-scanf("%d", &m);
-printf("%s%d%s%d%c", "I valori inseriti sono ", n, " e ", m , '\n');
-scoping(n, m, message);
-k = (k - 1);
+allocate_string(&taglia, 256);
+allocate_string(&ans1, 256);
+allocate_string(&ans, 256);
+a = 1;
+b = 2.2;
+x = 3;
+risultato = 0.0;
+safe_strcpy(&ans, "no" );
+sommac(a, x, b, taglia, &risultato);
+stampa(safe_strcat("la somma di ", safe_strcat(to_string(&a, "double"), safe_strcat(" e ", safe_strcat(to_string(&b, "double"), safe_strcat(" incrementata di ", safe_strcat(to_string(&c, "int"), safe_strcat(" è ", taglia))))))));
+stampa(safe_strcat("ed è pari a ", to_string(&risultato, "double")));
+printf("%s", "vuoi continuare? (si/no) - inserisci due volte la risposta\n");
+safe_scanf(&ans);
+safe_scanf(&ans1);
+while ((strcmp(ans, "si") == 0)) {
+printf("%s", "inserisci un intero: ");
+scanf("%lf", &a);
+printf("%s", "inserisci un reale: ");
+scanf("%lf", &b);
+sommac(a, x, b, taglia, &risultato);
+stampa(safe_strcat("la somma di ", safe_strcat(to_string(&a, "double"), safe_strcat(" e ", safe_strcat(to_string(&b, "double"), safe_strcat(" incrementata di ", safe_strcat(to_string(&c, "int"), safe_strcat(" è ", taglia))))))));
+stampa(safe_strcat("ed è pari a ", to_string(&risultato, "double")));
+printf("%s", "vuoi continuare? (si/no): ");
+safe_scanf(&ans);
 }
-printf("%s%c", message , '\n');
-printf("%d%c", glob() , '\n');
-free(message);
+printf("%s%c", "" , '\n');
+printf("%s%c", "ciao" , '\n');
+free(taglia);
+free(ans1);
+free(ans);
 
 
 
@@ -147,73 +170,28 @@ free(tempString);
 return 0;
 }
 
-void scoping(int n, int m, char* message) {
-safe_strcpy(&message, "level 1" );
-if ((n <= 1)) {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 2.1");
-int n  = 10;
-if ((m <= 1)) {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 3.1");
-printf("%s%c", message , '\n');
-free(message);
+void sommac(int a, int d, double b, char* size, double* result) {
+*result = (a + (b + (c + d)));
+if ((*result > 100)) {
+safe_strcpy(&size, "grande" );
 }
 else {
-if (((m > 1) && (m < 5))) {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 3.2");
-printf("%s%c", message , '\n');
-free(message);
+if ((*result > 50)) {
+safe_strcpy(&size, "media" );
 }
 else {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 3.3");
-printf("%s%c", message , '\n');
-free(message);
+safe_strcpy(&size, "piccola" );
 }
 }
-printf("%s%c", message , '\n');
-free(message);
-}
-else {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 2.2");
-if ((m <= 1)) {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 3.4");
-printf("%s%c", message , '\n');
-free(message);
-}
-else {
-if (((m > 1) && (m < 5))) {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 3.5");
-printf("%s%c", message , '\n');
-free(message);
-}
-else {
-char *message;
-allocate_string(&message, 256);
-safe_strcpy(&message, "level 3.6");
-printf("%s%c", message , '\n');
-free(message);
-}
-}
-printf("%s%c", message , '\n');
-free(message);
-}
-printf("%s%c", message , '\n');
 }
 
-int glob() {
-return 100;
+char* stampa(char* messaggio) {
+int i  = 0;
+while ((i < 4)) {
+printf("%s%c", "" , '\n');
+i = (i + 1);
+}
+printf("%s%c", messaggio , '\n');
+return "ok";
 }
 

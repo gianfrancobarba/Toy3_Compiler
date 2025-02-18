@@ -238,15 +238,20 @@ public class CodeGenerator implements Visitor {
     @Override
     public void visit(FunCallOp funCallOp) {
         List<ExprOp> args = funCallOp.getExprList();
+
+        // Salviamo il valore originale di isStmt
+        boolean originalIsStmt = isStmt;
+
         if (funConflictMap.containsKey(funCallOp.getId().getLessema()))
             funCallOp.getId().setLessema(funConflictMap.get(funCallOp.getId().getLessema()));
 
         code.append(funCallOp.getId().getLessema()).append("(");
+
         if (!args.isEmpty()) {
-            AtomicInteger i = new AtomicInteger(); // Contatore per la posizione dell'argomento
+            AtomicInteger i = new AtomicInteger();
             args.forEach(arg -> {
-                setStmt(arg, false);
-                if(funSignatureMap.get(funCallOp.getId().getLessema()) != null) {
+                setStmt(arg, false); // Gli argomenti NON sono istruzioni
+                if (funSignatureMap.get(funCallOp.getId().getLessema()) != null) {
                     if (funSignatureMap.get(funCallOp.getId().getLessema()).get(i.get()).contains("*") && !arg.getType().equals("string")) {
                         code.append("&");
                     }
@@ -255,16 +260,20 @@ public class CodeGenerator implements Visitor {
                 arg.accept(this);
                 code.append(", ");
             });
-            code.deleteCharAt(code.length() - 2); // Rimuove l'ultima virgola
+
+            code.deleteCharAt(code.length() - 2);
             code.setCharAt(code.length() - 1, ')');
-        }
-        else {
+        } else {
             code.append(")");
         }
+
+        // Ripristiniamo il valore originale di isStmt
+        isStmt = originalIsStmt;
 
         if (isStmt)
             code.append(";\n");
     }
+
 
     @Override
     public void visit(WhileOp whileOp) {
@@ -411,9 +420,16 @@ public class CodeGenerator implements Visitor {
             } else { // Altrimenti si tratta di una concatenazione di stringhe
                 code.append("safe_strcat(");
                 if (!isLeftString) { // Se il primo operando non è una stringa, lo converte in stringa
-                    code.append("to_string(&");
-                    binaryExprOp.getLeft().accept(this);
-                    code.append(", \"").append(binaryExprOp.getLeft().getType()).append("\")");
+                    if(binaryExprOp.getLeft() instanceof Identifier id) {
+                        code.append("to_string(&");
+                        binaryExprOp.getLeft().accept(this);
+                        code.append(", \"").append(binaryExprOp.getLeft().getType()).append("\")");
+                    }
+                    else {
+                        code.append("to_string((int[]){");
+                        binaryExprOp.getLeft().accept(this);
+                        code.append("},\"").append(binaryExprOp.getLeft().getType()).append("\")");
+                    }
                 } else { // Altrimenti visita normalmente il primo operando
                     binaryExprOp.getLeft().accept(this);
                 }
@@ -421,9 +437,17 @@ public class CodeGenerator implements Visitor {
                 code.append(", ");
 
                 if (!isRightString) { // Se il secondo operando non è una stringa, lo converte in stringa
-                    code.append("to_string(&");
-                    binaryExprOp.getRight().accept(this);
-                    code.append(", \"").append(binaryExprOp.getRight().getType()).append("\")");
+                    if(binaryExprOp.getRight() instanceof Identifier id) {
+                        code.append("to_string(&");
+                        binaryExprOp.getRight().accept(this);
+                        code.append(", \"").append(binaryExprOp.getRight().getType()).append("\")");
+                    }
+                    else {
+                        code.append("to_string((int[]){");
+                        binaryExprOp.getRight().accept(this);
+                        code.append("}, \"").append(binaryExprOp.getRight().getType()).append("\")");
+                    }
+
                 } else { // Altrimenti visita normalmente il secondo operando
                     binaryExprOp.getRight().accept(this);
                 }
@@ -732,7 +756,7 @@ public class CodeGenerator implements Visitor {
         code.append("    if (!s1 && !s2) return NULL;\n");
         code.append("    if (!s1) return strdup(s2);\n");
         code.append("    if (!s2) return strdup(s1);\n");
-
+//        code.append("    printf(\"%s -> %s \\n \", s1,s2);\n");
         code.append("    size_t len1 = strlen(s1);\n");
         code.append("    size_t len2 = strlen(s2);\n");
 
@@ -811,7 +835,7 @@ public class CodeGenerator implements Visitor {
         code.append("    } else {\n");
         code.append("        return \"UNKNOWN\";\n");
         code.append("    }\n");
-
+//        code.append("    printf(\"TOSTRING %s \\n \", buffer);\n");
         code.append("    return buffer;\n");
         code.append("}\n\n");
     }

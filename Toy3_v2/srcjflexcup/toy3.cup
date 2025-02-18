@@ -213,7 +213,10 @@ FunCall ::= ID:id LPAR Exprs:e RPAR
             :}
           | ID:id LPAR RPAR         {: RESULT = new FunCallOp(new Identifier((String) id), null); :};
 
-Expr ::= Expr:e1 ArithOp:arithOp Expr:e2 {: RESULT = new BinaryExprOp((ExprOp) e1, (String) arithOp, (ExprOp) e2); :}
+Expr ::= | Expr:e1 PLUS Expr:e2           {: RESULT = new BinaryExprOp((ExprOp) e1, "+", (ExprOp) e2); :}
+       | Expr:e1 MINUS Expr:e2            {: RESULT = new BinaryExprOp((ExprOp) e1, "-", (ExprOp) e2); :}
+       | Expr:e1 TIMES Expr:e2            {: RESULT = new BinaryExprOp((ExprOp) e1, "*", (ExprOp) e2); :}
+       | Expr:e1 DIV Expr:e2              {: RESULT = new BinaryExprOp((ExprOp) e1, "/", (ExprOp) e2); :}
        | Expr:e1 AND Expr:e2              {: RESULT = new BinaryExprOp((ExprOp) e1, "and", (ExprOp) e2); :}
        | Expr:e1 OR Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, "or", (ExprOp) e2); :}
        | Expr:e1 GT Expr:e2               {: RESULT = new BinaryExprOp((ExprOp) e1, ">", (ExprOp) e2); :}
