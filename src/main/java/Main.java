@@ -14,8 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Main {
-//    private static final String[] files = {"valid1.txt", "valid2.txt", "valid3.txt", "valid4.txt"}; //, "test_program.txt", "valid1.txt", "valid2.txt", "valid3.txt", "valid4.txt"};
-
     public static void main(String[] args) {
 
         Path inputPath = Paths.get(args[0]);
@@ -30,20 +28,20 @@ public class Main {
                 ProgramOp ast = (ProgramOp) p.parse().value;
 
                 // Applica il Visitor all'AST
-                System.out.println("** Stampa dell'AST **");
+//                System.out.println("** Stampa dell'AST **");
                 PrintVisitor printVisitor = new PrintVisitor();
                 ast.accept(printVisitor);
 
                 // Test the Scoping visitor
-                System.out.println("** Testing Scoping Visitor **");
+//                System.out.println("** Testing Scoping Visitor **");
                 Scoping scopingVisitor = new Scoping();
                 ast.accept(scopingVisitor);
 
-                System.out.println("** Testing TypeChecking Visitor **");
+//                System.out.println("** Testing TypeChecking Visitor **");
                 TypeChecking typeChecking = new TypeChecking();
                 ast.accept(typeChecking);
 
-                System.out.println("** Testing Code Generation **");
+//                System.out.println("** Testing Code Generation **");
                 CodeGenerator codeGenerator = new CodeGenerator(outputFileName);
                 ast.accept(codeGenerator);
 
@@ -53,7 +51,6 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        }
     }
 }
 

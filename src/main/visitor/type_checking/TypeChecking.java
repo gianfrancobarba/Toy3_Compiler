@@ -89,7 +89,6 @@ public class TypeChecking implements Visitor {
         String result = BinaryOpTable.getResult(operator, ignoreRef(leftType), ignoreRef(rightType));
 
         if(result == null){
-            System.out.println(binaryExprOp);
             System.err.print("ERROR: Invalid types in binary expression \"" + leftType + " " + operator + " " + rightType + "\"");
             System.exit(1);
         }

@@ -35,17 +35,16 @@ public class Scoping implements Visitor {
                 else if (varDeclOp instanceof FunDeclOp)
                     ((FunDeclOp) varDeclOp).accept(this);
 
-        System.out.println("\n ---- Scope in ProgramOp ----");
-        symbolTable.printTable();
+        ////System.out.println("\n ---- Scope in ProgramOp ----");
+        ////symbolTable.printTable();
 
         programOp.getBeginEndOp().accept(this);
 
-        symbolTable.exitScope();
+        ////symbolTable.exitScope();
     }
 
     @Override
     public void visit(VarDeclOp varDeclOp) {
-        // System.out.println("Visit var decl");
         if (varDeclOp.getTypeOrConstant() instanceof ConstOp) {
             if (varDeclOp.getListVarOptInit().size() > 1) {
                 System.err.print("ERROR: cannot declare multiple variables with a constant type");
@@ -123,8 +122,8 @@ public class Scoping implements Visitor {
             }
         }
 
-        System.out.println("\n---- Scope in DefDeclOp [" + funId + "] ----");
-        symbolTable.printTable();
+        ////System.out.println("\n---- Scope in DefDeclOp [" + funId + "] ----");
+        ////symbolTable.printTable();
 
         symbolTable.exitScope();
     }
@@ -144,7 +143,7 @@ public class Scoping implements Visitor {
     public void visit(PVarOp pVarOp) {
         String varId  = pVarOp.getId().getLessema();
         if(symbolTable.probe(Kind.VAR, varId) ) {
-            symbolTable.printTable();
+            ////symbolTable.printTable();
             if(Objects.equals(symbolTable.lookup(Kind.VAR, varId), tempType)){
                 System.err.print("ERROR: Redefinition of parameter " + varId);
                 System.exit(1);
@@ -172,8 +171,8 @@ public class Scoping implements Visitor {
             }
         }
 
-        System.out.println("\n---- Scope in BeginEndOp ----");
-        symbolTable.printTable();
+        ////System.out.println("\n---- Scope in BeginEndOp ----");
+        ////symbolTable.printTable();
 
         if(beginEndOp.getStmtList() != null){
             for(StatementOp statOp : beginEndOp.getStmtList()){
@@ -195,8 +194,8 @@ public class Scoping implements Visitor {
             }
         }
 
-        System.out.println("\n---- Scope in BodyOp [" + bodyOp.getFunLabel() + "] ----");
-        symbolTable.printTable();
+        ////System.out.println("\n---- Scope in BodyOp [" + bodyOp.getFunLabel() + "] ----");
+        ////symbolTable.printTable();
 
         if(bodyOp.getStatements() != null){
             for(StatementOp statOp : bodyOp.getStatements()){
@@ -227,14 +226,14 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(IfThenOp ifThenOp) {
-        System.out.println("\n---- Scope IfThenOp [ " + ifThenOp.getFunLabel()+"] ----");
+        ////System.out.println("\n---- Scope IfThenOp [ " + ifThenOp.getFunLabel()+"] ----");
         ifThenOp.getThenBranch().setFunLabel("ifThenBranch <- " + ifThenOp.getFunLabel());
         ifThenOp.getThenBranch().accept(this);
     }
 
     @Override
     public void visit(IfThenElseOp ifThenElseOp) {
-        System.out.println("\n---- Scope IfThenElseOp [" + ifThenElseOp.getFunLabel()+"] ----");
+        ////System.out.println("\n---- Scope IfThenElseOp [" + ifThenElseOp.getFunLabel()+"] ----");
         ifThenElseOp.getThenBranch().setFunLabel("IfElse_IfBranch <- " + ifThenElseOp.getFunLabel());
         ifThenElseOp.getElseBranch().setFunLabel("ifElse_ElseBranch <- " + ifThenElseOp.getFunLabel());
 
@@ -244,7 +243,7 @@ public class Scoping implements Visitor {
 
     @Override
     public void visit(WhileOp whileOp) {
-        System.out.println("\n---- Scope WhileOp [" + whileOp.getFunLabel()+"] ----");
+        ////System.out.println("\n---- Scope WhileOp [" + whileOp.getFunLabel()+"] ----");
         whileOp.getBody().setFunLabel("WhileOp <- "+ whileOp.getFunLabel());
 
         whileOp.getBody().accept(this);
