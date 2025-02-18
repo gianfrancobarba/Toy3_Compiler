@@ -460,14 +460,22 @@ public class CodeGenerator implements Visitor {
             }
         }
         else if (expr instanceof FunCallOp funCall) {
-                switch (funCall.getType()) {
-                    case "int" -> code.append("to_string((int[]){");
-                    case "double" -> code.append("to_string((double[]){");
-                    case "char" -> code.append("to_string((char[]){");
-                    case "bool" -> code.append("to_string((bool[]){");
-                }
+            switch (funCall.getType()) {
+                case "int" -> code.append("to_string((int[]){");
+                case "double" -> code.append("to_string((double[]){");
+                case "char" -> code.append("to_string((char[]){");
+                case "bool" -> code.append("to_string((bool[]){");
             }
         }
+        else if (expr instanceof Identifier id) {
+            switch (id.getType()) {
+                case "int" -> code.append("to_string((int[]){");
+                case "double" -> code.append("to_string((double[]){");
+                case "char" -> code.append("to_string((char[]){");
+                case "bool" -> code.append("to_string((bool[]){");
+            }
+        }
+    }
 
     @Override
     public void visit(UnaryExprOp unaryExprOp) {
