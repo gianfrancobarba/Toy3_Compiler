@@ -1,46 +1,55 @@
 package main.java;
 
 import toy3.sym;
-import java_cup.runtime.Symbol;
 import toy3.Lexer;
+import java_cup.runtime.Symbol;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.Reader;
 
 public class TesterLexer {
-    public static void main(String[] args) throws FileNotFoundException {
 
+    public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("Usage: java TesterLexer <input_file>");
             System.exit(1);
         }
 
-        // Specifica il percorso del file di input
-        File input = new File(System.getProperty("user.dir") + "/" + args[0]);
-        Lexer lexicalAnalyzer = new Lexer(new FileReader(input));
+        File inputFile = new File(args[0]);
+        if (!inputFile.exists() || !inputFile.isFile()) {
+            System.err.println("File not found: " + inputFile.getAbsolutePath());
+            System.exit(1);
+        }
 
-        // Token definiti nella specifica JFlex
-        final String[] tokenName = {"PROGRAM", "BEGIN", "END", "SEMI", "COLON", "COMMA", "DEF", "LPAR", "RPAR",
-                "LBRAC", "RBRAC", "INT", "BOOL", "DOUBLE", "STRING", "CHAR", "TRUE", "FALSE", "RETURN",
-                "IF", "THEN", "ELSE", "WHILE", "DO", "PLUS", "MINUS", "TIMES", "DIV", "ASSIGN", "ASSIGNDECL",
-                "GT", "GE", "LT", "LE", "EQ", "NE", "NOT", "AND", "OR", "IN", "OUT", "OUTNL", "REF", "PIPE",
-                "INT_CONST", "DOUBLE_CONST", "STRING_CONST", "CHAR_CONST", "ID"};
+        try (Reader reader = new FileReader(inputFile)) {
+            Lexer lexer = new Lexer(reader);
+            Symbol token;
 
-        Symbol token;
-        try {
-            while ((token = lexicalAnalyzer.next_token()) != null) {
+            System.out.println("Analisi lessicale del file: " + inputFile.getName() + "\n");
+
+            while ((token = lexer.next_token()) != null) {
                 if (token.sym == sym.EOF) {
+                    System.out.println("<EOF>");
                     break;
                 }
 
-                if (token.value != null) {
-                    System.out.println("<" + tokenName[token.sym - 2] + ", " + token.value + ">");
-                } else {
-                    System.out.println("<" + tokenName[token.sym - 2] + ">");
-                }
+                String tokenName = sym.terminalNames[token.sym];
 
+                if (token.value != null) {
+                    System.out.printf("<%s, %s> (Linea: %d, Colonna: %d)%n",
+                            tokenName, token.value, token.left + 1, token.right + 1);
+                } else {
+                    System.out.printf("<%s> (Linea: %d, Colonna: %d)%n",
+                            tokenName, token.left + 1, token.right + 1);
+                }
             }
+
+            System.out.println("\nAnalisi lessicale completata!");
+
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + inputFile.getAbsolutePath());
         } catch (Exception e) {
             System.err.println("Errore durante l'analisi lessicale: " + e.getMessage());
             e.printStackTrace();
