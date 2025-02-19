@@ -1,19 +1,6 @@
 program
 
-def fun(a: int; b: int) : int {
-    return a + b;
-}
-
-def fun2(ref a: int; b: int) : string {
-    return "" + a + b;
-}
-
 begin
-
-a = 2 | b = 4 : int;
-x = "ciao" : string;
-y: bool;
-
-"stampa: " + (fun(a,b) == fun(a, b)) + " e " + fun2(a, b) !>>;
-
+x = 1 : int;
+"ciao"+x !>>;
 end
