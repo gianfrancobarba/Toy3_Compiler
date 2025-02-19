@@ -441,10 +441,19 @@ public class TypeChecking implements Visitor {
 
     @Override
     public void visit(VarOptInitOp varOptInitOp) {
-        varOptInitOp.getId().accept(this);
-        varOptInitOp.setType(varOptInitOp.getId().getType());
-        if(varOptInitOp.getExprOp() != null)
-            varOptInitOp.getExprOp().accept(this);
+        Identifier id = varOptInitOp.getId();
+        ExprOp expr = varOptInitOp.getExprOp();
+
+        id.accept(this);
+        varOptInitOp.setType(id.getType());
+        if(expr != null) {
+            expr.accept(this);
+            if (!isCompatible(ignoreRef(id.getType()), ignoreRef(expr.getType()))) {
+                System.err.print("ERROR: Conflicting types in assignment: id " + id.getLessema());
+                System.err.print(" has type " + id.getType() + " but expression has type " + expr.getType());
+                System.exit(1);
+            }
+        }
     }
 
     @Override
