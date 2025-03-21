@@ -653,6 +653,7 @@ public class CodeGenerator implements Visitor {
             case "and" -> "&&";
             case "or" -> "||";
             case "not" -> "!";
+            case "<>" -> "!=";
             default -> op;
         };
     }
