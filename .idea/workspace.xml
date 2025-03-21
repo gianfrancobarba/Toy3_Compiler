@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="922add36-d5bd-4283-92cb-74626c7fc57e" name="Changes" comment="fix precedence in cup&#10;fix converOp ( &lt;&gt; viene tradotto correttamente ora con !=)">
+      <change beforePath="$PROJECT_DIR$/src/toy3/parser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/toy3/parser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/srcjflexcup/toy3.cup" beforeDir="false" afterPath="$PROJECT_DIR$/srcjflexcup/toy3.cup" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_files/c_out/valid1.c" beforeDir="false" afterPath="$PROJECT_DIR$/test_files/c_out/valid1.c" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitLabMergeRequestFiltersHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPENED",
+    "assignee": {
+      "type": "org.jetbrains.plugins.gitlab.mergerequest.ui.filters.GitLabMergeRequestsFiltersValue.MergeRequestsMemberFilterValue.MergeRequestsAssigneeFilterValue",
+      "username": "project_65375667_bot_33dac583744ade8fdd86ad35c7c46ff7",
+      "fullname": "nuovo pc"
+    }
+  }
+}]]></component>
+  <component name="GitLabMergeRequestsSettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "first": "https://gitlab.com/g4660/compilatori_2024_25/toy3semancgenes5/barba-corcione_es5tsc.git",
+    "second": "c8020c6e-b2c5-4e00-b6d9-2313b89a2cb8"
+  }
+}]]></component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "Application.Unnamed.executor": "Run",
+    "Maven.barba-corcione_es5tsc [compile].executor": "Run",
+    "Maven.barba-corcione_es5tsc [validate].executor": "Run",
+    "git-widget-placeholder": "main",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="main.java.Main" />
+      <module name="barba-corcione_es5tsc" />
+      <option name="PROGRAM_PARAMETERS" value="tests/valid1/valid1.txt" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task id="LOCAL-00001" summary="fix precedence in cup&#10;fix converOp ( &lt;&gt; viene tradotto correttamente ora con !=)">
+      <option name="closed" value="true" />
+      <created>1742569871634</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1742569871634</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="esame di francesco" />
+    <MESSAGE value="fix precedence in cup&#10;fix converOp ( &lt;&gt; viene tradotto correttamente ora con !=)" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix precedence in cup&#10;fix converOp ( &lt;&gt; viene tradotto correttamente ora con !=)" />
+  </component>
+</project>
