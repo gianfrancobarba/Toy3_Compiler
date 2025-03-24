@@ -7,6 +7,7 @@ import main.visitor.scoping.Scoping;
 import main.visitor.type_checking.TypeChecking;
 import toy3.Lexer;
 import toy3.parser;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;

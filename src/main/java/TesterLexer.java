@@ -1,7 +1,7 @@
 package main.java;
 
-import toy3.sym;
 import toy3.Lexer;
+import toy3.sym;
 import java_cup.runtime.Symbol;
 
 import java.io.File;

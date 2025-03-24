@@ -6,36 +6,50 @@
   <component name="ChangeListManager">
     <list default="true" id="922add36-d5bd-4283-92cb-74626c7fc57e" name="Changes" comment="fix precedence in cup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/TesterLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TesterLexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/toy3/Lexer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/toy3/parser.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/test_files/c_out/valid2.c" beforeDir="false" afterPath="$PROJECT_DIR$/test_files/c_out/valid2.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_files/c_out/valid3.c" beforeDir="false" afterPath="$PROJECT_DIR$/test_files/c_out/valid3.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_files/c_out/valid4.c" beforeDir="false" afterPath="$PROJECT_DIR$/test_files/c_out/valid4.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitLabMergeRequestFiltersHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPENED",
-    "assignee": {
-      "type": "org.jetbrains.plugins.gitlab.mergerequest.ui.filters.GitLabMergeRequestsFiltersValue.MergeRequestsMemberFilterValue.MergeRequestsAssigneeFilterValue",
-      "username": "project_65375667_bot_33dac583744ade8fdd86ad35c7c46ff7",
-      "fullname": "nuovo pc"
+  <component name="GitLabMergeRequestFiltersHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPENED&quot;,
+    &quot;assignee&quot;: {
+      &quot;type&quot;: &quot;org.jetbrains.plugins.gitlab.mergerequest.ui.filters.GitLabMergeRequestsFiltersValue.MergeRequestsMemberFilterValue.MergeRequestsAssigneeFilterValue&quot;,
+      &quot;username&quot;: &quot;project_65375667_bot_33dac583744ade8fdd86ad35c7c46ff7&quot;,
+      &quot;fullname&quot;: &quot;nuovo pc&quot;
     }
   }
-}]]></component>
-  <component name="GitLabMergeRequestsSettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "first": "https://gitlab.com/g4660/compilatori_2024_25/toy3semancgenes5/barba-corcione_es5tsc.git",
-    "second": "c8020c6e-b2c5-4e00-b6d9-2313b89a2cb8"
+}</component>
+  <component name="GitLabMergeRequestsSettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;first&quot;: &quot;https://gitlab.com/g4660/compilatori_2024_25/toy3semancgenes5/barba-corcione_es5tsc.git&quot;,
+    &quot;second&quot;: &quot;c8020c6e-b2c5-4e00-b6d9-2313b89a2cb8&quot;
   }
-}]]></component>
+}</component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
     "Application.Unnamed.executor": "Run",
+    "Maven.barba-corcione_es5tsc [clean].executor": "Run",
     "Maven.barba-corcione_es5tsc [compile].executor": "Run",
     "Maven.barba-corcione_es5tsc [validate].executor": "Run",
     "git-widget-placeholder": "main",
@@ -91,6 +105,7 @@
     <MESSAGE value="esame di francesco" />
     <MESSAGE value="fix precedence in cup&#10;fix converOp ( &lt;&gt; viene tradotto correttamente ora con !=)" />
     <MESSAGE value="fix precedence in cup" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix precedence in cup" />
+    <MESSAGE value="esame mio pt.2" />
+    <option name="LAST_COMMIT_MESSAGE" value="esame mio pt.2" />
   </component>
 </project>
