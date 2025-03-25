@@ -28,6 +28,8 @@ import main.nodes.statements.IfThenOp;
 import main.nodes.statements.WhileOp;
 import main.nodes.statements.ReturnOp;
 import main.nodes.statements.BodyOp;
+import main.nodes.statements.AssignmentCascadeOp;
+import main.nodes.statements.CascadeOp;
 import main.nodes.types.ConstOp;
 
 parser code {:
@@ -40,6 +42,10 @@ parser code {:
     Stack<List<VarDeclOp>> varDeclStack = new Stack<>(); // Stack delle dichiarazioni delle variabili
     List<VarDeclOp> varDeclList = new ArrayList<>(); // Lista delle dichiarazioni delle variabili
     List<Object> declList = new ArrayList<>(); // Lista delle dichiarazioni
+
+    List<AssignmentCascadeOp> assignList = new ArrayList<>();
+
+    Stack<List<AssignmentCascadeOp>> assignStack = new Stack<>();
 :};
 
 
@@ -52,12 +58,13 @@ terminal double DOUBLE_CONST;
 terminal String STRING_CONST;
 terminal char CHAR_CONST;
 terminal String ID;
+terminal CASCADE, FOR, UPDATE;
 
 // Non-terminali
 non terminal Program;
 non terminal Decls, VarDecls, VarDecl, VarsOptInit, TypeOrConstant, Type, Constant, DefDecl, ParDecls, ParDecl, PVars, PVar;
 non terminal OptType, Body, Statements, Stat, Vars, Exprs, FunCall, Expr;
-
+non terminal Assignment, Assignments;
 // Precedenze e associatività
 precedence left OR;
 precedence left AND;
@@ -196,7 +203,32 @@ Stat ::= Vars:v IN SEMI                                {: RESULT = new ReadOp((L
        | IF LPAR Expr:e RPAR THEN Body:b1 ELSE Body:b2 {: RESULT = new IfThenElseOp((ExprOp) e,(BodyOp) b1,(BodyOp) b2); :}
        | IF LPAR Expr:e RPAR THEN Body:b               {: RESULT = new IfThenOp((ExprOp) e,(BodyOp) b); :}
        | WHILE LPAR Expr:e RPAR DO Body:b              {: RESULT = new WhileOp((ExprOp) e, (BodyOp) b); :}
-       | RETURN Expr:e SEMI                            {: RESULT = new ReturnOp((ExprOp) e); :};
+       | RETURN Expr:e SEMI                            {: RESULT = new ReturnOp((ExprOp) e); :}
+       | CASCADE LPAR Assignments:a1 RPAR FOR LPAR Expr:e RPAR UPDATE LPAR Assignments:a2 RPAR LBRAC Statements:stmts RBRAC
+         {:
+            List<AssignmentCascadeOp> updateList = (List<AssignmentCascadeOp>) ((Stack<List<AssignmentCascadeOp>>) a2).pop();
+            List<AssignmentCascadeOp> initialList = (List<AssignmentCascadeOp>) ((Stack<List<AssignmentCascadeOp>>) a1).pop();
+            RESULT = new CascadeOp((List<AssignmentCascadeOp>) initialList,
+                                    (ExprOp) e,
+                                    (List<AssignmentCascadeOp>) updateList,
+                                    (List<StatementOp>) stmts);
+            statList.clear();
+         :};
+
+//Assignments ::= Assignment:a SEMI Assignments {: assignList.add(0, (AssignmentCascadeOp) a); RESULT = assignList; :}
+// | Assignment:a {: assignList.add(0, (AssignmentCascadeOp) a); RESULT = assignList; :};
+//Assignment ::= ID:id ASSIGN Expr:e {: RESULT = new AssignmentCascadeOp(new Identifier((String) id), (ExprOp) e); :};
+
+Assignments ::= Assignment:a SEMI Assignments {: assignStack.peek().add((AssignmentCascadeOp) a);
+                                                 RESULT = assignStack; :}
+ | Assignment:a {: assignStack.push(new ArrayList<AssignmentCascadeOp>());
+                   assignStack.peek().add((AssignmentCascadeOp) a);
+                   RESULT = assignStack;
+                :}
+ | {: assignStack.push(new ArrayList<AssignmentCascadeOp>());
+                      RESULT = assignStack;
+   :};
+Assignment ::= ID:id ASSIGN Expr:e {: RESULT = new AssignmentCascadeOp(new Identifier((String) id), (ExprOp) e); :};
 
 // Variabili
 Vars ::= ID:id PIPE Vars {: varList.add(0, new Identifier((String) id)); RESULT = varList; :}

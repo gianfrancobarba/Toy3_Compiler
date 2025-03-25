@@ -117,6 +117,39 @@ public class TypeChecking implements Visitor {
     }
 
     @Override
+    public void visit(AssignmentCascadeOp assignmentCascadeOp) {
+        assignmentCascadeOp.getIdentifier().accept(this);
+        assignmentCascadeOp.getExprOp().accept(this);
+        if(!assignmentCascadeOp.getIdentifier().getType().equals("int") && !assignmentCascadeOp.getIdentifier().getType().equals("double")){
+            System.err.println("Error: identifier in cascade assignment must be int or double but is: "+ assignmentCascadeOp.getIdentifier().getType());
+            System.exit(1);
+        }
+        if(!assignmentCascadeOp.getExprOp().getType().equals("int") && !assignmentCascadeOp.getExprOp().getType().equals("double")){
+            System.err.println("Error: Expression in cascade assignment must be int or double but is: "+ assignmentCascadeOp.getExprOp().getType());
+            System.exit(1);
+        }
+        if(!isCompatible(assignmentCascadeOp.getIdentifier().getType(), assignmentCascadeOp.getExprOp().getType())){
+            System.err.println("Error: incompatible type in cascade assignment. identifier is type: "+ assignmentCascadeOp.getIdentifier().getType() + " but expr is type : "+ assignmentCascadeOp.getExprOp().getType() );
+            System.exit(1);
+        }
+    }
+
+    @Override
+    public void visit(CascadeOp cascadeOp) {
+        if(!cascadeOp.getInitAssignList().isEmpty() && cascadeOp.getInitAssignList() != null)
+            cascadeOp.getInitAssignList().forEach(assignmentCascadeOp -> assignmentCascadeOp.accept(this));
+        cascadeOp.getExpr().accept(this);
+        if(!cascadeOp.getExpr().getType().equals("bool")){
+            System.err.println("Error: cond-expr in Cascade statement must be bool but is: "+ cascadeOp.getExpr().getType() );
+            System.exit(1);
+        }
+        if(!cascadeOp.getUpdateAssignList().isEmpty() && cascadeOp.getUpdateAssignList() != null)
+            cascadeOp.getUpdateAssignList().forEach(assignmentCascadeOp -> assignmentCascadeOp.accept(this));
+        if(!cascadeOp.getStatementOpList().isEmpty() && cascadeOp.getStatementOpList() != null)
+            cascadeOp.getStatementOpList().forEach(statementOp -> statementOp.accept(this));
+    }
+
+    @Override
     public void visit(Identifier id) {
         String type;
         if(isFun) {

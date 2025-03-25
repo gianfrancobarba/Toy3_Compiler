@@ -83,6 +83,10 @@ ID = [:jletter:][:jletterdigit:]* // lettera seguita da lettere o numeri
     "or"               { return symbol(sym.OR); }
     "ref"              { return symbol(sym.REF); }
 
+    "cascade"          { return symbol(sym.CASCADE); }
+    "for"              { return symbol(sym.FOR); }
+    "update"           { return symbol(sym.UPDATE); }
+
     /* Simboli */
 
     ";"                { return symbol(sym.SEMI); }

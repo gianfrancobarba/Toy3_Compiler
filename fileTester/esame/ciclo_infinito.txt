@@ -1,0 +1,9 @@
+program
+
+begin
+
+cascade () for (true) update ()
+{
+    "Ciclo infinito" !>>;
+}
+end

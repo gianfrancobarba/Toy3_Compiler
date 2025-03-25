@@ -9,6 +9,7 @@ package toy3;
 public interface sym {
   /* terminals */
   public static final int CHAR_CONST = 49;
+  public static final int CASCADE = 51;
   public static final int ASSIGNDECL = 31;
   public static final int CHAR = 17;
   public static final int GE = 33;
@@ -16,8 +17,10 @@ public interface sym {
   public static final int DOUBLE = 15;
   public static final int SEMI = 5;
   public static final int INT = 13;
+  public static final int UPDATE = 53;
   public static final int OUT = 42;
   public static final int RBRAC = 12;
+  public static final int FOR = 52;
   public static final int REF = 44;
   public static final int MINUS = 27;
   public static final int OUTNL = 43;
@@ -110,7 +113,10 @@ public interface sym {
   "DOUBLE_CONST",
   "STRING_CONST",
   "CHAR_CONST",
-  "ID"
+  "ID",
+  "CASCADE",
+  "FOR",
+  "UPDATE"
   };
 }
 

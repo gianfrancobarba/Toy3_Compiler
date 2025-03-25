@@ -1,0 +1,9 @@
+program
+begin
+x:double;
+cascade (x:= 1.5) for ( x < 5.0 ) update ( x:= x+0.5){
+    "x = " >>;
+    x !>>;
+}
+
+end

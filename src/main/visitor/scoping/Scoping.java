@@ -303,6 +303,23 @@ public class Scoping implements Visitor {
     public void visit(ConstOp constOp) {
     }
 
+    @Override
+    public void visit(AssignmentCascadeOp assignmentCascadeOp) {
+        assignmentCascadeOp.getIdentifier().accept(this);
+        assignmentCascadeOp.getExprOp().accept(this);
+    }
+
+    @Override
+    public void visit(CascadeOp cascadeOp) {
+        if(!cascadeOp.getInitAssignList().isEmpty() && cascadeOp.getInitAssignList() != null)
+            cascadeOp.getInitAssignList().forEach(assignmentCascadeOp -> assignmentCascadeOp.accept(this)); // non puo essere nulla
+        cascadeOp.getExpr().accept(this);
+        if(!cascadeOp.getUpdateAssignList().isEmpty() && cascadeOp.getUpdateAssignList() != null)
+            cascadeOp.getUpdateAssignList().forEach(assignmentCascadeOp -> assignmentCascadeOp.accept(this));
+        if(!cascadeOp.getStatementOpList().isEmpty() && cascadeOp.getStatementOpList() != null)
+            cascadeOp.getStatementOpList().forEach(statementOp -> statementOp.accept(this));
+    }
+
     private String functionSignature(FunDeclOp funDeclOp) {
 
         StringBuilder sb = new StringBuilder();

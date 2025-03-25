@@ -397,6 +397,39 @@ public class CodeGenerator implements Visitor {
     }
 
     @Override
+    public void visit(AssignmentCascadeOp assignmentCascadeOp) {
+        assignmentCascadeOp.getIdentifier().accept(this);
+        code.append(" = ");
+        assignmentCascadeOp.getExprOp().accept(this);
+    }
+
+    @Override
+    public void visit(CascadeOp cascadeOp) {
+        code.append("\n{\n");
+        if(!cascadeOp.getInitAssignList().isEmpty() && cascadeOp.getInitAssignList() != null){
+            cascadeOp.getInitAssignList().forEach(assignmentCascadeOp -> {
+                assignmentCascadeOp.accept(this);
+                code.append(";");
+            });
+        }
+        code.append("for( ; ");
+        cascadeOp.getExpr().accept(this);
+        code.append("; ");
+        if(!cascadeOp.getUpdateAssignList().isEmpty() && cascadeOp.getUpdateAssignList() != null){
+            cascadeOp.getUpdateAssignList().forEach(assignmentCascadeOp ->{
+                assignmentCascadeOp.accept(this);
+                code.append(",");
+            });
+        }
+        code.deleteCharAt(code.length() - 1); // rimozione ultima virgola
+        code.append("){\n");
+        if(!cascadeOp.getStatementOpList().isEmpty() && cascadeOp.getStatementOpList() != null)
+            cascadeOp.getStatementOpList().forEach(statementOp -> statementOp.accept(this));
+        code.append("\n}\n");
+        code.append("\n}\n");
+    }
+
+    @Override
     public void visit(BinaryExprOp binaryExprOp) {
         boolean isLeftString = binaryExprOp.getLeft().getType().equals("string");
         boolean isRightString = binaryExprOp.getRight().getType().equals("string");
