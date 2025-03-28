@@ -2,7 +2,7 @@ program
 
 begin
 i:int;
-j:string;
+j:int;
 cascade (i:=0; j := 10) for (i < 10 and j > 0) update (i := i+1; j := j-1)
 {
     "i = " >>;
